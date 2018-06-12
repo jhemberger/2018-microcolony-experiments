@@ -27,6 +27,7 @@ mc1.df$date <- paste(mc1.df$date, "2018", sep = "/")
 mc1.df$date <- mdy(mc1.df$date)
 mc1.df$date <- parse_date(mc1.df$date)
 
+
 # Remove unused columns from data frame
 mc1.df$initials = NULL
 mc1.df$time = NULL
@@ -34,15 +35,22 @@ mc1.df$n_culled = NULL
 mc1.df$dom_worker = NULL
 mc1.df$`frozen?` = NULL
 # Bind final observations not on MC data sheets
-mc1a.df <- read_csv("D2018_MicroCol_Breakdown.csv", skip = 1,
+mc1end.df <- read_csv("D2018_MicroCol_Breakdown.csv", skip = 1,
                     col_names = c("id", "mc_mass", "mass_comb", "mass_box", "date"))
-mc1.df <- bind_rows(mc1.df, mc1a.df)
+mc1.df <- bind_rows(mc1.df, mc1end.df)
 mc1.df$date <- parse_date(mc1.df$date)
+rm(mc1end.df)
 
 # Create treatment variable
 mc1.df$treatment <- ifelse(mc1.df$id < 2, paste("zone.1"),
                            ifelse(mc1.df$id < 3 & mc1.df$id > 1, paste("zone.2"),
                                   ifelse(mc1.df$id < 4 & mc1.df$id > 3, paste("zone.3"), paste("zone.4"))
+                           )
+)
+
+mc1end.df$treatment <- ifelse(mc1end.df$id < 2, paste("zone.1"),
+                           ifelse(mc1end.df$id < 3 & mc1end.df$id > 1, paste("zone.2"),
+                                  ifelse(mc1end.df$id < 4 & mc1end.df$id > 3, paste("zone.3"), paste("zone.4"))
                            )
 )
 
@@ -57,3 +65,17 @@ mc1.df$delete = NULL
 mc1.df[which(mc1.df$drones_removed == "yes"), 8] <- mc1.df[which(mc1.df$drones_removed == "yes"), 4] 
 
 # Summarize/calculate colony growth and resource consumption 
+
+
+
+
+##### Basic summary plots/tables #####
+# Final comb mass
+mc1end.df %>%
+  group_by(treatment) %>%
+  summarise(mean.comb.mass = mean(mass.comb), se = sd(mass.comb) / sqrt(n())) %>%
+  ggplot() + 
+    geom_col(mapping = aes(x = treatment, y = mean.comb.mass, width = 0.5)) + 
+    geom_errorbar(mapping = aes(x = treatment, ymax = mean.comb.mass + se, 
+                                ymin = mean.comb.mass - se, width = 0.25)) +
+    theme_minimal()
