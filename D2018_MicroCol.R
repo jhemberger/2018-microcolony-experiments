@@ -13,7 +13,7 @@ library(tidyverse)
 library(lubridate)
 library(lme4)
 
-# Import/clean data
+##### Import/clean data #####
 # Experiment 1
 mc1.df <- read_csv("D2018_MicroCol_Round1.csv", skip = 2, 
                    col_names = c("id", "date", "time", "initials", "n_new_drones", 
@@ -55,3 +55,5 @@ mc1.df <- separate(mc1.df, drones_removed,
 mc1.df$delete = NULL 
 # Values to be over-written <- values copied - only if drones_removed = 'yes'
 mc1.df[which(mc1.df$drones_removed == "yes"), 8] <- mc1.df[which(mc1.df$drones_removed == "yes"), 4] 
+
+# Summarize/calculate colony growth and resource consumption 
