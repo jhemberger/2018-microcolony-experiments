@@ -36,21 +36,25 @@ mc1.df$dom_worker = NULL
 mc1.df$`frozen?` = NULL
 # Bind final observations not on MC data sheets
 mc1end.df <- read_csv("D2018_MicroCol_Breakdown.csv", skip = 1,
-                    col_names = c("id", "mc_mass", "mass_comb", "mass_box", "date"))
+                    col_names = c("id", "end_mc_mass", "end_mass_comb", "mass_box", "date"))
+mc1end.df$treatment <- ifelse(mc1end.df$id < 2, paste("zone.1"),
+                              ifelse(mc1end.df$id < 3 & mc1end.df$id > 1, paste("zone.2"),
+                                     ifelse(mc1end.df$id < 4 & mc1end.df$id > 3, paste("zone.3"), paste("zone.4"))
+                              )
+)
+mass.box.df <- data_frame(id = mc1end.df$id, mass_box = mc1end.df$mass.box)
+mc1end.df$mass_box <- NULL
 mc1.df <- bind_rows(mc1.df, mc1end.df)
 mc1.df$date <- parse_date(mc1.df$date)
 rm(mc1end.df)
+
+# Add mass of microcolony box to all obsvs
+mc1.df <- inner_join(mc1.df, mass.box.df, by = "id")
 
 # Create treatment variable
 mc1.df$treatment <- ifelse(mc1.df$id < 2, paste("zone.1"),
                            ifelse(mc1.df$id < 3 & mc1.df$id > 1, paste("zone.2"),
                                   ifelse(mc1.df$id < 4 & mc1.df$id > 3, paste("zone.3"), paste("zone.4"))
-                           )
-)
-
-mc1end.df$treatment <- ifelse(mc1end.df$id < 2, paste("zone.1"),
-                           ifelse(mc1end.df$id < 3 & mc1end.df$id > 1, paste("zone.2"),
-                                  ifelse(mc1end.df$id < 4 & mc1end.df$id > 3, paste("zone.3"), paste("zone.4"))
                            )
 )
 
@@ -64,18 +68,36 @@ mc1.df$delete = NULL
 # Values to be over-written <- values copied - only if drones_removed = 'yes'
 mc1.df[which(mc1.df$drones_removed == "yes"), 8] <- mc1.df[which(mc1.df$drones_removed == "yes"), 4] 
 
-# Summarize/calculate colony growth and resource consumption 
-
+##### Summarize/calculate colony growth and resource consumption #####
+mc1.df <- mc1.df %>%
+  group_by(id) %>%
+  mutate(true_mc_mass = mc_mass - mass_box - lag(p_mass_fd))
 
 
 
 ##### Basic summary plots/tables #####
 # Final comb mass
-mc1end.df %>%
+mc1.df %>%
+  filter(!is.na(end_mass_comb)) %>%
   group_by(treatment) %>%
-  summarise(mean.comb.mass = mean(mass.comb), se = sd(mass.comb) / sqrt(n())) %>%
+  summarise(mean.comb.mass = mean(end_mass_comb), se = sd(end_mass_comb) / sqrt(n())) %>%
   ggplot() + 
-    geom_col(mapping = aes(x = treatment, y = mean.comb.mass, width = 0.5)) + 
-    geom_errorbar(mapping = aes(x = treatment, ymax = mean.comb.mass + se, 
-                                ymin = mean.comb.mass - se, width = 0.25)) +
+    #geom_col(mapping = aes(x = treatment, y = mean.comb.mass, width = 0.5)) + 
+    geom_pointrange(mapping = aes(x = treatment, y = mean.comb.mass,
+                                  ymax = mean.comb.mass + se, 
+                                  ymin = mean.comb.mass - se)) +
+    scale_y_continuous(limits = c(0, 10)) + 
     theme_minimal()
+
+ggplot() + 
+  geom_line(data = mc1.df, mapping = aes(x = date, 
+                                         y = mc_mass, 
+                                         group = id, 
+                                         color = treatment), na.rm = TRUE)
+
+ggplot(data = mc1.df) + 
+  geom_smooth(span = 0.75, mapping = aes(x = date, 
+                            y = mc_mass - mass_box - lag(p_mass_fd), 
+                            #group = id, 
+                            color = treatment), na.rm = TRUE) + 
+  theme_minimal()
