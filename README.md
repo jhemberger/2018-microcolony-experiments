@@ -16,5 +16,10 @@ Free foraging bumble bee colonies are forced to respond to variable resource abu
 * `D2018_MircoCol_Round1_Clean.csv` Cleaned data set using `D2018_MicroCol.R` script
 * `D2018_MircoCol_Breakdown.csv` ORIGINAL DATA csv file containing final measurements of experiment - integrated into `D2018_MircoCol_Round1_Clean.csv` using `D2018_MicroCol.R`
 
+#### Markdown Files
+* `EXP_DESIGN.md` Background, hypotheses, design and treatment explanation
+* `EXP_METHODS.md` Feeding methodology, protocols, etc
+* `EXP_RESULTS.md` Summarize results from analyses
+
 #### Additional Scripts
 None at this time  
