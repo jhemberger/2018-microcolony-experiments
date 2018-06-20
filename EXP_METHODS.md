@@ -12,6 +12,7 @@ Treatment | Description
 
 Total experiment food availability: `Zone 1` == `Zone 4` | `Zone 2` == `Zone 3`
 
+## Task Lists
 #### Feed Day Tasks
 - [ ] Prepare pollen and nectar rations
 - [ ] Feed, mass, assess, and photograph microcolonies
@@ -27,14 +28,14 @@ Total experiment food availability: `Zone 1` == `Zone 4` | `Zone 2` == `Zone 3`
 - [ ] Ensure nectar wicks are prepped
 - [ ] Fill huimidifer reserviors 
 
-#### Ration Preparation
+## Ration Preparation
 Rations should be prepared the day of feeding, or the day before at most.  Make enough pollen dough for the feeding needed.  If existing pollen dough is available, use that first.  Pollen dough should only be kept refrigerated for 1 week at most.  Ration amounts to be prepared are laid out on the ration data sheet for each week.  
 
 Mass pollen dough for each microcolony to the nearest .05 grams.  Record the mass of each pollen ration for the colony on the ration data sheet (see below).  Massed dough should then be rolled into a ball, and sealed using honey bee wax.  Keep pollen balls in order in a weigh boat (1 boat for each zone).  
 
 Prepare nectar reserviors on a lunch tray.  Use a catheter syringe to alloquot the amount given by the ration data sheet.  Place lids on reservoirs and place fully soaked cotton nectar wick in the feeder tube.  
 
-#### Microcolony Feeding and Data Collection
+## Microcolony Feeding and Data Collection
 Prepare the rearing room bench by turning scale on, getting all necessary tools, and placing lunch tray on scale and taring the scale.  The steps of feeding and recording data on the microcolony are important.  Follow them exactly!  Each microcolony has its own data sheet.
 
 1. Record the date, time, initials, and room conditions.
