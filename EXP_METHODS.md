@@ -11,7 +11,7 @@ Treatment | Description
 **Zone 4** | 60% of ad-lib ration for both pollen and nectar.  Like `Zone 3`, execpt with reduced food availability.  
 
 ![Microcolony resource variation concept figure](/MC_ResourceVar_Concept-01.png) 
-* **Figure 1** Concept diagram showing food amount as measured by total food abundance over a given time (e.g., growing season - x-axis) and the variability of food availability over time (y-axis).  Actual landscapes are shown in the graph on the right*
+_**Figure 1** Concept diagram showing food amount as measured by total food abundance over a given time (e.g., growing season - x-axis) and the variability of food availability over time (y-axis).  Actual landscapes are shown in the graph on the right_
 
 Total experiment food availability: `Zone 1` == `Zone 4` | `Zone 2` == `Zone 3`
 
