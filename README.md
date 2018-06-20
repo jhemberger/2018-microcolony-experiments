@@ -1,6 +1,6 @@
 # Microcolony Landscape Resource Simulation Experiments
 
-This experiment was designed to simulate variable resource landscapes for foraging bee Bombus impatiens colonies.  This markdown contains a summary of the experiment as well as a description of the scripts and files within this repository.  
+This experiment was designed to simulate variable resource landscapes for foraging Bombus impatiens colonies.  This markdown contains a summary of the experiment as well as a description of the scripts and files within this repository.  
 
 ## Experiment Motivation
 

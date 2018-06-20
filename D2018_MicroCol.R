@@ -68,6 +68,9 @@ mc1.df$delete = NULL
 # Values to be over-written <- values copied - only if drones_removed = 'yes'
 mc1.df[which(mc1.df$drones_removed == "yes"), 8] <- mc1.df[which(mc1.df$drones_removed == "yes"), 4] 
 
+# Export cleaned .csv ready for summary and analysis
+write_csv(mc1.df, "./D2018_MicroCol_Round1_Clean.csv")
+
 ##### Summarize/calculate colony growth and resource consumption #####
 mc1.df <- mc1.df %>%
   group_by(id) %>%
