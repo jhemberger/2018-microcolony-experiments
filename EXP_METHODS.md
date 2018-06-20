@@ -12,18 +12,39 @@ Treatment | Description
 
 Total experiment food availability: `Zone 1` == `Zone 4` | `Zone 2` == `Zone 3`
 
-### Feed Day Tasks
+#### Feed Day Tasks
 - [ ] Prepare pollen and nectar rations
 - [ ] Feed, mass, assess, and photograph microcolonies
 - [ ] Fill humidifer reserviors
 - [ ] Wash and sterilize nectar cups and all materials
 - [ ] Wipe down all surfaces with bleach solution
 
-### Every Third (Weekly) Feed Tasks
+#### Every Third (Weekly) Feed Tasks
 - [ ] Remove all pollen previously provided and mass remaining
 
 
-### Other Tasks
+#### Other Tasks
 - [ ] Ensure nectar wicks are prepped
 - [ ] Fill huimidifer reserviors 
-- [ ] 
+
+#### Ration Preparation
+Rations should be prepared the day of feeding, or the day before at most.  Make enough pollen dough for the feeding needed.  If existing pollen dough is available, use that first.  Pollen dough should only be kept refrigerated for 1 week at most.  Ration amounts to be prepared are laid out on the ration data sheet for each week.  
+
+Mass pollen dough for each microcolony to the nearest .05 grams.  Record the mass of each pollen ration for the colony on the ration data sheet (see below).  Massed dough should then be rolled into a ball, and sealed using honey bee wax.  Keep pollen balls in order in a weigh boat (1 boat for each zone).  
+
+Prepare nectar reserviors on a lunch tray.  Use a catheter syringe to alloquot the amount given by the ration data sheet.  Place lids on reservoirs and place fully soaked cotton nectar wick in the feeder tube.  
+
+#### Microcolony Feeding and Data Collection
+Prepare the rearing room bench by turning scale on, getting all necessary tools, and placing lunch tray on scale and taring the scale.  The steps of feeding and recording data on the microcolony are important.  Follow them exactly!  Each microcolony has its own data sheet.
+
+1. Record the date, time, initials, and room conditions.
+2. Mass new nectar reservoir that will be provided to the MC.
+3. Mass MC and record mass on MC data sheet.
+4. Record the number of worker deaths, number of new males, number of males total.
+5. Remove males and place into labeled vial.  Record the number that were removed of total (e.g. 3/5)
+6. Replace workers as needed.  Record the number that were replaced of total worker deaths (e.g. 1/1)
+7. If needed (every third feed), remove old pollen balls and place into labeled dish for later massing.
+8. Provide new pollen ball to colony.
+9. Replace MC on shelf with new nectar reservoir.
+10. Mass remaining nectar reservoir and record.
+11. Repeat 1-10 with all remaining MC's. 
