@@ -1,7 +1,7 @@
 # Microcolony Landscape Resource Simulation Experiments
 ## Methods and Feeding Protocol
 
-Microcolonies in this experiment are being subjected to a feeding treatment regime meant to simulate different landscapes in terms of resource abundance, and access over time.  Rations of pollen and nectar are based of of a 5 worker maximum consumption level (ad-libitum feeding) from Rotheray et al. (2017).  There are four treatments, or zones to which microcolonies are assigned, shown below: 
+Microcolonies in this experiment are being subjected to a feeding treatment regime meant to simulate different landscapes in terms of resource abundance, and access over time (Figure 1).  Rations of pollen and nectar are based of of a 5 worker maximum consumption level (ad-libitum feeding) from Rotheray et al. (2017).  There are four treatments, or zones to which microcolonies are assigned, shown below.  Feeding occurs every three days (two skip days in between).   
 
 Treatment | Description
 --------- | -----------
@@ -9,6 +9,9 @@ Treatment | Description
 **Zone 2** | 100% of ad-lib ration for both pollen and nectar.  Simulates a landscape with abundant floral resources that are constantly available over time.  
 **Zone 3** | 100% of ad-lib ration for both pollen and nectar.  However, rations are reduced for the bulk of the feeding dates, and the difference is made up during two "pulses" of pollen and nectar during weeks 2 and 6.  Simulates a landscape with low levels of food availability, and then large mass-flowering events.
 **Zone 4** | 60% of ad-lib ration for both pollen and nectar.  Like `Zone 3`, execpt with reduced food availability.  
+
+![Microcolony resource variation concept figure](/MC_ResourceVar_Concept-01.png) 
+* **Figure 1** Concept diagram showing food amount as measured by total food abundance over a given time (e.g., growing season - x-axis) and the variability of food availability over time (y-axis).  Actual landscapes are shown in the graph on the right*
 
 Total experiment food availability: `Zone 1` == `Zone 4` | `Zone 2` == `Zone 3`
 
@@ -21,7 +24,7 @@ Total experiment food availability: `Zone 1` == `Zone 4` | `Zone 2` == `Zone 3`
 - [ ] Wipe down all surfaces with bleach solution
 
 #### Every Third (Weekly) Feed Tasks
-- [ ] Remove all pollen previously provided and mass remaining
+- [ ] Remove all pollen previously provided and mass remaining pollen.  Record on MC data sheet.
 
 
 #### Other Tasks
