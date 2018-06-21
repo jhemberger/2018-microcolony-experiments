@@ -12,6 +12,7 @@
 library(tidyverse)
 library(lubridate)
 library(lme4)
+library(viridis)
 
 ##### Import/clean data #####
 # Experiment 1
@@ -70,6 +71,7 @@ mc1.df[which(mc1.df$drones_removed == "yes"), 8] <- mc1.df[which(mc1.df$drones_r
 
 # Export cleaned .csv ready for summary and analysis
 write_csv(mc1.df, "./D2018_MicroCol_Round1_Clean.csv")
+mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
 
 ##### Summarize/calculate colony growth and resource consumption #####
 mc1.df <- mc1.df %>%
@@ -92,15 +94,59 @@ mc1.df %>%
     scale_y_continuous(limits = c(0, 10)) + 
     theme_minimal()
 
-ggplot() + 
+ggplot(na.rm = TRUE) + 
   geom_line(data = mc1.df, mapping = aes(x = date, 
-                                         y = mc_mass, 
+                                         y = true_mc_mass, 
                                          group = id, 
-                                         color = treatment), na.rm = TRUE)
+                                         color = treatment,
+                                         na.rm = TRUE))
 
+# Total Males Produced
+mc1.df %>%
+  group_by(id, treatment) %>%
+  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
+  group_by(treatment) %>%
+  summarise(mean_males = mean(total_males), se = sd(total_males) / sqrt(n())) %>%
+  ggplot() + 
+    geom_pointrange(mapping = aes(x = treatment, y = mean_males, 
+                                  ymax = mean_males + se,
+                                  ymin = mean_males - se)) + 
+    theme_minimal()
+mc1.df %>%
+  group_by(id, treatment) %>%
+  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
+  group_by(treatment) %>%
+  ggplot(mapping = aes(x = treatment, y = total_males)) + 
+    geom_boxplot() + 
+    theme_minimal()
+
+# Male production normalized by microcolony - diverging dot plot
+mc1.df %>%
+  group_by(id, treatment) %>%
+  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(drone_z = round((total_males - mean(total_males, na.rm = TRUE)) / sd(total_males, na.rm = TRUE), digits = 2)) %>%
+  mutate(drone_score = ifelse(drone_z < 0, "below", "above")) %>%
+  arrange(-desc(drone_z)) %>%
+  mutate(z_order = factor(`id`, levels = `id`)) %>% 
+  ggplot(aes(x = z_order, y = drone_z, label = drone_z)) + 
+    geom_point(stat = "identity", mapping = aes(col = drone_score), size = 8) + 
+    scale_color_manual(name = "Drone Production", 
+                       labels = c("Above Average", "Below Average"),
+                       values = c("above" = "#00ba38", "below" = "#f8766d")) + 
+    geom_text(color = "white", size = 2) + 
+    coord_flip() + 
+    theme_bw()
+
+# Mass gain over experiment (smoothed)
 ggplot(data = mc1.df) + 
+  geom_point(mapping = aes(x = date, y = mc_mass - mass_box - lag(p_mass_fd),
+                           color = treatment)) + 
   geom_smooth(span = 0.75, mapping = aes(x = date, 
                             y = mc_mass - mass_box - lag(p_mass_fd), 
                             #group = id, 
-                            color = treatment), na.rm = TRUE) + 
+                            color = treatment)) + 
+  #scale_color_viridis(discrete = TRUE, option = "plasma") + 
   theme_minimal()
+
+
