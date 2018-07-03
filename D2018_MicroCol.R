@@ -127,19 +127,21 @@ mc1.df %>%
   ungroup() %>%
   mutate(drone_z = round((total_males - mean(total_males, na.rm = TRUE)) / sd(total_males, na.rm = TRUE), digits = 2)) %>%
   mutate(drone_score = ifelse(drone_z < 0, "below", "above")) %>%
-  arrange(desc(id)) %>%
-  mutate(z_order = factor(`id`, levels = `id`)) %>% 
-  mutate(y_text_col = ifelse(id < 2, "yellow", 
-                             ifelse(id < 3, "green", 
-                                    ifelse(id < 4, "orange", "red")))) %>%
+  arrange(desc(drone_z)) %>%
+  mutate(z_order = factor(`id`, levels = `id`)) %>%
+  #mutate(y_text_col = ifelse(id < 2, "yellow", 
+                             #ifelse(id < 3, "green", 
+                                    #ifelse(id < 4, "orange", "red")))) %>%
   ggplot(aes(x = z_order, y = drone_z, label = drone_z)) + 
-    geom_tile(mapping = aes(fill = treatment), width = 1, height = Inf, alpha = 0.1) + 
-    scale_fill_manual(values = c("yellow", "green", "orange", "darkred")) + 
+    #geom_tile(mapping = aes(fill = treatment, width = 1, height = Inf), alpha = 0.2) + 
+    #scale_fill_manual(values = "green") + 
+    #scale_fill_manual(values = c("yellow", "green", "orange", "darkred")) + 
     geom_point(stat = "identity", mapping = aes(col = drone_score), size = 8) + 
     scale_color_manual(name = "Drone Production", 
                        labels = c("Above Average", "Below Average"),
                        values = c("above" = "#00ba38", "below" = "#f8766d")) + 
     geom_text(color = "white", size = 2) + 
+    labs(y = "Drone Production Z-Score", x = "Microcolony ID") + 
     coord_flip() + 
     theme_bw() 
 
