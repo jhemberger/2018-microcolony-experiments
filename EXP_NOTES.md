@@ -14,6 +14,8 @@
 - [ ] Data shape/spread/normality checks 
 
 #### Data Cleanup
-- [ ] Food consumption calculations (averaging out left-over pollen)
+- [ ] Food consumption calculations (averaging out left-over pollen, nectar diff.)
 - [ ] 
+
+#### Notes
 

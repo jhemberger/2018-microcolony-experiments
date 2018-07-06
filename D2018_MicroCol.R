@@ -1,4 +1,4 @@
-# ==========================================================================
+# METADATA===================================================================
 # 2018 BUMBLE BEE MICROCOLONY EXPERIMENTS
 # Jeremy Hemberger - j.hemberger.wisc@gmail.com
 # May 29, 2018
@@ -6,9 +6,9 @@
 # Model microcolony response to landscape-simulated food treatments
 # Experiment 1 dates: March 15, 2018 - May 24, 2018
 # Experiment 2 dates: 
-# ==========================================================================
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-# Import relevant packages 
+##### Import relevant packages #####
 library(tidyverse)
 library(lubridate)
 library(lme4)
@@ -78,6 +78,14 @@ mc1.df <- mc1.df %>%
   group_by(id) %>%
   mutate(true_mc_mass = mc_mass - mass_box - lag(p_mass_fd))
 
+test <- data_frame(id = mc1.df$id, 
+                   p_mass_rm = mc1.df$p_mass_rm, 
+                   p_mass_fd = mc1.df$p_mass_fd)
+
+test %>%
+  group_by(id) %>%
+  summarise(avg_daily_consm_p = mean(sum(p_mass_fd) - p_mass_rm))
+
 
 
 ##### Basic summary plots/tables #####
@@ -99,7 +107,7 @@ ggplot(na.rm = TRUE) +
                                          y = true_mc_mass, 
                                          group = id, 
                                          color = treatment,
-                                         na.rm = TRUE))
+                                         na.rm = FALSE))
 
 # Total Males Produced
 mc1.df %>%
@@ -153,7 +161,8 @@ ggplot(data = mc1.df) +
                             y = mc_mass - mass_box - lag(p_mass_fd), 
                             #group = id, 
                             color = treatment)) + 
-  #scale_color_viridis(discrete = TRUE, option = "plasma") + 
+  scale_color_viridis(discrete = TRUE, option = "plasma") + 
   theme_minimal()
+
 
 
