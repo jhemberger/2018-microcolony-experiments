@@ -79,15 +79,33 @@ mc1.df <- mc1.df %>%
   mutate(true_mc_mass = mc_mass - mass_box - lag(p_mass_fd))
 
 test <- data_frame(id = mc1.df$id, 
+                   date = mc1.df$date,
                    p_mass_rm = mc1.df$p_mass_rm, 
                    p_mass_fd = mc1.df$p_mass_fd)
 
-test %>%
-  group_by(id) %>%
-  summarise(avg_daily_consm_p = mean(sum(p_mass_fd) - p_mass_rm))
+test <- test[-c(426:449), ]
+p_mass_fd <- test$p_mass_fd
+
+a <- which(!is.na(test$p_mass_rm))
+a.diff <- 3
+a.diff <- append(a.diff, diff(a))
+start <- a - a.diff # start index position for adding pollen
+stop <- a - 1 # stop index position for adding pollen
+
+# This works (but not with NAs - need to figure out how to group so that sums
+# don't add across microcolony IDs
+
+p_mass_fd[is.na(p_mass_fd)] <- 0
+sum<-c(rep(0,length(start)))
+for (i in 1:length(start)) {
+  for (j in start[i]:stop[i]) {
+    sum[i] <- sum[i] + p_mass_fd[j]
+  }
+}
 
 
 
+lapply(list(p_mass_fd), food.calc, na.rm = TRUE)
 ##### Basic summary plots/tables #####
 # Final comb mass
 mc1.df %>%
