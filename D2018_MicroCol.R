@@ -84,28 +84,36 @@ test <- data_frame(id = mc1.df$id,
                    p_mass_fd = mc1.df$p_mass_fd)
 
 test <- test[-c(426:449), ]
-p_mass_fd <- test$p_mass_fd
+test2 <- test %>%
+  group_by(id) %>%
+  slice(-16:-17)
 
-a <- which(!is.na(test$p_mass_rm))
-a.diff <- 3
-a.diff <- append(a.diff, diff(a))
-start <- a - a.diff # start index position for adding pollen
-stop <- a - 1 # stop index position for adding pollen
+# Two options to replace NA with 0, second one is better given else statement
+# is unnecessary
+# test$p_mass_rm <- ifelse(is.na(test$p_mass_fd), paste("0"), test$p_mass_rm)
+food.rm <- which(!is.na(test2$p_mass_rm)) # grab index of pollen remaining to be subtracted
+test2$p_mass_rm[is.na(test2$p_mass_fd)] <- "0"
+
+start <- which(!is.na(test2$p_mass_rm)) # start position for summing pollen feed
+start <- start[-127]
+stop <- start - 1
+stop <- stop[-1]
+stop <- stop[-127]
+stop <- as.integer(append(stop, "377")) # stop position for summing pollen feed
 
 # This works (but not with NAs - need to figure out how to group so that sums
 # don't add across microcolony IDs
 
-p_mass_fd[is.na(p_mass_fd)] <- 0
-sum<-c(rep(0,length(start)))
+test2$p_mass_fd[is.na(test2$p_mass_fd)] <- 0 # Unnecessary with if statement added? if broken...
+sum <- c(rep(0, length(start)))
 for (i in 1:length(start)) {
-  for (j in start[i]:stop[i]) {
-    sum[i] <- sum[i] + p_mass_fd[j]
+  #if(is.na(test$p_mass_fd[j] == FALSE)) {
+    for (j in start[i]:stop[i]) {
+      sum[i] <- sum[i] + test2$p_mass_fd[j] #- as.numeric(test2$p_mass_rm[food.rm])
+    #}
   }
 }
 
-
-
-lapply(list(p_mass_fd), food.calc, na.rm = TRUE)
 ##### Basic summary plots/tables #####
 # Final comb mass
 mc1.df %>%
