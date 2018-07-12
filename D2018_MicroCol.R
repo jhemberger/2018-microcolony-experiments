@@ -27,7 +27,7 @@ mc1.df <- read_csv("D2018_MicroCol_Round1.csv", skip = 2,
 mc1.df$date <- paste(mc1.df$date, "2018", sep = "/")
 mc1.df$date <- mdy(mc1.df$date)
 mc1.df$date <- parse_date(mc1.df$date)
-
+mc1.df <- mc1.df[-c(409:425), ]
 
 # Remove unused columns from data frame
 mc1.df$initials = NULL
@@ -43,7 +43,7 @@ mc1end.df$treatment <- ifelse(mc1end.df$id < 2, paste("zone.1"),
                                      ifelse(mc1end.df$id < 4 & mc1end.df$id > 3, paste("zone.3"), paste("zone.4"))
                               )
 )
-mass.box.df <- data_frame(id = mc1end.df$id, mass_box = mc1end.df$mass.box)
+mass.box.df <- data_frame(id = mc1end.df$id, mass_box = mc1end.df$mass_box)
 mc1end.df$mass_box <- NULL
 mc1.df <- bind_rows(mc1.df, mc1end.df)
 mc1.df$date <- parse_date(mc1.df$date)
@@ -83,38 +83,50 @@ test <- data_frame(id = mc1.df$id,
                    p_mass_rm = mc1.df$p_mass_rm, 
                    p_mass_fd = mc1.df$p_mass_fd)
 
-test <- test[-c(426:449), ]
-test2 <- test %>%
-  group_by(id) %>%
-  slice(-16:-17)
+test <- test[-c(409:456), ]
 
 # Two options to replace NA with 0, second one is better given else statement
 # is unnecessary
 # test$p_mass_rm <- ifelse(is.na(test$p_mass_fd), paste("0"), test$p_mass_rm)
-food.rm <- which(!is.na(test2$p_mass_rm)) # grab index of pollen remaining to be subtracted
-test2$p_mass_rm[is.na(test2$p_mass_fd)] <- "0"
+# food.rm <- which(!is.na(test2$p_mass_rm)) # grab index of pollen remaining to be subtracted
+test$p_mass_rm[is.na(test$p_mass_fd)] <- 0.00
+test$p_mass_fd[is.na(test$p_mass_fd)] <- 2.00
 
-start <- which(!is.na(test2$p_mass_rm)) # start position for summing pollen feed
-start <- start[-127]
+test <- test %>%
+  group_by(id) %>%
+  slice(-16:-17)
+
+pollen.subtract <- test %>%
+  filter(!is.na(p_mass_rm)) 
+pollen.subtract <- as.vector(pollen.subtract$p_mass_rm)
+pollen.subtract <- tail(pollen.subtract, -1)
+
+start <- which(!is.na(test$p_mass_rm)) # & test$p_mass_rm > 0) # start position for summing pollen feed
 stop <- start - 1
-stop <- stop[-1]
-stop <- stop[-127]
-stop <- as.integer(append(stop, "377")) # stop position for summing pollen feed
+start <- head(start, -1)
+stop <- tail(stop, -1)
+# stop <- stop[-127]
+# stop <- as.integer(append(stop, "377")) # stop position for summing pollen feed
 
 # This works (but not with NAs - need to figure out how to group so that sums
 # don't add across microcolony IDs
 
-test2$p_mass_fd[is.na(test2$p_mass_fd)] <- 0 # Unnecessary with if statement added? if broken...
-sum <- c(rep(0, length(start)))
+pollen.sum <- c(rep(0, length(start)))
 for (i in 1:length(start)) {
   #if(is.na(test$p_mass_fd[j] == FALSE)) {
     for (j in start[i]:stop[i]) {
-      sum[i] <- sum[i] + test2$p_mass_fd[j] #- as.numeric(test2$p_mass_rm[food.rm])
+      pollen.sum[i] <- pollen.sum[i] + test$p_mass_fd[j] #- as.numeric(test2$p_mass_rm[food.rm])
     #}
   }
 }
 
-##### Basic summary plots/tables #####
+pollen.subtract[pollen.subtract == 0] <- NA
+pollen.consumed <- pollen.sum - pollen.subtract
+length(pollen.subtract) == length(pollen.sum - pollen.subtract)
+test$p_mass_cons <- NA
+test$p_mass_cons[stop + 1] <- pollen.consumed
+
+ ##### Basic summary plots/tables #####
 # Final comb mass
 mc1.df %>%
   filter(!is.na(end_mass_comb)) %>%
