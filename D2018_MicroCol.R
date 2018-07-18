@@ -74,59 +74,79 @@ write_csv(mc1.df, "./D2018_MicroCol_Round1_Clean.csv")
 mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
 
 ##### Summarize/calculate colony growth and resource consumption #####
-mc1.df <- mc1.df %>%
+mc1.df <- mc1.df %>%g
   group_by(id) %>%
   mutate(true_mc_mass = mc_mass - mass_box - lag(p_mass_fd))
 
-test <- data_frame(id = mc1.df$id, 
+mc1.feed.df <- data_frame(id = mc1.df$id, 
                    date = mc1.df$date,
                    p_mass_rm = mc1.df$p_mass_rm, 
-                   p_mass_fd = mc1.df$p_mass_fd)
+                   p_mass_fd = mc1.df$p_mass_fd, 
+                   n_mass_fd = mc1.df$n_mass_fd, 
+                   n_mass_rm = mc1.df$n_mass_rm)
 
-test <- test[-c(409:456), ]
+mc1.feed.df <- mc1.feed.df[-c(409:456), ] # OR
+mc1.feed.df <- mc1.feed.df[-c(409:432), ] 
 
 # Two options to replace NA with 0, second one is better given else statement
 # is unnecessary
-# test$p_mass_rm <- ifelse(is.na(test$p_mass_fd), paste("0"), test$p_mass_rm)
-# food.rm <- which(!is.na(test2$p_mass_rm)) # grab index of pollen remaining to be subtracted
-test$p_mass_rm[is.na(test$p_mass_fd)] <- 0.00
-test$p_mass_fd[is.na(test$p_mass_fd)] <- 2.00
+# mc1.feed.df$p_mass_rm <- ifelse(is.na(mc1.feed.df$p_mass_fd), paste("0"), mc1.feed.df$p_mass_rm)
+# food.rm <- which(!is.na(mc1.feed.df2$p_mass_rm)) # grab index of pollen remaining to be subtracted
+mc1.feed.df$p_mass_rm[is.na(mc1.feed.df$p_mass_fd)] <- 0.00 # Add 0 for start position on replicate
+mc1.feed.df$p_mass_fd[is.na(mc1.feed.df$p_mass_fd)] <- 2.00 # Initial feed for all treatments
 
-test <- test %>%
-  group_by(id) %>%
-  slice(-16:-17)
+pollen.subtract <- mc1.feed.df %>%
+  filter(!is.na(p_mass_rm)) # Pull pollen remaining to be subtracted
+pollen.subtract <- as.vector(pollen.subtract$p_mass_rm) # Convert to vector
+pollen.subtract <- tail(pollen.subtract, -1) # Remove first value which is 0 - 
+# this aligns the values to be subtracted to the correct sum
 
-pollen.subtract <- test %>%
-  filter(!is.na(p_mass_rm)) 
-pollen.subtract <- as.vector(pollen.subtract$p_mass_rm)
-pollen.subtract <- tail(pollen.subtract, -1)
+start <- which(!is.na(mc1.feed.df$p_mass_rm)) # & mc1.feed.df$p_mass_rm > 0) # start position for summing pollen feed
+stop <- start - 1 # stop points are 1 behind the start
+start <- head(start, -1) # trim off last start index
+stop <- tail(stop, -1) # trim off first stop index to correctly align
 
-start <- which(!is.na(test$p_mass_rm)) # & test$p_mass_rm > 0) # start position for summing pollen feed
-stop <- start - 1
-start <- head(start, -1)
-stop <- tail(stop, -1)
-# stop <- stop[-127]
-# stop <- as.integer(append(stop, "377")) # stop position for summing pollen feed
-
-# This works (but not with NAs - need to figure out how to group so that sums
-# don't add across microcolony IDs
-
-pollen.sum <- c(rep(0, length(start)))
+pollen.sum <- c(rep(0, length(start))) # Initialize pollen.sum vector
 for (i in 1:length(start)) {
-  #if(is.na(test$p_mass_fd[j] == FALSE)) {
     for (j in start[i]:stop[i]) {
-      pollen.sum[i] <- pollen.sum[i] + test$p_mass_fd[j] #- as.numeric(test2$p_mass_rm[food.rm])
-    #}
+      pollen.sum[i] <- pollen.sum[i] + mc1.feed.df$p_mass_fd[j]
   }
-}
+} # Nested for loop to sum pollen provided over start:stop index values, append
+# to the pollen.sum vector
 
-pollen.subtract[pollen.subtract == 0] <- NA
-pollen.consumed <- pollen.sum - pollen.subtract
-length(pollen.subtract) == length(pollen.sum - pollen.subtract)
-test$p_mass_cons <- NA
-test$p_mass_cons[stop + 1] <- pollen.consumed
+pollen.subtract[pollen.subtract == 0] <- NA # Replace 0's (start points) with NA
+pollen.consumed <- pollen.sum - pollen.subtract # Calculate differences - NA's 
+# for very last feed as we didn't measure final pollen remaining
+length(pollen.subtract) == length(pollen.sum - pollen.subtract) # Check to see that
+# vector lengths are equal
+mc1.feed.df$p_mass_cons <- NA # Create column for pollen consumption
+mc1.feed.df$p_mass_cons[stop + 1] <- pollen.consumed # Paste pollen consumed values
 
- ##### Basic summary plots/tables #####
+fd.days <- ((stop - start) + 1)
+mc1.feed.df$p_mass_cons_avg <- NA
+mc1.feed.df$p_mass_cons_avg[which(!is.na(mc1.feed.df$p_mass_cons)) - 1] <- mc1.feed.df$p_mass_cons[which(!is.na(mc1.feed.df$p_mass_cons))] / fd.days
+mc1.feed.df <- fill(mc1.feed.df, p_mass_cons_avg, .direction = "up")
+
+# Nectar consumption and cleanup
+mc1.feed.df[52, 6] <- 0.00
+mc1.feed.df[329, 6] <- 17.67
+mc1.feed.df$n_mass_cons <- NA
+mc1.feed.df$n_mass_rm[which(is.na(mc1.feed.df$n_mass_rm))] <- 0.00
+mc1.feed.df$n_mass_cons <- mc1.feed.df$n_mass_fd - lead(mc1.feed.df$n_mass_rm)
+mc1.feed.df <- mc1.feed.df %>%
+  mutate(n_mass_cons = lag(n_mass_cons, 1))
+mc1.feed.df$n_mass_cons[which(mc1.feed.df$n_mass_rm == 0)] <- NA
+mc1.feed.df$n_mass_cons[which(is.na(mc1.feed.df$n_mass_cons))] <- 0.00
+
+
+mc1.feed.df$treatment <- ifelse(mc1.feed.df$id < 2, paste("zone.1"),
+                           ifelse(mc1.feed.df$id < 3 & mc1.feed.df$id > 1, paste("zone.2"),
+                                  ifelse(mc1.feed.df$id < 4 & mc1.feed.df$id > 3, paste("zone.3"), paste("zone.4"))
+                           )
+)
+mc1.feed.df$treatment <- as.factor(mc1.feed.df$treatment)
+
+##### Basic summary plots/tables #####
 # Final comb mass
 mc1.df %>%
   filter(!is.na(end_mass_comb)) %>%
@@ -185,7 +205,7 @@ mc1.df %>%
     geom_point(stat = "identity", mapping = aes(col = drone_score), size = 8) + 
     scale_color_manual(name = "Drone Production", 
                        labels = c("Above Average", "Below Average"),
-                       values = c("above" = "#00ba38", "below" = "#f8766d")) + 
+                       values = c("above" = "slateblue", "below" = "powderblue")) + 
     geom_text(color = "white", size = 2) + 
     labs(y = "Drone Production Z-Score", x = "Microcolony ID") + 
     coord_flip() + 
@@ -202,5 +222,38 @@ ggplot(data = mc1.df) +
   scale_color_viridis(discrete = TRUE, option = "plasma") + 
   theme_minimal()
 
+# Nectar consumptiion grouped by treatment
+mc1.feed.df %>%
+  group_by(treatment, date) %>%
 
+  summarise(nectar_cons = mean(n_mass_cons),
+            nectar_se = (sd(n_mass_cons) / (sqrt(n()))), 
+            pollen_cons = mean(p_mass_cons_avg), 
+            pollen_se = (sd(p_mass_cons_avg) / sqrt(n())))
 
+mc1.feed.df %>%
+  group_by(id) %>%
+  mutate(cum_pollen = cumsum(p_mass_cons_avg), 
+         cum_nectar = cumsum(n_mass_cons)) %>%
+  group_by(date, treatment) %>%
+  summarise(nectar_cons = mean(cum_nectar), 
+            nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
+            pollen_cons = mean(cum_pollen, na.rm = TRUE), 
+            pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
+  # ggplot() + 
+  # geom_pointrange(mapping = aes(x = date, 
+  #                     y = nectar_cons, 
+  #                     ymin = nectar_cons - nectar_se,
+  #                     ymax = nectar_cons + nectar_se, 
+  #                     color = treatment)) + 
+  # theme_minimal() %>%
+  ggplot() + 
+  geom_pointrange(mapping = aes(x = date,
+                                y = pollen_cons, 
+                                ymin = pollen_cons - pollen_se, 
+                                ymax = pollen_cons + pollen_se, 
+                                color = treatment)) + 
+  geom_smooth(mapping = aes(x = date, 
+                          y = pollen_cons, 
+                          color = treatment), se = FALSE) + 
+  theme_minimal()
