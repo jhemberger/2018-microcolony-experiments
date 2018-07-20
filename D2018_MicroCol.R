@@ -13,6 +13,7 @@ library(tidyverse)
 library(lubridate)
 library(lme4)
 library(viridis)
+library(ggcorrplot)
 
 ##### Import/clean data #####
 # Experiment 1
@@ -35,19 +36,22 @@ mc1.df$time = NULL
 mc1.df$n_culled = NULL
 mc1.df$dom_worker = NULL
 mc1.df$`frozen?` = NULL
+mc1.df$age_class = NULL
 # Bind final observations not on MC data sheets
 mc1end.df <- read_csv("D2018_MicroCol_Breakdown.csv", skip = 1,
                     col_names = c("id", "end_mc_mass", "end_mass_comb", "mass_box", "date"))
-mc1end.df$treatment <- ifelse(mc1end.df$id < 2, paste("zone.1"),
-                              ifelse(mc1end.df$id < 3 & mc1end.df$id > 1, paste("zone.2"),
-                                     ifelse(mc1end.df$id < 4 & mc1end.df$id > 3, paste("zone.3"), paste("zone.4"))
-                              )
-)
+# mc1end.df$treatment <- ifelse(mc1end.df$id < 2, paste("zone.1"),
+#                               ifelse(mc1end.df$id < 3 & mc1end.df$id > 1, paste("zone.2"),
+#                                      ifelse(mc1end.df$id < 4 & mc1end.df$id > 3, paste("zone.3"), paste("zone.4"))
+#                               )
+# )
+# mc1.df$mc_mass[409:432] <- mc1.df$end_mc_mass[409:432]
+# mc1.df$end_mc_mass <- NULL
 mass.box.df <- data_frame(id = mc1end.df$id, mass_box = mc1end.df$mass_box)
-mc1end.df$mass_box <- NULL
-mc1.df <- bind_rows(mc1.df, mc1end.df)
-mc1.df$date <- parse_date(mc1.df$date)
-rm(mc1end.df)
+# mc1end.df$mass_box <- NULL
+# mc1.df <- bind_rows(mc1.df, mc1end.df)
+# mc1.df$date <- parse_date(mc1.df$date)
+# rm(mc1end.df)
 
 # Add mass of microcolony box to all obsvs
 mc1.df <- inner_join(mc1.df, mass.box.df, by = "id")
@@ -240,20 +244,75 @@ mc1.feed.df %>%
             nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
             pollen_cons = mean(cum_pollen, na.rm = TRUE), 
             pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
-  # ggplot() + 
-  # geom_pointrange(mapping = aes(x = date, 
-  #                     y = nectar_cons, 
-  #                     ymin = nectar_cons - nectar_se,
-  #                     ymax = nectar_cons + nectar_se, 
-  #                     color = treatment)) + 
-  # theme_minimal() %>%
-  ggplot() + 
+  ggplot() +
   geom_pointrange(mapping = aes(x = date,
-                                y = pollen_cons, 
-                                ymin = pollen_cons - pollen_se, 
-                                ymax = pollen_cons + pollen_se, 
-                                color = treatment)) + 
-  geom_smooth(mapping = aes(x = date, 
-                          y = pollen_cons, 
-                          color = treatment), se = FALSE) + 
-  theme_minimal()
+                      y = nectar_cons,
+                      ymin = nectar_cons - nectar_se,
+                      ymax = nectar_cons + nectar_se,
+                      color = treatment)) +
+  geom_smooth(mapping = aes(x = date,
+                            y = nectar_cons,
+                            color = treatment), se = FALSE) + 
+  theme_minimal() #%>%
+  # ggplot() + 
+  # geom_pointrange(mapping = aes(x = date,
+  #                               y = pollen_cons, 
+  #                               ymin = pollen_cons - pollen_se, 
+  #                               ymax = pollen_cons + pollen_se, 
+  #                               color = treatment)) + 
+  # geom_smooth(mapping = aes(x = date, 
+  #                         y = pollen_cons, 
+  #                         color = treatment), se = FALSE) + 
+  # theme_minimal()
+
+# Average interval mass gain - diverging dot plot
+mc.massgain <- mc1.df %>%
+  select(id, date, mc_mass, p_mass_rm, p_mass_fd, treatment, mass_box) %>%
+  mutate(p_mass_cons = mc1.feed.df$p_mass_cons_avg) %>%
+  replace_na(list(mc_mass = 0)) %>%
+  mutate(mc_mass_diff = c(0, diff(mc1.df$mc_mass))) %>%
+  #filter(id == "3.3") %>%
+  mutate(mc_mass_gain = ifelse(lag(!is.na(p_mass_rm == TRUE)), 
+                               mc_mass_diff + lag(p_mass_rm) - lag(p_mass_fd) + p_mass_cons, 
+                               mc_mass_diff - lag(p_mass_fd) + p_mass_cons)) # this needs to be checked...
+
+mc.massgain$mc_mass_gain[which(diff(mc.massgain$id) != 0) + 1] <- NA
+
+# plot using z-scores
+mc.massgain %>% 
+  group_by(id, treatment) %>%
+  summarise(mean_intv_massgain = mean(mc_mass_gain, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(mass_gain_z = round((mean_intv_massgain - mean(mean_intv_massgain, na.rm = TRUE)) / sd(mean_intv_massgain, na.rm = TRUE), digits = 2)) %>%
+  mutate(mass_score = ifelse(mass_gain_z < 0, "below", "above")) %>%
+  arrange(desc(mass_gain_z)) %>%
+  mutate(z_order = factor(`id`, levels = `id`)) %>%
+  ggplot(aes(x = z_order, y = mass_gain_z, label = mass_gain_z)) + 
+
+  geom_point(stat = "identity", mapping = aes(col = mass_score), size = 8) + 
+  scale_color_manual(name = "Mass gain between feeding intervals", 
+                     labels = c("Above Average", "Below Average"),
+                     values = c("above" = "slateblue", "below" = "powderblue")) + 
+  geom_text(color = "white", size = 2) + 
+  labs(y = "Mass Gain Z-Score", x = "Microcolony ID") + 
+  coord_flip() + 
+  theme_bw()
+  
+# plot using raw average gains (still above/below 0)
+mc.massgain %>% 
+  group_by(id, treatment) %>%
+  summarise(mean_intv_massgain = round(mean(mc_mass_gain, na.rm = TRUE), digits =2)) %>%
+  ungroup() %>%
+  mutate(mass_score = ifelse(mean_intv_massgain < 0, "below", "above")) %>%
+  arrange(desc(mean_intv_massgain)) %>%
+  mutate(mass_order = factor(`id`, levels = `id`)) %>%
+  ggplot(aes(x = mass_order, y = mean_intv_massgain, label = mean_intv_massgain)) + 
+  geom_point(stat = "identity", mapping = aes(col = mass_score), size = 8) + 
+  scale_color_manual(name = "Average change in mass between feeding intervals", 
+                     labels = c("Gained Mass", "Lost Mass"),
+                     values = c("above" = "slateblue", "below" = "powderblue")) + 
+  geom_text(color = "white", size = 2) + 
+  labs(y = "Mean feeding interval mass gain", x = "Microcolony ID") + 
+  coord_flip() + 
+  theme_bw()
+         
