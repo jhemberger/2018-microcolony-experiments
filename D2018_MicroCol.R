@@ -24,10 +24,12 @@ mc1.df <- read_csv("D2018_MicroCol_Round1.csv", skip = 2,
                                  "activity", "dom_worker", "mc_mass", "p_mass_rm", 
                                  "n_mass_rm", "p_mass_fd", "n_mass_fd", "n_culled", 
                                  "frozen?", "temp", "humidity"), 
-                   na = c("-", "", " ")) 
+                   na = c("-", "", " "))
+# Change date column to an actual date format
 mc1.df$date <- paste(mc1.df$date, "2018", sep = "/")
 mc1.df$date <- mdy(mc1.df$date)
 mc1.df$date <- parse_date(mc1.df$date)
+# Remove end values from data frame that aren't used in plotting/analysis
 mc1.df <- mc1.df[-c(409:425), ]
 
 # Remove unused columns from data frame
@@ -37,31 +39,24 @@ mc1.df$n_culled = NULL
 mc1.df$dom_worker = NULL
 mc1.df$`frozen?` = NULL
 mc1.df$age_class = NULL
+
 # Bind final observations not on MC data sheets
 mc1end.df <- read_csv("D2018_MicroCol_Breakdown.csv", skip = 1,
                     col_names = c("id", "end_mc_mass", "end_mass_comb", "mass_box", "date"))
-# mc1end.df$treatment <- ifelse(mc1end.df$id < 2, paste("zone.1"),
-#                               ifelse(mc1end.df$id < 3 & mc1end.df$id > 1, paste("zone.2"),
-#                                      ifelse(mc1end.df$id < 4 & mc1end.df$id > 3, paste("zone.3"), paste("zone.4"))
-#                               )
-# )
-# mc1.df$mc_mass[409:432] <- mc1.df$end_mc_mass[409:432]
-# mc1.df$end_mc_mass <- NULL
 mass.box.df <- data_frame(id = mc1end.df$id, mass_box = mc1end.df$mass_box)
-# mc1end.df$mass_box <- NULL
-# mc1.df <- bind_rows(mc1.df, mc1end.df)
-# mc1.df$date <- parse_date(mc1.df$date)
-# rm(mc1end.df)
 
 # Add mass of microcolony box to all obsvs
 mc1.df <- inner_join(mc1.df, mass.box.df, by = "id")
 
 # Create treatment variable
-mc1.df$treatment <- ifelse(mc1.df$id < 2, paste("zone.1"),
-                           ifelse(mc1.df$id < 3 & mc1.df$id > 1, paste("zone.2"),
-                                  ifelse(mc1.df$id < 4 & mc1.df$id > 3, paste("zone.3"), paste("zone.4"))
-                           )
-)
+mc1.df$treatment <- ifelse(mc1.df$id < 2,
+                           paste("zone.1"),
+                           ifelse(
+                             mc1.df$id < 3 & mc1.df$id > 1,
+                             paste("zone.2"),
+                             ifelse(mc1.df$id < 4 &
+                                      mc1.df$id > 3, paste("zone.3"), paste("zone.4"))
+                           ))
 
 # Correct worker replace/drone removed to be amount actually replaced/removed
 # e.g. 3/5 means 3 of 5 total were replaced/removed 
@@ -78,17 +73,18 @@ write_csv(mc1.df, "./D2018_MicroCol_Round1_Clean.csv")
 mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
 
 ##### Summarize/calculate colony growth and resource consumption #####
-mc1.df <- mc1.df %>%g
+mc1.df <- mc1.df %>%
   group_by(id) %>%
   mutate(true_mc_mass = mc_mass - mass_box - lag(p_mass_fd))
 
+# Split off feed variables to seperate data frame
 mc1.feed.df <- data_frame(id = mc1.df$id, 
                    date = mc1.df$date,
                    p_mass_rm = mc1.df$p_mass_rm, 
                    p_mass_fd = mc1.df$p_mass_fd, 
                    n_mass_fd = mc1.df$n_mass_fd, 
                    n_mass_rm = mc1.df$n_mass_rm)
-
+# Remove end records not used in feed calcs
 mc1.feed.df <- mc1.feed.df[-c(409:456), ] # OR
 mc1.feed.df <- mc1.feed.df[-c(409:432), ] 
 
@@ -126,29 +122,53 @@ length(pollen.subtract) == length(pollen.sum - pollen.subtract) # Check to see t
 mc1.feed.df$p_mass_cons <- NA # Create column for pollen consumption
 mc1.feed.df$p_mass_cons[stop + 1] <- pollen.consumed # Paste pollen consumed values
 
-fd.days <- ((stop - start) + 1)
-mc1.feed.df$p_mass_cons_avg <- NA
-mc1.feed.df$p_mass_cons_avg[which(!is.na(mc1.feed.df$p_mass_cons)) - 1] <- mc1.feed.df$p_mass_cons[which(!is.na(mc1.feed.df$p_mass_cons))] / fd.days
+fd.days <- ((stop - start) + 1) # Number of days between feedings
+mc1.feed.df$p_mass_cons_avg <- NA # initialize new column and fill with NAs
+
+# Where mc1.feed.df$p_pass_cons is not an NA, subtract 1 from that index value and
+# then write the value of where mc1.feed.df$p_mass_cons is not an NA divided by 
+# the number of days between feedings (average interval pollen consumption)
+mc1.feed.df$p_mass_cons_avg[which(!is.na(mc1.feed.df$p_mass_cons)) - 1] <-
+  mc1.feed.df$p_mass_cons[which(!is.na(mc1.feed.df$p_mass_cons))] / fd.days 
+
+# Fill those values up since they're the same for each record in that interval
 mc1.feed.df <- fill(mc1.feed.df, p_mass_cons_avg, .direction = "up")
 
 # Nectar consumption and cleanup
-mc1.feed.df[52, 6] <- 0.00
-mc1.feed.df[329, 6] <- 17.67
-mc1.feed.df$n_mass_cons <- NA
-mc1.feed.df$n_mass_rm[which(is.na(mc1.feed.df$n_mass_rm))] <- 0.00
+mc1.feed.df[52, 6] <- 0.00 # Fix error from original csv
+mc1.feed.df[329, 6] <- 17.67 # Fix error from original csv
+mc1.feed.df$n_mass_cons <- NA # Initialize new column for nectar consumption 
+
+# Where n_mass_rm is an NA, paste 0 in the n_mass_rm column
+mc1.feed.df$n_mass_rm[which(is.na(mc1.feed.df$n_mass_rm))] <- 0.00 
+# Calculate nectar consumed 
 mc1.feed.df$n_mass_cons <- mc1.feed.df$n_mass_fd - lead(mc1.feed.df$n_mass_rm)
+
+# Move values of n_mass_cons up 1 to line up with microcolony id
 mc1.feed.df <- mc1.feed.df %>%
   mutate(n_mass_cons = lag(n_mass_cons, 1))
 mc1.feed.df$n_mass_cons[which(mc1.feed.df$n_mass_rm == 0)] <- NA
 mc1.feed.df$n_mass_cons[which(is.na(mc1.feed.df$n_mass_cons))] <- 0.00
 
-
-mc1.feed.df$treatment <- ifelse(mc1.feed.df$id < 2, paste("zone.1"),
-                           ifelse(mc1.feed.df$id < 3 & mc1.feed.df$id > 1, paste("zone.2"),
-                                  ifelse(mc1.feed.df$id < 4 & mc1.feed.df$id > 3, paste("zone.3"), paste("zone.4"))
-                           )
+# Create treatment variable in mc1.feed.df 
+mc1.feed.df$treatment <- ifelse(
+  mc1.feed.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc1.feed.df$id < 3 & mc1.feed.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc1.feed.df$id < 4 &
+        mc1.feed.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
 )
-mc1.feed.df$treatment <- as.factor(mc1.feed.df$treatment)
+mc1.feed.df$treatment <- as.factor(mc1.feed.df$treatment) # Coerce treatment as factor
+
+# Write csv file to working directory
+write_csv(mc1.feed.df, "./D2018_MicroCol_Round1_Feed_Clean.csv")
 
 ##### Basic summary plots/tables #####
 # Final comb mass
@@ -171,7 +191,7 @@ ggplot(na.rm = TRUE) +
                                          color = treatment,
                                          na.rm = FALSE))
 
-# Total Males Produced
+# Total Males Produced as point range plot
 mc1.df %>%
   group_by(id, treatment) %>%
   summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
@@ -182,6 +202,8 @@ mc1.df %>%
                                   ymax = mean_males + se,
                                   ymin = mean_males - se)) + 
     theme_minimal()
+
+# Total males produced as boxplot
 mc1.df %>%
   group_by(id, treatment) %>%
   summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
@@ -190,7 +212,7 @@ mc1.df %>%
     geom_boxplot() + 
     theme_minimal()
 
-# Male production normalized by microcolony - diverging dot plot
+# Male production normalized across microcolonies - diverging dot plot
 mc1.df %>%
   group_by(id, treatment) %>%
   summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
@@ -199,13 +221,7 @@ mc1.df %>%
   mutate(drone_score = ifelse(drone_z < 0, "below", "above")) %>%
   arrange(desc(drone_z)) %>%
   mutate(z_order = factor(`id`, levels = `id`)) %>%
-  #mutate(y_text_col = ifelse(id < 2, "yellow", 
-                             #ifelse(id < 3, "green", 
-                                    #ifelse(id < 4, "orange", "red")))) %>%
   ggplot(aes(x = z_order, y = drone_z, label = drone_z)) + 
-    #geom_tile(mapping = aes(fill = treatment, width = 1, height = Inf), alpha = 0.2) + 
-    #scale_fill_manual(values = "green") + 
-    #scale_fill_manual(values = c("yellow", "green", "orange", "darkred")) + 
     geom_point(stat = "identity", mapping = aes(col = drone_score), size = 8) + 
     scale_color_manual(name = "Drone Production", 
                        labels = c("Above Average", "Below Average"),
@@ -221,7 +237,6 @@ ggplot(data = mc1.df) +
                            color = treatment)) + 
   geom_smooth(span = 0.75, mapping = aes(x = date, 
                             y = mc_mass - mass_box - lag(p_mass_fd), 
-                            #group = id, 
                             color = treatment)) + 
   scale_color_viridis(discrete = TRUE, option = "plasma") + 
   theme_minimal()
@@ -229,7 +244,6 @@ ggplot(data = mc1.df) +
 # Nectar consumptiion grouped by treatment
 mc1.feed.df %>%
   group_by(treatment, date) %>%
-
   summarise(nectar_cons = mean(n_mass_cons),
             nectar_se = (sd(n_mass_cons) / (sqrt(n()))), 
             pollen_cons = mean(p_mass_cons_avg), 
@@ -253,7 +267,7 @@ mc1.feed.df %>%
   geom_smooth(mapping = aes(x = date,
                             y = nectar_cons,
                             color = treatment), se = FALSE) + 
-  theme_minimal() #%>%
+  theme_minimal() #%>% 
   # ggplot() + 
   # geom_pointrange(mapping = aes(x = date,
   #                               y = pollen_cons, 
@@ -265,7 +279,7 @@ mc1.feed.df %>%
   #                         color = treatment), se = FALSE) + 
   # theme_minimal()
 
-# Average interval mass gain - diverging dot plot
+# Average interval mass gain across entire experiment - diverging dot plot
 mc.massgain <- mc1.df %>%
   select(id, date, mc_mass, p_mass_rm, p_mass_fd, treatment, mass_box) %>%
   mutate(p_mass_cons = mc1.feed.df$p_mass_cons_avg) %>%
@@ -298,10 +312,10 @@ mc.massgain %>%
   coord_flip() + 
   theme_bw()
   
-# plot using raw average gains (still above/below 0)
+# plot using raw average mass gains (still above/below 0)
 mc.massgain %>% 
   group_by(id, treatment) %>%
-  summarise(mean_intv_massgain = round(mean(mc_mass_gain, na.rm = TRUE), digits =2)) %>%
+  summarise(mean_intv_massgain = round(mean(mc_mass_gain, na.rm = TRUE), digits = 2)) %>%
   ungroup() %>%
   mutate(mass_score = ifelse(mean_intv_massgain < 0, "below", "above")) %>%
   arrange(desc(mean_intv_massgain)) %>%
