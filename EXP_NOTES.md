@@ -18,6 +18,7 @@
 
 #### Notes
 __8/10:__  Starting to think about how to analyze these data.  Need to first calculate more accurate measure of colony mass.  So far, I have this in mind as an example:
+
 * `day1.mass = mc.mass - mass.box + p.mass.cons(days 1-9) / 4` 
 * `day3.mass = mc.mass - mass.box - mass.pol.fd(day 1) + p.mass.cons(days 1-9) / 4`
 * `day6.mass = mc.mass - mass.box - mass.pol.fd(day 1 + 3) + p.mass.cons(days 1-9) / 4`
