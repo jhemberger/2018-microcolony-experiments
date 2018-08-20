@@ -170,6 +170,54 @@ mc1.feed.df$treatment <- as.factor(mc1.feed.df$treatment) # Coerce treatment as 
 # Write csv file to working directory
 write_csv(mc1.feed.df, "./D2018_MicroCol_Round1_Feed_Clean.csv")
 
+# Calculate true microcolony mass 
+x <- list()
+y <- 0
+for (i in fd.days) {
+  y <- y + 1
+  if (i == 4) {
+    z <- 3:0
+  } else {
+    z <- 3:1
+  }
+  x[[y]] <- z
+}
+
+for (i in fd.days) {
+  if (i == 4) {
+    print("true")
+  } else {
+    print("false")
+  }
+}
+
+fd.days.count <- unlist(x)
+fd.days.count <- c(fd.days.count, c(NA, NA, NA))
+mc.massgain$fd.days <- fd.days.count
+
+mc.massgain.test <- mc.massgain %>%
+  filter(id == 3.3) %>%
+  mutate(mass_box = 433.61) %>%
+  mutate(interval_day = 1:nrow(mc.massgain.test)) %>%
+  mutate(mc_mass_true = ifelse(
+    fd.days == 3,
+    mc_mass - mass_box + p_mass_cons,
+    ifelse(
+      fd.days == 2,
+      mc_mass - mass_box - lag(p_mass_fd, n = 1) + p_mass_cons,
+      ifelse(
+        fd.days == 1,
+        mc_mass - mass_box - lag(p_mass_fd, n = 1) - lag(p_mass_fd, n = 2) + p_mass_cons,
+        ifelse(
+          fd.days == 0,
+          mc_mass - mass_box - lag(p_mass_fd, n = 1) - lag(p_mass_fd, n = 2), - lag(p_mass_fd, n = 3) + p_mass_cons
+        )
+      )
+    )))
+  
+  
+
+
 ##### Basic summary plots/tables #####
 # Final comb mass
 mc1.df %>%
@@ -194,6 +242,7 @@ ggplot(na.rm = TRUE) +
 # Total Males Produced as point range plot
 mc1.df %>%
   group_by(id, treatment) %>%
+  filter(id != 2.4) %>%
   summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
   group_by(treatment) %>%
   summarise(mean_males = mean(total_males), se = sd(total_males) / sqrt(n())) %>%
@@ -206,6 +255,7 @@ mc1.df %>%
 # Total males produced as boxplot
 mc1.df %>%
   group_by(id, treatment) %>%
+  filter(id != 2.4) %>%
   summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
   group_by(treatment) %>%
   ggplot(mapping = aes(x = treatment, y = total_males)) + 
@@ -233,10 +283,10 @@ mc1.df %>%
 
 # Mass gain over experiment (smoothed)
 ggplot(data = mc1.df) + 
-  geom_point(mapping = aes(x = date, y = mc_mass - mass_box - lag(p_mass_fd),
+  geom_point(mapping = aes(x = date, y = mc_mass, #- mass_box - lag(p_mass_fd),
                            color = treatment)) + 
   geom_smooth(span = 0.75, mapping = aes(x = date, 
-                            y = mc_mass - mass_box - lag(p_mass_fd), 
+                            y = mc_mass, #- mass_box - lag(p_mass_fd), 
                             color = treatment)) + 
   scale_color_viridis(discrete = TRUE, option = "plasma") + 
   theme_minimal()
@@ -258,26 +308,26 @@ mc1.feed.df %>%
             nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
             pollen_cons = mean(cum_pollen, na.rm = TRUE), 
             pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
+  # ggplot() +
+  # geom_pointrange(mapping = aes(x = date,
+  #                     y = nectar_cons,
+  #                     ymin = nectar_cons - nectar_se,
+  #                     ymax = nectar_cons + nectar_se,
+  #                     color = treatment)) +
+  # geom_smooth(mapping = aes(x = date,
+  #                           y = nectar_cons,
+  #                           color = treatment), se = FALSE) + 
+  # theme_minimal() #%>% 
   ggplot() +
   geom_pointrange(mapping = aes(x = date,
-                      y = nectar_cons,
-                      ymin = nectar_cons - nectar_se,
-                      ymax = nectar_cons + nectar_se,
-                      color = treatment)) +
+                                y = pollen_cons,
+                                ymin = pollen_cons - pollen_se,
+                                ymax = pollen_cons + pollen_se,
+                                color = treatment)) +
   geom_smooth(mapping = aes(x = date,
-                            y = nectar_cons,
-                            color = treatment), se = FALSE) + 
-  theme_minimal() #%>% 
-  # ggplot() + 
-  # geom_pointrange(mapping = aes(x = date,
-  #                               y = pollen_cons, 
-  #                               ymin = pollen_cons - pollen_se, 
-  #                               ymax = pollen_cons + pollen_se, 
-  #                               color = treatment)) + 
-  # geom_smooth(mapping = aes(x = date, 
-  #                         y = pollen_cons, 
-  #                         color = treatment), se = FALSE) + 
-  # theme_minimal()
+                          y = pollen_cons,
+                          color = treatment), se = FALSE) +
+  theme_minimal()
 
 # Average interval mass gain across entire experiment - diverging dot plot
 mc.massgain <- mc1.df %>%
@@ -330,3 +380,27 @@ mc.massgain %>%
   coord_flip() + 
   theme_bw()
          
+
+# Analysis with Agathe
+mc1.drone.df <- mc1.df %>%
+  group_by(id, treatment) %>%
+  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
+  filter(id != 2.4) # drop due to infighting issues
+mc1.drone.df$treatment <- as.factor(mc1.drone.df$treatment)
+
+mod.1 <- aov(total_males ~ treatment, data = mc1.drone.df)
+lm.mod.1 <- lm(total_males ~ treatment, data = mc1.drone.df)
+summary(mod.1)
+TukeyHSD(mod.1)
+
+mc.massgain$treatment <- as.factor(mc.massgain$treatment)
+mod.2 <- aov(mc_mass_gain ~ treatment + p_mass_cons + Error(id), data = mc.massgain)
+mod.2.1 <- aov(mc_mass_gain ~ treatment + Error(id), data = mc.massgain)
+summary(mod.2)
+summary(mod.2.1)
+
+mc.massgain2 <- mc.massgain %>%
+  filter(id != 2.4)
+mod.x <- lm(mc_mass_gain ~ treatment, data = mc.massgain2)
+summary(mod.x)
+anova(mod.x)
