@@ -57,6 +57,14 @@ mc1.df$treatment <- ifelse(mc1.df$id < 2,
                              ifelse(mc1.df$id < 4 &
                                       mc1.df$id > 3, paste("zone.3"), paste("zone.4"))
                            ))
+mc1end.df$treatment <- ifelse(mc1end.df$id < 2,
+                           paste("zone.1"),
+                           ifelse(
+                             mc1end.df$id < 3 & mc1end.df$id > 1,
+                             paste("zone.2"),
+                             ifelse(mc1end.df$id < 4 &
+                                      mc1end.df$id > 3, paste("zone.3"), paste("zone.4"))
+                           ))
 
 # Correct worker replace/drone removed to be amount actually replaced/removed
 # e.g. 3/5 means 3 of 5 total were replaced/removed 
@@ -197,7 +205,8 @@ mc.massgain$fd.days <- fd.days.count
 
 mc.massgain.test <- mc.massgain %>%
   filter(id == 3.3) %>%
-  mutate(mass_box = 433.61) %>%
+  mutate(mass_box = 433.61)
+mc.massgain.test <- mc.massgain.test %>%
   mutate(interval_day = 1:nrow(mc.massgain.test)) %>%
   mutate(mc_mass_true = ifelse(
     fd.days == 3,
@@ -220,7 +229,7 @@ mc.massgain.test <- mc.massgain %>%
 
 ##### Basic summary plots/tables #####
 # Final comb mass
-mc1.df %>%
+mc1end.df %>%
   filter(!is.na(end_mass_comb)) %>%
   group_by(treatment) %>%
   summarise(mean.comb.mass = mean(end_mass_comb), se = sd(end_mass_comb) / sqrt(n())) %>%
@@ -230,14 +239,15 @@ mc1.df %>%
                                   ymax = mean.comb.mass + se, 
                                   ymin = mean.comb.mass - se)) +
     scale_y_continuous(limits = c(0, 10)) + 
-    theme_minimal()
+    theme_bw()
 
 ggplot(na.rm = TRUE) + 
   geom_line(data = mc1.df, mapping = aes(x = date, 
                                          y = true_mc_mass, 
                                          group = id, 
                                          color = treatment,
-                                         na.rm = FALSE))
+                                         na.rm = FALSE)) + 
+  theme_bw()
 
 # Total Males Produced as point range plot
 mc1.df %>%
@@ -250,7 +260,7 @@ mc1.df %>%
     geom_pointrange(mapping = aes(x = treatment, y = mean_males, 
                                   ymax = mean_males + se,
                                   ymin = mean_males - se)) + 
-    theme_minimal()
+    theme_bw()
 
 # Total males produced as boxplot
 mc1.df %>%
@@ -275,21 +285,22 @@ mc1.df %>%
     geom_point(stat = "identity", mapping = aes(col = drone_score), size = 8) + 
     scale_color_manual(name = "Drone Production", 
                        labels = c("Above Average", "Below Average"),
-                       values = c("above" = "slateblue", "below" = "powderblue")) + 
-    geom_text(color = "white", size = 2) + 
+                       values = c("above" = "green2", "below" = "red2")) + 
+    geom_text(color = "black", size = 2) + 
     labs(y = "Drone Production Z-Score", x = "Microcolony ID") + 
     coord_flip() + 
     theme_bw() 
 
 # Mass gain over experiment (smoothed)
 ggplot(data = mc1.df) + 
-  geom_point(mapping = aes(x = date, y = mc_mass, #- mass_box - lag(p_mass_fd),
-                           color = treatment)) + 
-  geom_smooth(span = 0.75, mapping = aes(x = date, 
+  # geom_point(mapping = aes(x = date, y = mc_mass, #- mass_box - lag(p_mass_fd),
+  #                          color = treatment)) + 
+  geom_smooth(span = 0.75, 
+              mapping = aes(x = date, 
                             y = mc_mass, #- mass_box - lag(p_mass_fd), 
-                            color = treatment)) + 
-  scale_color_viridis(discrete = TRUE, option = "plasma") + 
-  theme_minimal()
+                            color = treatment,
+                            fill = treatment)) + 
+  theme_bw()
 
 # Nectar consumptiion grouped by treatment
 mc1.feed.df %>%
@@ -327,7 +338,7 @@ mc1.feed.df %>%
   geom_smooth(mapping = aes(x = date,
                           y = pollen_cons,
                           color = treatment), se = FALSE) +
-  theme_minimal()
+  theme_bw()
 
 # Average interval mass gain across entire experiment - diverging dot plot
 mc.massgain <- mc1.df %>%
@@ -356,8 +367,8 @@ mc.massgain %>%
   geom_point(stat = "identity", mapping = aes(col = mass_score), size = 8) + 
   scale_color_manual(name = "Mass gain between feeding intervals", 
                      labels = c("Above Average", "Below Average"),
-                     values = c("above" = "slateblue", "below" = "powderblue")) + 
-  geom_text(color = "white", size = 2) + 
+                     values = c("above" = "green2", "below" = "red2")) + 
+  geom_text(color = "black", size = 2) + 
   labs(y = "Mass Gain Z-Score", x = "Microcolony ID") + 
   coord_flip() + 
   theme_bw()
@@ -390,6 +401,8 @@ mc1.drone.df$treatment <- as.factor(mc1.drone.df$treatment)
 
 mod.1 <- aov(total_males ~ treatment, data = mc1.drone.df)
 lm.mod.1 <- lm(total_males ~ treatment, data = mc1.drone.df)
+summary(lm.mod.1)
+TukeyHSD(lm.mod.1)
 summary(mod.1)
 TukeyHSD(mod.1)
 

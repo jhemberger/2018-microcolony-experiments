@@ -1,0 +1,97 @@
+---
+title: "2018 Resource Pulse Microcolony Analysis"
+subtitle: Analysis and model construction/selection
+date: 11/28/2018
+output: html_notebook
+---
+
+
+
+```{r}
+# Import packages ---------------------------------------------------------
+library(psych)
+library(nlme)
+library(car)
+library(multcompView)
+library(lsmeans)
+library(tidyverse)
+library(rcompanion)
+```
+
+
+```{r echo = FALSE}
+# Load in data ------------------------------------------------------------
+mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
+mc1.feed.df <- read_csv("./D2018_MicroCol_Round1_Feed_Clean.csv")
+mc1.df$treatment <- factor(mc1.df$treatment)
+mc1.df <- mc1.df %>%
+  filter(!is.na(true_mc_mass))
+```
+
+```{r}
+# Repeated measures analysis ----------------------------------------------
+corr.model = lme(true_mc_mass ~ treatment + date + treatment*date, 
+                 random = ~ 1 | id,
+                 data = mc1.df,
+                 na.action = na.exclude)
+
+ACF(corr.model) # Lag 1: 0.314
+```
+
+```{r}
+model.1 = lme(true_mc_mass ~ treatment + date + treatment*date, 
+              random = ~ 1 | id,
+              data = mc1.df,
+              correlation = corAR1(form = ~ date | id,
+                                   value = 0.314),
+              na.action = na.exclude,
+              method = "REML")
+Anova(model.1)
+```
+
+```{r}
+model.1.fixed = gls(true_mc_mass ~ treatment + date + treatment*date,
+                    data = mc1.df,
+                    method = "REML",
+                    na.action = na.exclude)
+
+anova(model.1, model.1.fixed)
+```
+
+```{r}
+plot(model.1)
+```
+```{r}
+model.null <- lme(true_mc_mass ~ 1,
+                 random = ~ 1 | id,
+                 data = mc1.df,
+                 na.action = na.exclude)
+
+nagelkerke(model.1, 
+           model.null)
+```
+
+
+```{r}
+marginal <- lsmeans(model.1, 
+                   ~ treatment:date)
+
+cld(marginal,
+    alpha   = 0.05, 
+    Letters = letters,
+    adjust  = "tukey")
+```
+
+Not sure what is up here - need to look into this function more.  Used in example to produce an interaction plot. Maybe because there are NAs?
+```{r}
+sum <- groupwiseMean(true_mc_mass ~ id + date,
+                    data   = mc1.df)
+sum
+```
+
+```{r}
+model.1.resid <- residuals(model.1)
+plotNormalHistogram(model.1.resid)
+plot(residuals(model.1),
+     fitted(model.1))
+```
