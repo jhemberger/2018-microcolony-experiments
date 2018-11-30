@@ -1,4 +1,4 @@
-# METADATA===================================================================
+# PROJECT | METADATA========================================================
 # 2018 BUMBLE BEE MICROCOLONY EXPERIMENTS
 # Jeremy Hemberger - j.hemberger.wisc@gmail.com
 # May 29, 2018
@@ -6,24 +6,41 @@
 # Model microcolony response to landscape-simulated food treatments
 # Experiment 1 dates: March 15, 2018 - May 24, 2018
 # Experiment 2 dates: 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-##### Import relevant packages #####
+
+# Load packages ---------------------------------------------------------
 library(tidyverse)
 library(lubridate)
 library(lme4)
 library(viridis)
 library(ggcorrplot)
 
-##### Import/clean data #####
-# Experiment 1
+# Round 1 - Spring 2018 -------------------------------------------------
+# **Import and clean data -----------------------------------------------
 mc1.df <- read_csv("D2018_MicroCol_Round1.csv", skip = 2, 
-                   col_names = c("id", "date", "time", "initials", "n_new_drones", 
-                                 "n_drones", "n_worker_deaths", "age_class",
-                                 "workers_replaced", "drones_removed",
-                                 "activity", "dom_worker", "mc_mass", "p_mass_rm", 
-                                 "n_mass_rm", "p_mass_fd", "n_mass_fd", "n_culled", 
-                                 "frozen?", "temp", "humidity"), 
+                   col_names = c(
+                     "id",
+                     "date",
+                     "time",
+                     "initials",
+                     "n_new_drones",
+                     "n_drones",
+                     "n_worker_deaths",
+                     "age_class",
+                     "workers_replaced",
+                     "drones_removed",
+                     "activity",
+                     "dom_worker",
+                     "mc_mass",
+                     "p_mass_rm",
+                     "n_mass_rm",
+                     "p_mass_fd",
+                     "n_mass_fd",
+                     "n_culled",
+                     "frozen?",
+                     "temp",
+                     "humidity"
+                   ), 
                    na = c("-", "", " "))
 # Change date column to an actual date format
 mc1.df$date <- paste(mc1.df$date, "2018", sep = "/")
@@ -54,16 +71,18 @@ mc1.df$treatment <- ifelse(mc1.df$id < 2,
                            ifelse(
                              mc1.df$id < 3 & mc1.df$id > 1,
                              paste("zone.2"),
-                             ifelse(mc1.df$id < 4 &
-                                      mc1.df$id > 3, paste("zone.3"), paste("zone.4"))
+                             ifelse(mc1.df$id < 4 & mc1.df$id > 3, 
+                                    paste("zone.3"), 
+                                    paste("zone.4"))
                            ))
 mc1end.df$treatment <- ifelse(mc1end.df$id < 2,
                            paste("zone.1"),
                            ifelse(
                              mc1end.df$id < 3 & mc1end.df$id > 1,
                              paste("zone.2"),
-                             ifelse(mc1end.df$id < 4 &
-                                      mc1end.df$id > 3, paste("zone.3"), paste("zone.4"))
+                             ifelse(mc1end.df$id < 4 & mc1end.df$id > 3, 
+                                    paste("zone.3"), 
+                                    paste("zone.4"))
                            ))
 
 # Correct worker replace/drone removed to be amount actually replaced/removed
@@ -80,7 +99,10 @@ mc1.df[which(mc1.df$drones_removed == "yes"), 8] <- mc1.df[which(mc1.df$drones_r
 write_csv(mc1.df, "./D2018_MicroCol_Round1_Clean.csv")
 mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
 
-##### Summarize/calculate colony growth and resource consumption #####
+
+# **Calculate food consumption/colony growth ------------------------------
+
+
 mc1.df <- mc1.df %>%
   group_by(id) %>%
   mutate(true_mc_mass = mc_mass - mass_box - lag(p_mass_fd))
@@ -223,197 +245,106 @@ mc.massgain.test <- mc.massgain.test %>%
         )
       )
     )))
-  
-  
 
 
-##### Basic summary plots/tables #####
-# Final comb mass
-mc1end.df %>%
-  filter(!is.na(end_mass_comb)) %>%
-  group_by(treatment) %>%
-  summarise(mean.comb.mass = mean(end_mass_comb), se = sd(end_mass_comb) / sqrt(n())) %>%
-  ggplot() + 
-    #geom_col(mapping = aes(x = treatment, y = mean.comb.mass, width = 0.5)) + 
-    geom_pointrange(mapping = aes(x = treatment, y = mean.comb.mass,
-                                  ymax = mean.comb.mass + se, 
-                                  ymin = mean.comb.mass - se)) +
-    scale_y_continuous(limits = c(0, 10)) + 
-    theme_bw()
+# **Drone fitness ---------------------------------------------------------
+mc.drone.it.df <- read_csv("./D2018_MC1_DroneIT.csv")
+mc.drone.mass.df <- read_csv("./D2018_MC1_DroneMass.csv")
 
-ggplot(na.rm = TRUE) + 
-  geom_line(data = mc1.df, mapping = aes(x = date, 
-                                         y = true_mc_mass, 
-                                         group = id, 
-                                         color = treatment,
-                                         na.rm = FALSE)) + 
-  theme_bw()
+mc.drone.it.df$X5 <- NULL
+mc.drone.it.df <- mc.drone.it.df %>%
+  fill(date, id, .direction = "down")
 
-# Total Males Produced as point range plot
-mc1.df %>%
-  group_by(id, treatment) %>%
-  filter(id != 2.4) %>%
-  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
-  group_by(treatment) %>%
-  summarise(mean_males = mean(total_males), se = sd(total_males) / sqrt(n())) %>%
-  ggplot() + 
-    geom_pointrange(mapping = aes(x = treatment, y = mean_males, 
-                                  ymax = mean_males + se,
-                                  ymin = mean_males - se)) + 
-    theme_bw()
+mc.drone.it.df$treatment <- ifelse(
+  mc.drone.it.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc.drone.it.df$id < 3 & mc.drone.it.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc.drone.it.df$id < 4 & mc.drone.it.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
+)
 
-# Total males produced as boxplot
-mc1.df %>%
-  group_by(id, treatment) %>%
-  filter(id != 2.4) %>%
-  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
-  group_by(treatment) %>%
-  ggplot(mapping = aes(x = treatment, y = total_males)) + 
-    geom_boxplot() + 
-    theme_minimal()
+mc.drone.mass.df$treatment <- ifelse(
+  mc.drone.mass.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc.drone.mass.df$id < 3 & mc.drone.mass.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc.drone.mass.df$id < 4 & mc.drone.mass.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
+)
 
-# Male production normalized across microcolonies - diverging dot plot
-mc1.df %>%
-  group_by(id, treatment) %>%
-  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(drone_z = round((total_males - mean(total_males, na.rm = TRUE)) / sd(total_males, na.rm = TRUE), digits = 2)) %>%
-  mutate(drone_score = ifelse(drone_z < 0, "below", "above")) %>%
-  arrange(desc(drone_z)) %>%
-  mutate(z_order = factor(`id`, levels = `id`)) %>%
-  ggplot(aes(x = z_order, y = drone_z, label = drone_z)) + 
-    geom_point(stat = "identity", mapping = aes(col = drone_score), size = 8) + 
-    scale_color_manual(name = "Drone Production", 
-                       labels = c("Above Average", "Below Average"),
-                       values = c("above" = "green2", "below" = "red2")) + 
-    geom_text(color = "black", size = 2) + 
-    labs(y = "Drone Production Z-Score", x = "Microcolony ID") + 
-    coord_flip() + 
-    theme_bw() 
+# Summarise IT distance by id, date
+mc.drone.it.df %>%
+  group_by(date, id) %>%
+  summarise(total.drones = n(), 
+            mean.it = mean(it.distance, 
+                           na.rm = TRUE),
+            sd.it = sd(it.distance, 
+                       na.rm = TRUE),
+            se.it = sd.it / sqrt(total.drones))
 
-# Mass gain over experiment (smoothed)
-ggplot(data = mc1.df) + 
-  # geom_point(mapping = aes(x = date, y = mc_mass, #- mass_box - lag(p_mass_fd),
-  #                          color = treatment)) + 
-  geom_smooth(span = 0.75, 
-              mapping = aes(x = date, 
-                            y = mc_mass, #- mass_box - lag(p_mass_fd), 
-                            color = treatment,
-                            fill = treatment)) + 
-  theme_bw()
-
-# Nectar consumptiion grouped by treatment
-mc1.feed.df %>%
-  group_by(treatment, date) %>%
-  summarise(nectar_cons = mean(n_mass_cons),
-            nectar_se = (sd(n_mass_cons) / (sqrt(n()))), 
-            pollen_cons = mean(p_mass_cons_avg), 
-            pollen_se = (sd(p_mass_cons_avg) / sqrt(n())))
-
-mc1.feed.df %>%
-  group_by(id) %>%
-  mutate(cum_pollen = cumsum(p_mass_cons_avg), 
-         cum_nectar = cumsum(n_mass_cons)) %>%
+# Summarise IT distance by treatment, date
+mc.drone.it.df %>%
   group_by(date, treatment) %>%
-  summarise(nectar_cons = mean(cum_nectar), 
-            nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
-            pollen_cons = mean(cum_pollen, na.rm = TRUE), 
-            pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
-  # ggplot() +
-  # geom_pointrange(mapping = aes(x = date,
-  #                     y = nectar_cons,
-  #                     ymin = nectar_cons - nectar_se,
-  #                     ymax = nectar_cons + nectar_se,
-  #                     color = treatment)) +
-  # geom_smooth(mapping = aes(x = date,
-  #                           y = nectar_cons,
-  #                           color = treatment), se = FALSE) + 
-  # theme_minimal() #%>% 
-  ggplot() +
-  geom_pointrange(mapping = aes(x = date,
-                                y = pollen_cons,
-                                ymin = pollen_cons - pollen_se,
-                                ymax = pollen_cons + pollen_se,
-                                color = treatment)) +
-  geom_smooth(mapping = aes(x = date,
-                          y = pollen_cons,
-                          color = treatment), se = FALSE) +
-  theme_bw()
-
-# Average interval mass gain across entire experiment - diverging dot plot
-mc.massgain <- mc1.df %>%
-  select(id, date, mc_mass, p_mass_rm, p_mass_fd, treatment, mass_box) %>%
-  mutate(p_mass_cons = mc1.feed.df$p_mass_cons_avg) %>%
-  replace_na(list(mc_mass = 0)) %>%
-  mutate(mc_mass_diff = c(0, diff(mc1.df$mc_mass))) %>%
-  #filter(id == "3.3") %>%
-  mutate(mc_mass_gain = ifelse(lag(!is.na(p_mass_rm == TRUE)), 
-                               mc_mass_diff + lag(p_mass_rm) - lag(p_mass_fd) + p_mass_cons, 
-                               mc_mass_diff - lag(p_mass_fd) + p_mass_cons)) # this needs to be checked...
-
-mc.massgain$mc_mass_gain[which(diff(mc.massgain$id) != 0) + 1] <- NA
-
-# plot using z-scores
-mc.massgain %>% 
-  group_by(id, treatment) %>%
-  summarise(mean_intv_massgain = mean(mc_mass_gain, na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(mass_gain_z = round((mean_intv_massgain - mean(mean_intv_massgain, na.rm = TRUE)) / sd(mean_intv_massgain, na.rm = TRUE), digits = 2)) %>%
-  mutate(mass_score = ifelse(mass_gain_z < 0, "below", "above")) %>%
-  arrange(desc(mass_gain_z)) %>%
-  mutate(z_order = factor(`id`, levels = `id`)) %>%
-  ggplot(aes(x = z_order, y = mass_gain_z, label = mass_gain_z)) + 
-
-  geom_point(stat = "identity", mapping = aes(col = mass_score), size = 8) + 
-  scale_color_manual(name = "Mass gain between feeding intervals", 
-                     labels = c("Above Average", "Below Average"),
-                     values = c("above" = "green2", "below" = "red2")) + 
-  geom_text(color = "black", size = 2) + 
-  labs(y = "Mass Gain Z-Score", x = "Microcolony ID") + 
-  coord_flip() + 
-  theme_bw()
+  summarise(total.drones = n(), 
+            mean.it = mean(it.distance,
+                           na.rm = TRUE),
+            sd.it = sd(it.distance,
+                       na.rm = TRUE),
+            se.it = sd.it / sqrt(total.drones))
   
-# plot using raw average mass gains (still above/below 0)
-mc.massgain %>% 
-  group_by(id, treatment) %>%
-  summarise(mean_intv_massgain = round(mean(mc_mass_gain, na.rm = TRUE), digits = 2)) %>%
-  ungroup() %>%
-  mutate(mass_score = ifelse(mean_intv_massgain < 0, "below", "above")) %>%
-  arrange(desc(mean_intv_massgain)) %>%
-  mutate(mass_order = factor(`id`, levels = `id`)) %>%
-  ggplot(aes(x = mass_order, y = mean_intv_massgain, label = mean_intv_massgain)) + 
-  geom_point(stat = "identity", mapping = aes(col = mass_score), size = 8) + 
-  scale_color_manual(name = "Average change in mass between feeding intervals", 
-                     labels = c("Gained Mass", "Lost Mass"),
-                     values = c("above" = "slateblue", "below" = "powderblue")) + 
-  geom_text(color = "white", size = 2) + 
-  labs(y = "Mean feeding interval mass gain", x = "Microcolony ID") + 
-  coord_flip() + 
-  theme_bw()
-         
+# Summarise IT distance by treatment
+mc.drone.it.df %>%
+  group_by(treatment) %>%
+  summarise(total.drones = n(), 
+            mean.it = mean(it.distance,
+                           na.rm = TRUE),
+            sd.it = sd(it.distance,
+                       na.rm = TRUE),
+            se.it = sd.it / sqrt(total.drones))
 
-# Analysis with Agathe
-mc1.drone.df <- mc1.df %>%
-  group_by(id, treatment) %>%
-  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
-  filter(id != 2.4) # drop due to infighting issues
-mc1.drone.df$treatment <- as.factor(mc1.drone.df$treatment)
+# check if drone numbers match after summary
+all_equal(sum(mc.drone.it.sum.df$total.drones), 
+          nrow(mc.drone.it.df)) 
 
-mod.1 <- aov(total_males ~ treatment, data = mc1.drone.df)
-lm.mod.1 <- lm(total_males ~ treatment, data = mc1.drone.df)
-summary(lm.mod.1)
-TukeyHSD(lm.mod.1)
-summary(mod.1)
-TukeyHSD(mod.1)
+# Summarise mass by id
+mc.drone.mass.df %>%
+  group_by(id) %>%
+  summarise(total.drones = sum(n.drones),
+            mean.mass = mean(avg.individ.mass, 
+                              na.rm = TRUE),
+            sd.mass = sd(avg.individ.mass,
+                          na.rm = TRUE),
+            se.mass = sd.mass / sqrt(total.drones))
 
-mc.massgain$treatment <- as.factor(mc.massgain$treatment)
-mod.2 <- aov(mc_mass_gain ~ treatment + p_mass_cons + Error(id), data = mc.massgain)
-mod.2.1 <- aov(mc_mass_gain ~ treatment + Error(id), data = mc.massgain)
-summary(mod.2)
-summary(mod.2.1)
+# Summarise mass by treatment
+mc.drone.mass.df %>%
+  group_by(date, treatment) %>%
+  summarise(total.drones = sum(n.drones),
+            mean.mass = mean(avg.individ.mass, 
+                             na.rm = TRUE),
+            sd.mass = sd(avg.individ.mass,
+                         na.rm = TRUE),
+            se.mass = sd.mass / sqrt(total.drones))
 
-mc.massgain2 <- mc.massgain %>%
-  filter(id != 2.4)
-mod.x <- lm(mc_mass_gain ~ treatment, data = mc.massgain2)
-summary(mod.x)
-anova(mod.x)
+# Summarise mass by treatment
+mc.drone.mass.df %>%
+  group_by(treatment) %>%
+  summarise(total.drones = sum(n.drones),
+            mean.mass = mean(avg.individ.mass, 
+                             na.rm = TRUE),
+            sd.mass = sd(avg.individ.mass,
+                         na.rm = TRUE),
+            se.mass = sd.mass / sqrt(total.drones))
+
+
