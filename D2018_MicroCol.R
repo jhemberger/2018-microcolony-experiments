@@ -16,7 +16,7 @@ library(viridis)
 library(ggcorrplot)
 
 # Round 1 - Spring 2018 -------------------------------------------------
-# **Import and clean data -----------------------------------------------
+## **Import and clean data -----------------------------------------------
 mc1.df <- read_csv("D2018_MicroCol_Round1.csv", skip = 2, 
                    col_names = c(
                      "id",
@@ -100,7 +100,7 @@ write_csv(mc1.df, "./D2018_MicroCol_Round1_Clean.csv")
 mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
 
 
-# **Calculate food consumption/colony growth ------------------------------
+## **Calculate food consumption/colony growth ------------------------------
 
 
 mc1.df <- mc1.df %>%
@@ -348,3 +348,122 @@ mc.drone.mass.df %>%
             se.mass = sd.mass / sqrt(total.drones))
 
 
+
+
+
+# Round 2 - Summer 2018 ---------------------------------------------------
+
+# **Import and clean data -------------------------------------------------
+mc2.df <- read_csv("D2018_MicroCol_Round2.csv",
+                   skip = 1,
+                   col_names = c(
+                     "id",
+                     "date",
+                     "time",
+                     "initials",
+                     "temp",
+                     "humidity",
+                     "activity",
+                     "mc_mass",
+                     "n_drones",
+                     "n_new_drones",
+                     "n_worker_deaths",
+                     "brood",
+                     "workers_replaced",
+                     "drones_removed",
+                     "p_mass_rm",
+                     "n_mass_rm",
+                     "p_mass_fd",
+                     "n_mass_fd"),
+                     na = c(" ", "N/A", "x")
+                   )
+mc2.end.df <- read_csv("./D2018_MicroCol_Round2_BroodMass.csv",
+                       skip = 1,
+                       col_names = c(
+                         "id",
+                         "end_mass_comb",
+                         "mass_box"
+                       ))
+mc2.end.df$mass_box <- NULL
+mc2.df$time <- NULL
+mc2.df$initials <- NULL
+
+mc.boxmass.df <- data_frame(id = mc1end.df$id, 
+                            mass_box = mc1end.df$mass_box)
+mc.boxmass.avg <- mean(mc.boxmass.df$mass_box, 
+                       na.rm = TRUE)
+
+mc2.df <- left_join(mc2.df, 
+                     mc.boxmass.df, 
+                     by = "id")
+mc2.df <- left_join(mc2.df, 
+                     mc2.end.df,
+                     by = "id")
+
+mc2.df$mass_box[is.na(mc2.df$mass_box)] <- mc.boxmass.avg
+
+mc2.df$treatment <- ifelse(mc2.df$id < 2,
+                           paste("zone.1"),
+                           ifelse(
+                             mc2.df$id < 3 & mc2.df$id > 1,
+                             paste("zone.2"),
+                             ifelse(mc2.df$id < 4 & mc2.df$id > 3, 
+                                    paste("zone.3"), 
+                                    paste("zone.4"))
+                           ))
+write_csv(mc2.df, "./D2018_MicroCol_Round2_Clean.csv")
+mc2.df <- read_csv("./D2018_MicroCol_Round2_Clean.csv")
+
+
+# **Calc food consumption/colony growth -----------------------------------
+mc2.feed.df <- data_frame(id= mc2.df$id, 
+                          date = mc2.df$date,
+                          mc_mass = mc2.df$mc_mass,
+                          p_mass_rm = mc2.df$p_mass_rm,
+                          p_mass_fd = mc2.df$p_mass_fd,
+                          n_mass_fd = mc2.df$n_mass_fd,
+                          n_mass_rm = mc2.df$n_mass_rm,
+                          mass_box = mc2.df$mass_box,
+                          treatment = mc2.df$treatment)
+
+mc2.feed.df <- mc2.feed.df %>%
+  group_by(id) %>%
+  mutate(fd.day = row_number())
+
+
+# Insert row above first feed day (day 0) to account for 3g of pollen for 
+# microcolony initiation - how to do? 
+
+test <- mc2.feed.df %>%
+  ungroup(mc2.feed.df) %>%
+  add_row(list(mc2.feed.df[mc2.feed.df$fd.day == 1, ]),
+          .before = which(mc2.feed.df$fd.day == 1))
+
+mc2.feed.init <- mc2.feed.df[mc2.feed.df$fd.day == 1, ]
+# mc2.feed.init$n_mass_rm <- NA
+# mc2.feed.init$n_mass_fd <- NA
+mc2.feed.init$p_mass_fd <- 3.000
+mc2.feed.init$p_mass_fd <- as.numeric(mc2.feed.init$p_mass_fd)
+mc2.feed.init$fd.day <- 0
+
+mc2.feed.init$n_mass_rm <- parse_double(mc2.feed.init$n_mass_rm)
+mc2.feed.init$n_mass_fd <- parse_number(mc2.feed.init$n_mass_fd)
+mc2.feed.init$p_mass_fd <- parse_number(mc2.feed.init$p_mass_fd)
+
+test2 <- mc2.feed.df %>%
+  bind_rows(mc2.feed.init)
+# Function to insert each row of mc2.feed.init above fd.day 1
+feed.init <- function() {
+  init.pos <- which(mc2.feed.df$fd.day == 1) # indexd position of day 1 (insert before this)
+  for (i in 1:length(init.pos)) {
+    mc2.feed.df.test <- mc2.feed.df %>%
+      bind_rows(mc2.feed.init)
+    # j <- unlist(mc2.feed.init[i, ])
+    # add_row(.data = mc2.feed.df,
+    #         unlist(mc2.feed.init[i, ]),
+    #         .before = init.pos[i])
+  }
+}
+feed.init()
+
+#grab first row of mc2.feed.init, insert it above init.pos in mc2.feed.df

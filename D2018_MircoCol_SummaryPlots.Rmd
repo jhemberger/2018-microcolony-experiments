@@ -213,6 +213,11 @@ mc.massgain %>%
                size = 1.1,
                color = "white",
                alpha = 0.25) + 
+  geom_hline(yintercept = 0,
+             linetype = "dashed",
+             color = "red",
+             size = 1.25,
+             alpha = 0.25) +
   geom_point(stat = "identity", 
              mapping = aes(col = mass_score), 
              size = 8,
