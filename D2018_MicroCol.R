@@ -84,7 +84,9 @@ mc1end.df$treatment <- ifelse(mc1end.df$id < 2,
                                     paste("zone.3"), 
                                     paste("zone.4"))
                            ))
-
+mc1.df <- mc1.df %>%
+group_by(id) %>%
+  mutate(fd.day = row_number())
 # Correct worker replace/drone removed to be amount actually replaced/removed
 # e.g. 3/5 means 3 of 5 total were replaced/removed 
 mc1.df <- separate(mc1.df, drones_removed,
@@ -101,8 +103,6 @@ mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
 
 
 ## **Calculate food consumption/colony growth ------------------------------
-
-
 mc1.df <- mc1.df %>%
   group_by(id) %>%
   mutate(true_mc_mass = mc_mass - mass_box - lag(p_mass_fd))
@@ -352,7 +352,6 @@ mc.drone.mass.df %>%
 
 
 # Round 2 - Summer 2018 ---------------------------------------------------
-
 # **Import and clean data -------------------------------------------------
 mc2.df <- read_csv("D2018_MicroCol_Round2.csv",
                    skip = 1,
@@ -377,6 +376,8 @@ mc2.df <- read_csv("D2018_MicroCol_Round2.csv",
                      "n_mass_fd"),
                      na = c(" ", "N/A", "x")
                    )
+mc2.df$date <- mdy(mc2.df$date)
+mc2.df$date <- parse_date(mc2.df$date)
 mc2.end.df <- read_csv("./D2018_MicroCol_Round2_BroodMass.csv",
                        skip = 1,
                        col_names = c(
@@ -407,10 +408,30 @@ mc2.df$treatment <- ifelse(mc2.df$id < 2,
                            ifelse(
                              mc2.df$id < 3 & mc2.df$id > 1,
                              paste("zone.2"),
-                             ifelse(mc2.df$id < 4 & mc2.df$id > 3, 
-                                    paste("zone.3"), 
+                             ifelse(mc2.df$id < 4 & mc2.df$id > 3,
+                                    paste("zone.3"),
                                     paste("zone.4"))
                            ))
+mc2.end.df$treatment <- ifelse(
+  mc2.end.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc2.end.df$id < 3 & mc2.end.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc2.end.df$id < 4 & mc2.end.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
+)
+mc2.df <- mc2.df %>%
+  group_by(id) %>%
+  mutate(fd.day = row_number())
+
+mc2.feed.df <- mc2.feed.df %>%
+  mutate(mc_mass_diff = c(NA, diff(mc_mass_true)))
+
 write_csv(mc2.df, "./D2018_MicroCol_Round2_Clean.csv")
 mc2.df <- read_csv("./D2018_MicroCol_Round2_Clean.csv")
 
@@ -430,40 +451,134 @@ mc2.feed.df <- mc2.feed.df %>%
   group_by(id) %>%
   mutate(fd.day = row_number())
 
-
 # Insert row above first feed day (day 0) to account for 3g of pollen for 
-# microcolony initiation - how to do? 
-
-test <- mc2.feed.df %>%
-  ungroup(mc2.feed.df) %>%
-  add_row(list(mc2.feed.df[mc2.feed.df$fd.day == 1, ]),
-          .before = which(mc2.feed.df$fd.day == 1))
-
+# microcolony initiation 
 mc2.feed.init <- mc2.feed.df[mc2.feed.df$fd.day == 1, ]
-# mc2.feed.init$n_mass_rm <- NA
-# mc2.feed.init$n_mass_fd <- NA
+mc2.feed.init$n_mass_rm <- NA
+mc2.feed.init$n_mass_fd <- NA
 mc2.feed.init$p_mass_fd <- 3.000
-mc2.feed.init$p_mass_fd <- as.numeric(mc2.feed.init$p_mass_fd)
 mc2.feed.init$fd.day <- 0
 
-mc2.feed.init$n_mass_rm <- parse_double(mc2.feed.init$n_mass_rm)
-mc2.feed.init$n_mass_fd <- parse_number(mc2.feed.init$n_mass_fd)
-mc2.feed.init$p_mass_fd <- parse_number(mc2.feed.init$p_mass_fd)
+mc2.feed.df <- mc2.feed.df %>%
+  bind_rows(mc2.feed.init) %>%
+  arrange(id, fd.day)
 
-test2 <- mc2.feed.df %>%
-  bind_rows(mc2.feed.init)
-# Function to insert each row of mc2.feed.init above fd.day 1
-feed.init <- function() {
-  init.pos <- which(mc2.feed.df$fd.day == 1) # indexd position of day 1 (insert before this)
-  for (i in 1:length(init.pos)) {
-    mc2.feed.df.test <- mc2.feed.df %>%
-      bind_rows(mc2.feed.init)
-    # j <- unlist(mc2.feed.init[i, ])
-    # add_row(.data = mc2.feed.df,
-    #         unlist(mc2.feed.init[i, ]),
-    #         .before = init.pos[i])
+pollen.subtract.r2 <- mc2.feed.df %>%
+  filter(!is.na(p_mass_rm))
+pollen.subtract.r2 <- as.vector(pollen.subtract.r2$p_mass_rm)
+
+mc2.feed.df$p_mass_rm[mc2.feed.df$p_mass_fd == 3] <- 0.0 
+
+start.r2 <- which(!is.na(mc2.feed.df$p_mass_rm))
+stop.r2 <- start.r2 - 1 # stop points are 1 behind the start
+#start.r2 <- head(start.r2, -1) # trim off last start index
+stop.r2 <- tail(stop.r2, -1) # trim off first stop index to correctly align
+stop.r2 <- c(stop.r2, 476)
+
+print(start.r2)
+print(stop.r2)
+
+pollen.sum.r2 <- c(rep(0, length(start.r2))) # Initialize pollen.sum vector
+for (i in 1:length(start.r2)) {
+  for (j in start.r2[i]:stop.r2[i]) {
+    pollen.sum.r2[i] <- pollen.sum.r2[i] + mc2.feed.df$p_mass_fd[j]
   }
 }
-feed.init()
+print(pollen.sum.r2)
 
-#grab first row of mc2.feed.init, insert it above init.pos in mc2.feed.df
+length(pollen.subtract.r2) == length(pollen.sum.r2 - pollen.subtract.r2) # Check equality
+# not - need to remove last pollen sum from each MC id - remove every 6th entry of pollen sum 
+psum.rm <- seq(6, 168, by = 6) # Index pos. of each 
+pollen.sum.r2 <- pollen.sum.r2[-psum.rm]
+print(pollen.sum.r2)
+length(pollen.subtract.r2) == length(pollen.sum.r2) # TRUE
+pollen.consumed.r2 <- pollen.sum.r2 - pollen.subtract.r2
+print(pollen.consumed.r2) # 15 values are negative w/mean value of 0.107 grams
+
+mc2.feed.df$p_mass_cons <- NA
+pcons.index <- stop.r2[-psum.rm]
+mc2.feed.df$p_mass_cons[pcons.index + 1] <- pollen.consumed.r2
+mc2.feed.df$p_mass_cons[which(mc2.feed.df$p_mass_rm == 0)] <- 0.00
+
+# Calculate average daily pollen/nectar consumption 
+mc2.feed.df$p_mass_cons_avg <- NA
+fd.days.r2 <- ((stop.r2 - start.r2) + 1)
+mc2.feed.df$p_mass_cons_avg[which(!is.na(mc2.feed.df$p_mass_cons))] <-
+  mc2.feed.df$p_mass_cons[which(!is.na(mc2.feed.df$p_mass_cons))] / fd.days.r2
+mc2.feed.df <- fill(mc2.feed.df, 
+                    p_mass_cons_avg, 
+                    .direction = "up")
+mc2.feed.df$p_mass_cons_avg[mc2.feed.df$p_mass_cons_avg == 0] <- NA
+mc2.feed.df$p_mass_cons_avg <- as.numeric(mc2.feed.df$p_mass_cons_avg) # for some 
+# reason it was boolean...? 
+
+mc2.feed.df$n_mass_cons <- NA
+mc2.feed.df$n_mass_rm <- as.numeric(mc2.feed.df$n_mass_rm)
+mc2.feed.df$n_mass_cons <- mc2.feed.df$n_mass_fd - lead(mc2.feed.df$n_mass_rm)
+mc2.feed.df$n_mass_cons <- as.numeric(mc2.feed.df$n_mass_cons)
+
+mc2.feed.df$treatment <- as.factor(mc2.feed.df$treatment)
+
+write_csv(mc2.feed.df, "./D2018_MicroCol_Round2_Feed_Clean.csv")
+
+# Old school way to do feed days - did in tidy version below
+x <- list()
+y <- 0
+for (i in fd.days.r2) {
+  y <- y + 1
+  if (i == 4) {
+    z <- 3:0
+  } else {
+    z <- 3:1
+  }
+  x[[y]] <- z
+}
+fd.days.count <- unlist(x)
+test <- mc2.feed.df
+test$fd.day.count <- fd.days.count
+
+# Feed day counts for use in true mass calculation
+mc2.feed.df <- mc2.feed.df %>%
+  group_by(id) %>%
+  mutate(fd.day.count = c(0, rep(seq(3, 1, by = -1), 5), 0))
+
+# Calculate initial mass at start of experiment - first obsv. minus 3 grams of 
+# pollen added to initiate microcolony.  Mass gains/losses from this point are 
+# calculated relative to this mc_mass_init value. 
+mc2.feed.df <- mc2.feed.df %>%
+  group_by(id) %>%
+  mutate(mc_mass_init = mc_mass[fd.day == 0] - 3)
+
+# Calculate "true" mass relative to initiation mass.
+mc2.feed.df <- mc2.feed.df %>%
+  ungroup() %>%
+  mutate(mc_mass_true = ifelse(
+    fd.day.count == 3,
+    ((mc_mass - mc_mass_init) + p_mass_cons_avg),
+    ifelse(
+      fd.day.count == 2,
+      (((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) + p_mass_cons_avg),
+      ifelse(
+        fd.day.count == 1,
+        ((((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) - lag(p_mass_fd, n = 2)) + p_mass_cons_avg),
+        0
+        )
+      )
+    ))
+
+mc2.feed.df$mc_mass_true[mc2.feed.df$mc_mass_true == 0] <- NA
+
+write_csv(mc2.feed.df, "./D2018_MicroCol_Round2_Feed_Clean.csv")
+mc2.feed.df <- read_csv("./D2018_MicroCol_Round2_Feed_Clean.csv")
+
+
+
+
+# **Drone fitness ---------------------------------------------------------
+mc2.drone.df <- mc2.df %>%
+  group_by(id, treatment) %>%
+  summarise(total_drones = sum(n_new_drones, na.rm = TRUE))
+
+
+
+
