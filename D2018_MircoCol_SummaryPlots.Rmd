@@ -12,16 +12,26 @@ subtitle: Summary figures
 ## Load packages
 ```{r}
 library(tidyverse)
-library(viridis)
 library(lubridate)
+library(plyr)
+library(broom)
 ```
 
+## Load all data
+```{r} 
+load(file = "mc1df.Rdata")
+load(file = "mc2df.Rdata")
+load(file = "mc1enddf.Rdata")
+load(file = "mc2enddf.Rdata")
+load(file = "mc1feeddf.Rdata")
+load(file = "mc2feeddf.Rdata")
+load(file = "mcmassgain.Rdata")
+```
 ## Round 1 Summary Plots 
 #### Final comb mass
 
 ```{r}
 mc1end.df %>%
-  filter(!is.na(end_mass_comb)) %>%
   group_by(treatment) %>%
   summarise(mean.comb.mass = mean(end_mass_comb), 
             se = sd(end_mass_comb) / sqrt(n())) %>%
@@ -41,13 +51,30 @@ mc1end.df %>%
 
 #### Raw mass gain for all microcolony replicates
 ```{r}
+mc1.feed.df %>%
+  filter(!is.na(mc_mass_true)) %>%
 ggplot(na.rm = TRUE) + 
-  geom_line(data = mc1.df, mapping = aes(x = date, 
-                                         y = true_mc_mass, 
-                                         group = id, 
-                                         color = treatment,
-                                         na.rm = FALSE),
+  geom_line(mapping = aes(x = fd.day, 
+                          y = mc_mass_true, 
+                          group = id, 
+                          color = treatment),
+            na.rm = TRUE,
             size = 1.1) + 
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
   theme_black()
 ```
 
@@ -60,6 +87,10 @@ mc1.df %>%
   group_by(treatment) %>%
   summarise(mean_males = mean(total_males), se = sd(total_males) / sqrt(n())) %>%
   ggplot() + 
+    geom_col(mapping = aes(x = treatment,
+                         y = mean_males,
+                         fill = treatment,
+                         width = 0.5)) + 
   geom_pointrange(mapping = aes(x = treatment, y = mean_males, 
                                 ymax = mean_males + se,
                                 ymin = mean_males - se),
@@ -118,21 +149,22 @@ mc1.df %>%
 
 #### Drone production bump chart - by treatment
 ```{r}
+mc1.df$id <- as.factor(mc1.df$id)
 mc1.df %>%
   ungroup() %>%
   group_by(id) %>%
   mutate(fd.day = row_number()) %>%
-  mutate(csum_drones = cumsum(n_new_drones)) %>%
+  mutate(csum_drones = cumsum(n_new_drones)) %>% # won't work unless NO NA's
   arrange(id, date) %>%
   ggplot(mapping = aes(x = fd.day,
                        y = csum_drones,
-                       group = id)) +
-  geom_line(mapping = aes(color = treatment),
+                       group = id)) + 
+  geom_line(mapping = aes(color = treatment), 
             alpha = 0.6,
-            size = 1.5) +
+            size = 1.5) + 
   geom_point(mapping = aes(color = treatment),
              alpha = 0.75,
-             size = 3) +
+             size = 3) + 
   annotate("rect",
            xmin = 4,
            xmax = 6,
@@ -140,7 +172,7 @@ mc1.df %>%
            ymax = Inf,
            fill = "white",
            alpha = 0.2) + 
-    annotate("rect",
+  annotate("rect",
            xmin = 11,
            xmax = 13,
            ymin = -Inf,
@@ -156,14 +188,28 @@ mc1.df %>%
 
 #### Average mass gain - smoothed
 ```{r}
-ggplot(data = mc1.df) + 
-  # geom_point(mapping = aes(x = date, y = mc_mass, #- mass_box - lag(p_mass_fd),
-  #                          color = treatment)) + 
+ggplot(data = mc1.feed.df) + 
   geom_smooth(span = 0.75, 
-              mapping = aes(x = date, 
-                            y = mc_mass, #- mass_box - lag(p_mass_fd), 
+              mapping = aes(x = fd.day, 
+                            y = mc_mass_true, #- mass_box - lag(p_mass_fd), 
                             color = treatment,
-                            fill = treatment)) + 
+                            fill = treatment),
+              method = "loess") + 
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
   theme_black()
 ```
 
@@ -214,7 +260,7 @@ mc1.feed.df %>%
 ```
 
 #### Calculate average interval mass gain across entire experiment
-```{r}
+
 mc.massgain <- mc1.df %>%
   select(id, date, mc_mass, p_mass_rm, p_mass_fd, treatment, mass_box) %>%
   mutate(p_mass_cons = mc1.feed.df$p_mass_cons_avg) %>%
@@ -226,7 +272,7 @@ mc.massgain <- mc1.df %>%
                                mc_mass_diff - lag(p_mass_fd) + p_mass_cons)) # this needs to be checked...
 
 mc.massgain$mc_mass_gain[which(diff(mc.massgain$id) != 0) + 1] <- NA
-```
+
 
 ##### Average interval mass gain - z-score diverging dot plot
 ```{r}
@@ -335,12 +381,15 @@ mc2.end.df %>%
   theme_black()
 ```
 #### Corrected mass time series
+Removed MC 1.4 due to all negative true mass values. 
 ```{r}
-ggplot() + 
-  geom_line(data = mc2.feed.df, mapping = aes(x = date, 
-                                              y = mc_mass_true, 
-                                              group = id, 
-                                              color = treatment),
+mc2.feed.df %>%
+  filter(id != 1.4) %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = date, 
+                          y = mc_mass_true, 
+                          group = id, 
+                          color = treatment),
             size = 1.1) + 
   theme_black()
 ```
@@ -357,7 +406,7 @@ mc2.drone.df %>%
                          y = mean_drones,
                          fill = treatment,
                          width = 0.5)) + 
-    geom_pointrange(mapping = aes(x = treatment, 
+  geom_pointrange(mapping = aes(x = treatment, 
                                 y = mean_drones, 
                                 ymax = mean_drones + se_drones,
                                 ymin = mean_drones - se_drones),
@@ -561,9 +610,205 @@ mc2.df %>%
            ymax = Inf,
            fill = "white",
            alpha = 0.2) + 
-    scale_x_continuous(breaks = unique(mc2.df$fd.day)) +
+  scale_x_continuous(breaks = unique(mc2.df$fd.day)) +
   labs(y = "Cumulative Drone Production",
        x = "Feeding Interval") + 
   theme_black()
 
+```
+
+## Rate of Microcolony Growth
+### Round 1
+#### Zone 1
+```{r}
+mc1.feed.df$pulse_cat <- as.character(mc1.feed.df$pulse_cat)
+mc1.feed.df %>%
+  ungroup() %>%
+  filter(treatment == "zone.1") %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = fd.day,
+                           y = mc_mass_true_intrp,
+                           color = pulse_cat)) + 
+  geom_smooth(mapping = aes(x = fd.day,
+                            y = mc_mass_true_intrp,
+                            col = pulse_cat),
+              method = "lm",
+              se = FALSE) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  theme_black()
+
+```
+
+#### Zone 2
+```{r}
+mc1.feed.df$pulse_cat <- as.character(mc1.feed.df$pulse_cat)
+mc1.feed.df %>%
+  ungroup() %>%
+  filter(treatment == "zone.2") %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = fd.day,
+                           y = mc_mass_true_intrp,
+                           color = pulse_cat)) + 
+  geom_smooth(mapping = aes(x = fd.day,
+                            y = mc_mass_true_intrp,
+                            col = pulse_cat),
+              method = "lm",
+              se = FALSE) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  theme_black()
+
+```
+
+
+#### Zone 3
+```{r}
+mc1.feed.df$pulse_cat <- as.character(mc1.feed.df$pulse_cat)
+mc1.feed.df %>%
+  ungroup() %>%
+  filter(treatment == "zone.3") %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = fd.day,
+                           y = mc_mass_true_intrp,
+                           color = pulse_cat)) + 
+  geom_smooth(mapping = aes(x = fd.day,
+                            y = mc_mass_true_intrp,
+                            col = pulse_cat),
+              method = "lm",
+              se = FALSE) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  theme_black()
+
+```
+
+
+#### Zone 4
+```{r}
+mc1.feed.df$pulse_cat <- as.character(mc1.feed.df$pulse_cat)
+mc1.feed.df %>%
+  ungroup() %>%
+  filter(treatment == "zone.4") %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = fd.day,
+                           y = mc_mass_true_intrp,
+                           color = pulse_cat)) + 
+  geom_smooth(mapping = aes(x = fd.day,
+                            y = mc_mass_true_intrp,
+                            color = pulse_cat),
+              method = "lm",
+              se = FALSE) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  theme_black()
+```
+
+### Pull slopes from lm fits (slope = ROC)
+#### Round 1
+```{r}
+trt.slopes <- function() {
+  trts <- unique(mc1.feed.df$treatment)
+  df.ls <- list() 
+  for (i in trts) {
+    df <- mc1.feed.df %>%
+      filter(treatment == i) %>%
+      dlply("pulse_cat", function(.)
+        tidy(lm(mc_mass_true_intrp ~ fd.day, data = .))) %>%
+      bind_rows(.id = "id") %>%
+      mutate(treatment = i)
+    df.ls[[i]] <- df
+  }
+  df.end <- bind_rows(df.ls)
+  assign("mc1.trtslope.df",
+         df.end,
+         envir = .GlobalEnv)
+}
+trt.slopes()
+mc1.trtslope.df
+```
+
+```{r}
+mc1.trtslope.df$id <- as.factor(mc1.trtslope.df$id)
+mc1.trtslope.df$id <- factor(mc1.trtslope.df$id, levels = c("b1",
+                                                            "p1",
+                                                            "a1.b2",
+                                                            "p2",
+                                                            "a2"))
+mc1.trtslope.df %>%
+  filter(term != "(Intercept)") %>%
+  ggplot() + 
+  geom_pointrange(mapping = aes(x = id,
+                                y = estimate,
+                                ymin = estimate - std.error,
+                                ymax = estimate + std.error,
+                                color = treatment),
+                  size = 1) +
+  geom_line(mapping = aes(x = id,
+                           y = estimate,
+                           group = treatment,
+                           color = treatment),
+            size = 1.25,
+            alpha = 0.75) + 
+  geom_hline(yintercept = 0,
+             color = "white",
+             size = 1.25,
+             alpha = 0.25) + 
+  labs(x = "Period relative to food pulse",
+       y = "Estimated rate of mass gain") + 
+  scale_y_continuous(limits = c(-3.25, 3.25),
+                     breaks = seq(-3, 3, by = 1)) + 
+  theme_black()
+```
+
+#### Round 2
+```{r}
+trt.slopes <- function() {
+  trts <- unique(mc2.feed.df$treatment)
+  df.ls <- list() 
+  for (i in trts) {
+    df <- mc2.feed.df %>%
+      filter(treatment == i) %>%
+      dlply("pulse_cat", function(.)
+        tidy(lm(mc_mass_true ~ fd.day, data = .))) %>%
+      bind_rows(.id = "id") %>%
+      mutate(treatment = i)
+    df.ls[[i]] <- df
+  }
+  df.end <- bind_rows(df.ls)
+  assign("mc2.trtslope.df",
+         df.end,
+         envir = .GlobalEnv)
+}
+trt.slopes()
+mc2.trtslope.df
+```
+
+```{r}
+mc2.trtslope.df$id <- as.factor(mc2.trtslope.df$id)
+mc2.trtslope.df$id <- factor(mc2.trtslope.df$id, levels = c("b1",
+                                                            "p1",
+                                                            "a1.b2",
+                                                            "p2",
+                                                            "a2"))
+mc2.trtslope.df %>%
+  filter(term != "(Intercept)") %>%
+  ggplot() + 
+  geom_pointrange(mapping = aes(x = id,
+                                y = estimate,
+                                ymin = estimate - std.error,
+                                ymax = estimate + std.error,
+                                color = treatment),
+                  size = 1) + 
+  geom_line(mapping = aes(x = id,
+                           y = estimate,
+                           group = treatment,
+                           color = treatment),
+            size = 1.25,
+            alpha = 0.75) + 
+  geom_hline(yintercept = 0,
+             color = "white",
+             size = 1.25,
+             alpha = 0.25) + 
+  labs(x = "Period relative to food pulse",
+       y = "Estimated rate of mass gain") + 
+  scale_y_continuous(limits = c(-3, 3),
+                     breaks = seq(-3, 3, by = 1)) + 
+  theme_black()
 ```

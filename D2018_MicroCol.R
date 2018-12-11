@@ -14,6 +14,7 @@ library(lubridate)
 library(lme4)
 library(viridis)
 library(ggcorrplot)
+library(zoo)
 
 # Round 1 - Spring 2018 -------------------------------------------------
 ## **Import and clean data -----------------------------------------------
@@ -97,6 +98,7 @@ mc1.df$delete = NULL
 # Values to be over-written <- values copied - only if drones_removed = 'yes'
 mc1.df[which(mc1.df$drones_removed == "yes"), 8] <- mc1.df[which(mc1.df$drones_removed == "yes"), 4] 
 
+mc1.df$n_new_drones[is.na(mc1.df$n_new_drones)] <- 0
 # Export cleaned .csv ready for summary and analysis
 write_csv(mc1.df, "./D2018_MicroCol_Round1_Clean.csv")
 mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
@@ -195,10 +197,7 @@ mc1.feed.df$treatment <- ifelse(
     )
   )
 )
-mc1.feed.df$treatment <- as.factor(mc1.feed.df$treatment) # Coerce treatment as factor
-
-# Write csv file to working directory
-write_csv(mc1.feed.df, "./D2018_MicroCol_Round1_Feed_Clean.csv")
+mc1.feed.df$treatment <- as.factor(mc1.feed.df$treatment)
 
 # Calculate true microcolony mass 
 x <- list()
@@ -223,28 +222,71 @@ for (i in fd.days) {
 
 fd.days.count <- unlist(x)
 fd.days.count <- c(fd.days.count, c(NA, NA, NA))
-mc.massgain$fd.days <- fd.days.count
+mc1.feed.df$fd.day.count <- fd.days.count
 
-mc.massgain.test <- mc.massgain %>%
-  filter(id == 3.3) %>%
-  mutate(mass_box = 433.61)
-mc.massgain.test <- mc.massgain.test %>%
-  mutate(interval_day = 1:nrow(mc.massgain.test)) %>%
+mc1.feed.df <- mc1.feed.df %>%
+  ungroup() %>%
+  group_by(id) %>%
+  mutate(fd.day.count = c(1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 1 ,2))
+
+mc1.feed.df <- mc1.feed.df %>%
+  group_by(id) %>%
+  mutate(fd.day = row_number())
+mc1.feed.df <- mc1.feed.df %>%
+  ungroup() %>%
+  mutate(mc_mass = mc1.df$mc_mass) %>%
+  group_by(id) %>%
+  mutate(mc_mass_init = mc_mass[fd.day == 1] - 3)
+
+mc1.feed.df <- mc1.feed.df %>%
+  ungroup() %>%
   mutate(mc_mass_true = ifelse(
-    fd.days == 3,
-    mc_mass - mass_box + p_mass_cons,
+    fd.day.count == 1,
+    ((mc_mass - mc_mass_init) + p_mass_cons_avg),
     ifelse(
-      fd.days == 2,
-      mc_mass - mass_box - lag(p_mass_fd, n = 1) + p_mass_cons,
+      fd.day.count == 2,
+      (((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) + p_mass_cons_avg),
       ifelse(
-        fd.days == 1,
-        mc_mass - mass_box - lag(p_mass_fd, n = 1) - lag(p_mass_fd, n = 2) + p_mass_cons,
-        ifelse(
-          fd.days == 0,
-          mc_mass - mass_box - lag(p_mass_fd, n = 1) - lag(p_mass_fd, n = 2), - lag(p_mass_fd, n = 3) + p_mass_cons
-        )
+        fd.day.count == 3,
+        ((((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) - lag(p_mass_fd, n = 2)) + p_mass_cons_avg),
+        ifelse(fd.day.count == 0,
+               ((((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) - lag(p_mass_fd, n = 2)) - lag(p_mass_fd, n = 3)) + p_mass_cons_avg, 0)
       )
-    )))
+    )
+  ))
+
+# Create before/during/after/between pulse cateogorizations 
+mc1.feed.df <- mc1.feed.df %>%
+  ungroup() %>%
+  mutate(pulse_cat = ifelse(
+    fd.day <= 3, 
+    "b1",
+    ifelse(
+      fd.day > 3 & fd.day <= 6,
+      "p1",
+      ifelse(
+        fd.day > 6 & fd.day <= 10,
+        "a1.b2",
+        ifelse(fd.day >10 & fd.day <= 13,
+               "p2",
+               "a2")
+      )
+    )
+  ))
+mc1.feed.df$pulse_cat <- as.factor(mc1.feed.df$pulse_cat)
+
+# Interpolate missing values of mc_mass_true
+
+mc1.feed.df <- mc1.feed.df %>%
+  ungroup() %>%
+  group_by(id) %>%
+  mutate(mc_mass_true_intrp = na.approx(mc_mass_true, 
+                                        maxgap = 4,
+                                        rule = 2))
+
+# Write csv file to working directory
+write_csv(mc1.feed.df, "./D2018_MicroCol_Round1_Feed_Clean.csv")
+
 
 
 # **Drone fitness ---------------------------------------------------------
@@ -567,6 +609,27 @@ mc2.feed.df <- mc2.feed.df %>%
     ))
 
 mc2.feed.df$mc_mass_true[mc2.feed.df$mc_mass_true == 0] <- NA
+mc2.feed.df$mc_mass_true[mc2.feed.df$fd.day == 0] <- 0.00
+mc2.feed.df$date[mc2.feed.df$mc_mass_true == 0] <- "2018-06-19"
+
+mc2.feed.df <- mc2.feed.df %>%
+  ungroup() %>%
+  mutate(pulse_cat = ifelse(
+    fd.day <= 3, 
+    "b1",
+    ifelse(
+      fd.day > 3 & fd.day <= 6,
+      "p1",
+      ifelse(
+        fd.day > 6 & fd.day <= 10,
+        "a1.b2",
+        ifelse(fd.day >10 & fd.day <= 13,
+               "p2",
+               "a2")
+      )
+    )
+  ))
+mc2.feed.df$pulse_cat <- as.factor(mc2.feed.df$pulse_cat)
 
 write_csv(mc2.feed.df, "./D2018_MicroCol_Round2_Feed_Clean.csv")
 mc2.feed.df <- read_csv("./D2018_MicroCol_Round2_Feed_Clean.csv")
@@ -580,5 +643,11 @@ mc2.drone.df <- mc2.df %>%
   summarise(total_drones = sum(n_new_drones, na.rm = TRUE))
 
 
-
-
+# Save data to WD for Rmd -------------------------------------------------
+save(mc1.df, file = "mc1df.Rdata")
+save(mc2.df, file = "mc2df.Rdata")
+save(mc1end.df, file = "mc1enddf.Rdata")
+save(mc2.end.df, file = "mc2enddf.Rdata")
+save(mc1.feed.df, file = "mc1feeddf.Rdata")
+save(mc2.feed.df, file = "mc2feeddf.Rdata")
+save(mc.massgain, file = "mcmassgain.Rdata")
