@@ -290,40 +290,50 @@ write_csv(mc1.feed.df, "./D2018_MicroCol_Round1_Feed_Clean.csv")
 
 
 # **Drone fitness ---------------------------------------------------------
-mc.drone.it.df <- read_csv("./D2018_MC1_DroneIT.csv")
-mc.drone.mass.df <- read_csv("./D2018_MC1_DroneMass.csv")
+mc1.drone.it.df <- read_csv("./D2018_MC1_DroneIT.csv")
+mc1.drone.mass.df <- read_csv("./D2018_MC1_DroneMass.csv")
 
-mc.drone.it.df$X5 <- NULL
-mc.drone.it.df <- mc.drone.it.df %>%
+mc1.drone.it.df$X5 <- NULL
+mc1.drone.it.df <- mc1.drone.it.df %>%
   fill(date, id, .direction = "down")
 
-mc.drone.it.df$treatment <- ifelse(
-  mc.drone.it.df$id < 2,
+
+mc1.drone.it.df$treatment <- ifelse(
+  mc1.drone.it.df$id < 2,
   paste("zone.1"),
   ifelse(
-    mc.drone.it.df$id < 3 & mc.drone.it.df$id > 1,
+    mc1.drone.it.df$id < 3 & mc1.drone.it.df$id > 1,
     paste("zone.2"),
     ifelse(
-      mc.drone.it.df$id < 4 & mc.drone.it.df$id > 3,
+      mc1.drone.it.df$id < 4 & mc1.drone.it.df$id > 3,
       paste("zone.3"),
       paste("zone.4")
     )
   )
 )
 
-mc.drone.mass.df$treatment <- ifelse(
-  mc.drone.mass.df$id < 2,
+mc1.drone.mass.df$treatment <- ifelse(
+  mc1.drone.mass.df$id < 2,
   paste("zone.1"),
   ifelse(
-    mc.drone.mass.df$id < 3 & mc.drone.mass.df$id > 1,
+    mc1.drone.mass.df$id < 3 & mc1.drone.mass.df$id > 1,
     paste("zone.2"),
     ifelse(
-      mc.drone.mass.df$id < 4 & mc.drone.mass.df$id > 3,
+      mc1.drone.mass.df$id < 4 & mc1.drone.mass.df$id > 3,
       paste("zone.3"),
       paste("zone.4")
     )
   )
 )
+
+
+
+write_csv(mc1.drone.it.df, "./D2018_MC1_DroneIT_Clean.csv")
+write_csv(mc1.drone.mass.df, "./D2018_MC1_DroneMass_Clean.csv")
+
+mc1.drone.it.df <- read_csv("./D2018_MC1_DroneIT_Clean.csv")
+mc1.drone.mass.df <- read_csv("./D2018_MC1_DroneMass_Clean.csv")
+
 
 # Summarise IT distance by id, date
 mc.drone.it.df %>%
@@ -369,7 +379,7 @@ mc.drone.mass.df %>%
                           na.rm = TRUE),
             se.mass = sd.mass / sqrt(total.drones))
 
-# Summarise mass by treatment
+# Summarise mass by date, treatment
 mc.drone.mass.df %>%
   group_by(date, treatment) %>%
   summarise(total.drones = sum(n.drones),
@@ -388,8 +398,6 @@ mc.drone.mass.df %>%
             sd.mass = sd(avg.individ.mass,
                          na.rm = TRUE),
             se.mass = sd.mass / sqrt(total.drones))
-
-
 
 
 
@@ -468,8 +476,8 @@ mc2.end.df$treatment <- ifelse(
   )
 )
 mc2.df <- mc2.df %>%
-  group_by(id) %>%
-  mutate(fd.day = row_number())
+  dplyr::group_by(id) %>%
+  dplyr::mutate(fd.day = row_number())
 
 mc2.feed.df <- mc2.feed.df %>%
   mutate(mc_mass_diff = c(NA, diff(mc_mass_true)))
@@ -651,3 +659,5 @@ save(mc2.end.df, file = "mc2enddf.Rdata")
 save(mc1.feed.df, file = "mc1feeddf.Rdata")
 save(mc2.feed.df, file = "mc2feeddf.Rdata")
 save(mc.massgain, file = "mcmassgain.Rdata")
+save(mc1.drone.it.df, file = "mc1droneit.Rdata")
+save(mc1.drone.mass.df, file = "mc1dronemass.Rdata")

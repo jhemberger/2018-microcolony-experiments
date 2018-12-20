@@ -13,8 +13,8 @@ subtitle: Summary figures
 ```{r}
 library(tidyverse)
 library(lubridate)
-library(plyr)
 library(broom)
+library(plyr)
 ```
 
 ## Load all data
@@ -26,6 +26,8 @@ load(file = "mc2enddf.Rdata")
 load(file = "mc1feeddf.Rdata")
 load(file = "mc2feeddf.Rdata")
 load(file = "mcmassgain.Rdata")
+load(file = "mc1droneit.Rdata")
+load(file = "mc1dronemass.Rdata")
 ```
 ## Round 1 Summary Plots 
 #### Final comb mass
@@ -358,7 +360,74 @@ mc.massgain %>%
   theme_black()
 ```
 
+### Drone fitness
 
+##### IT distance: by treatment and date
+```{r} 
+mc1.drone.it.df %>%
+  dplyr::group_by(date, treatment) %>%
+  dplyr::summarise(total.drones = n(), 
+            mean.it = mean(it.distance,
+                           na.rm = TRUE),
+            sd.it = sd(it.distance,
+                       na.rm = TRUE),
+            se.it = sd.it / sqrt(total.drones)) %>%
+  dplyr::filter(total.drones > 1) %>%
+  arrange(date, treatment) %>%
+  ggplot(mapping = aes(x = date,
+                       y = mean.it,
+                       group = treatment)) + 
+  geom_pointrange(mapping = aes(ymax = mean.it + se.it,
+                                ymin = mean.it - se.it,
+                                color = treatment)) + 
+  geom_line(mapping = aes(x = date,
+                          y = mean.it,
+                          color = treatment),
+            alpha = 0.75) + 
+  scale_y_continuous(limits = c(2, 4)) + 
+  scale_x_date() + 
+  theme_black()
+```
+##### IT distance: mean by treatment
+```{r} 
+mc1.drone.it.df %>%
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(total.drones = n(), 
+            mean.it = mean(it.distance,
+                           na.rm = TRUE),
+            sd.it = sd(it.distance,
+                       na.rm = TRUE),
+            se.it = sd.it / sqrt(total.drones)) %>%
+  ggplot(mapping = aes(x = treatment,
+                       y = mean.it)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.75)) + 
+  geom_pointrange(mapping = aes(ymax = mean.it + se.it,
+                                ymin = mean.it - se.it),
+                  color = "white") + 
+  theme_black()
+```
+##### Drone mass: by treatment and date
+
+##### Drone mass: mean by treatment
+```{r}
+mc1.drone.mass.df %>%
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(total.drones = sum(n.drones),
+            mean.mass = mean(avg.individ.mass, 
+                             na.rm = TRUE),
+            sd.mass = sd(avg.individ.mass,
+                         na.rm = TRUE),
+            se.mass = sd.mass / sqrt(total.drones)) %>%
+  ggplot(mapping = aes(x = treatment,
+                       y = mean.mass)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.75)) + 
+  geom_pointrange(mapping = aes(ymax = mean.mass + se.mass,
+                                ymin = mean.mass - se.mass),
+                  color = "white") + 
+  theme_black()
+```
 ## Round 2 Summary Plots 
 #### Final comb mass
 ```{r}
@@ -583,10 +652,10 @@ mc2.feed.df %>%
 mc2.df$id <- as.factor(mc2.df$id)
 mc2.df %>%
   ungroup() %>%
-  group_by(id) %>%
-  mutate(fd.day = row_number()) %>%
-  mutate(csum_drones = cumsum(n_new_drones)) %>%
-  arrange(id, date) %>%
+  dplyr::group_by(id) %>%
+  dplyr::mutate(fd.day = row_number()) %>%
+  dplyr::mutate(csum_drones = cumsum(n_new_drones)) %>%
+  dplyr::arrange(id, date) %>%
   ggplot(mapping = aes(x = fd.day,
                        y = csum_drones,
                        group = id)) + 
@@ -597,15 +666,15 @@ mc2.df %>%
              alpha = 0.75,
              size = 3) + 
   annotate("rect",
-           xmin = 4,
-           xmax = 6,
+           xmin = 3.5,
+           xmax = 6.5,
            ymin = -Inf,
            ymax = Inf,
            fill = "white",
            alpha = 0.2) + 
   annotate("rect",
-           xmin = 11,
-           xmax = 13,
+           xmin = 10.5,
+           xmax = 13.5,
            ymin = -Inf,
            ymax = Inf,
            fill = "white",
