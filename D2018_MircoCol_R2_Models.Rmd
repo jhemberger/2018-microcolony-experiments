@@ -1,0 +1,345 @@
+---
+title: "2018 Resource Pulse Microcolony Analysis - Round 2"
+subtitle: Analysis and model construction/selection
+date: 12/18/2018
+output: html_notebook
+---
+
+### Import packages 
+```{r echo = TRUE, results = "hide"}
+library(psych)
+library(nlme) #lmer can't use temporal corrleation structures
+library(car)
+library(multcompView)
+library(lsmeans)
+library(tidyverse)
+library(rcompanion)
+library(lmtest)
+library(gam)
+library(gamm4)
+library(mgcv)
+```
+
+### Load in data
+```{r}
+mc2.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
+mc2.feed.df <- read_csv("./D2018_MicroCol_Round1_Feed_Clean.csv")
+mc2.drone.df <- read_csv("./D2018_MicroCol_Round2_Drones.csv")
+mc2.drone.it.df <- read_csv()
+mc2.drone.mass.df <- read_csv()
+```
+
+### RM ANOVA on mass gain
+##### Temporal correlation structure
+```{r}
+mc2.mass.corr.model <- lme(mc_mass_true ~ treatment + date + treatment*date, 
+                           random = ~ 1 | id,
+                           data = mc2.feed.df,
+                           na.action = na.exclude)
+
+ACF(mc2.mass.corr.model) # Lag 1: 0.314
+acf(mc2.feed.df$mc_mass_true, na.action = na.exclude)
+```
+
+##### Full model
+```{r}
+mc2.mass.model.1 = lme(mc_mass_true ~ treatment + date + treatment*date, 
+                       random = ~ 1 | id,
+                       data = mc2.feed.df,
+                       correlation = corAR1(form = ~ date | id,
+                                            value = 0.2833),
+                       na.action = na.exclude,
+                       method = "REML")
+Anova(mc2.mass.model.1)
+```
+
+##### Fixed effects only w/comparison
+```{r}
+mc2.mass.model.1.fixed = gls(mc_mass_true ~ treatment + date + treatment*date,
+                             data = mc2.feed.df,
+                             method = "REML",
+                             na.action = na.exclude)
+
+anova(mc2.mass.model.1, mc2.mass.model.1.fixed)
+```
+
+##### Null model w/comparison
+```{r}
+mc2.mass.model.null <- lme(mc_mass_true ~ 1,
+                           random = ~ 1 | id,
+                           data = mc2.feed.df,
+                           na.action = na.exclude)
+
+nagelkerke(mc2.mass.model.1, 
+           mc2.mass.model.null)
+```
+
+##### LS Means estimates
+```{r}
+mc2.mass.marginal <- lsmeans(mc2.mass.model.1, ~ treatment:date)
+
+mc2.mass.cld <- cld(mc2.mass.marginal,
+                    alpha   = 0.05, 
+                    Letters = letters,
+                    adjust  = "tukey")
+mc2.mass.cld
+```
+```{r}
+mc2.mass.cld$.group = gsub(" ", "", mc2.mass.cld$.group)
+ggplot(data = mc2.mass.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  geom_text(mapping = aes(y = upper.CL + 0.5),
+             color = "white") + 
+  ylab("Least square mean estimated microcolony mass") + 
+  xlab("Treatment")
+```
+
+##### Groupwise estimated means across exp
+```{r}
+mc2.feed.nona.df <- mc2.feed.df %>%
+  filter(id != 1.4) %>%
+  filter(!is.na(mc_mass_true))
+mc2.mass.gwm.df <- groupwiseMean( # This cannot have missing values for mean to be calc'd
+  mc_mass_true ~ treatment + date,
+  data = mc2.feed.nona.df,
+  conf = 0.95,
+  digits = 3
+)
+
+mc2.mass.gwm.df
+```
+
+Plot groupwise means from above
+```{r}
+pd = position_dodge(.2)
+ggplot(data = mc2.mass.gwm.df, 
+       mapping = aes(x = date,
+                     y = Mean,
+       color = treatment)) +
+  geom_errorbar(aes(ymin = Trad.lower,
+                    ymax = Trad.upper),
+                  width = 0.2, 
+                  size = 0.7, 
+                  position = pd) +
+  geom_point(size = 4, 
+             position = pd) +
+  theme_black() +
+  theme(axis.title = element_text(face = "bold")) +
+  ylab("Least square mean mass")
+```
+
+##### Model diagnostics
+```{r}
+mc2.model1.resid <- residuals(mc2.mass.model.1)
+plotNormalHistogram(mc2.model1.resid)
+plot(residuals(mc2.mass.model.1),
+     fitted(mc2.mass.model.1))
+plot(residuals(mc2.mass.model.1))
+acf(residuals(mc2.mass.model.1), na.action = na.exclude)
+```
+
+### RM ANOVA on drone production (__may need GLMM due to count data__) 
+##### Calculate cumulative drone production
+```{r} 
+mc2.cumdrone.df <- mc2.df %>%
+  ungroup() %>%
+  dplyr::filter(id != 1.4) %>%
+  dplyr::group_by(id) %>%
+  dplyr::mutate(fd.day = row_number()) %>%
+  dplyr::mutate(csum_drones = cumsum(n_new_drones)) %>%
+  dplyr::mutate(log_csum_drones = log(csum_drones + 1)) %>%
+  dplyr::arrange(id, date)
+mc2.cumdrone.df
+```
+
+##### Temporal correlation structure
+```{r}
+mc2.corr.model.cdrone = lme(log_csum_drones ~ treatment + date + treatment*date, 
+                            random = ~ 1 | id,
+                            data = mc2.cumdrone.df,
+                            na.action = na.exclude)
+
+ACF(mc2.corr.model.cdrone) # 1st order lag: 0.8272
+acf(mc2.cumdrone.df$csum_drones)
+```
+
+##### Full model
+```{r}
+mc2.cdrone.model.1 = lme(log_csum_drones ~ treatment + date + treatment*date, 
+                         random = ~ 1 | id,
+                         data = mc2.cumdrone.df,
+                         correlation = corAR1(form = ~ date | id,
+                                              value = 0.747),
+                         na.action = na.exclude,
+                         method = "REML")
+Anova(mc2.cdrone.model.1)
+```
+
+##### Fixed effects only w/comparison
+```{r}
+mc2.cdrone.model.1.fixed = gls(log_csum_drones ~ treatment + date + treatment*date,
+                               data = mc2.cumdrone.df,
+                               method = "REML",
+                               na.action = na.exclude)
+
+anova(mc2.cdrone.model.1, mc2.cdrone.model.1.fixed)
+```
+
+##### Null model w/comparison
+```{r}
+mc2.cdrone.model.null <- lme(log_csum_drones ~ 1,
+                             random = ~ 1 | id,
+                             data = mc2.cumdrone.df,
+                             na.action = na.exclude)
+
+nagelkerke(mc2.cdrone.model.1, 
+           mc2.cdrone.model.null)
+```
+
+##### LS Means estimates
+```{r}
+mc2.cdrone.marginal <- lsmeans(mc2.cdrone.model.1,  ~ treatment:date)
+
+mc2.drone.cld <- cld(mc2.cdrone.marginal,
+                     alpha   = 0.05, 
+                     Letters = letters,
+                     adjust  = "tukey")
+mc2.drone.cld
+```
+
+```{r}
+mc2.drone.cld$.group = gsub(" ", "", mc2.drone.cld$.group)
+ggplot(data = mc2.drone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  theme(legend.position = "none") +
+  geom_text(mapping = aes(y = upper.CL + 0.15),
+             color = "white") + 
+  ylab("Least square mean drone production") + 
+  xlab("Treatment")
+```
+##### Groupwise estimated means across exp
+```{r}
+mc2.drones.gwm.df <- groupwiseMean( # This cannot have missing values for mean to be calc'd
+  log_csum_drones ~ treatment + date,
+  data = mc2.cumdrone.df,
+  conf = 0.95,
+  digits = 3
+  )
+
+mc2.drones.gwm.df
+```
+
+Plot groupwise means from above
+```{r}
+pd = position_dodge(.2)
+ggplot(mc2.drones.gwm.df, aes(x = date,
+                              y = Mean,
+                              color = treatment)) +
+  geom_errorbar(aes(ymin = Trad.lower,
+                    ymax = Trad.upper),
+                  width = 0.2, 
+                  size = 0.7, 
+                  position = pd) +
+  geom_point(size = 4, 
+               position = pd,
+               alpha = 0.75) +
+  theme_black() +
+  theme(axis.title = element_text(face = "bold")) +
+  ylab("Least-square mean cumulative drone production") + 
+  xlab("Date of experiment")
+```
+
+##### Model diagnostics
+```{r}
+mc2.cdrone.model.1.resid <- residuals(mc2.cdrone.model.1)
+plotNormalHistogram(mc2.cdrone.model.1.resid)
+plot(residuals(mc2.cdrone.model.1),
+     fitted(mc2.cdrone.model.1))
+plot(mc2.cdrone.model.1)
+plot(residuals(mc2.cdrone.model.1))
+acf(residuals(mc2.cdrone.model.1))
+```
+
+
+### ANOVA for total drone production
+##### Define & summarize model
+```{r} 
+mc2.drone.df <- mc2.drone.df %>%
+  filter(id != 1.4)
+mc2.drone.lm <- lm(total_drones ~ treatment,
+                   data = mc2.drone.df)
+tidy(mc2.drone.lm)
+anova(mc2.drone.lm)
+```
+
+##### LS means calculation
+```{r}
+mc2.tdrone.marginal <- lsmeans(mc2.drone.lm,  ~ treatment)
+
+mc2.tdrone.cld <- cld(mc2.tdrone.marginal,
+                      alpha   = 0.05, 
+                      Letters = letters,
+                      adjust  = "tukey")
+mc2.tdrone.cld
+```
+
+##### Plot LS means
+```{r}
+mc2.tdrone.cld$.group=gsub(" ", "", mc2.tdrone.cld$.group)
+ggplot(data = mc2.tdrone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  theme(legend.position = "none") +
+  geom_text(mapping = aes(y = upper.CL + 2),
+             color = "white") + 
+  ylab("Least square mean drone production") + 
+  xlab("Treatment")
+```
+
+### GAM for drone production
+##### Temporal correlation structure
+```{r}
+mc2.corr.model.cdrone = lme(csum_drones ~ treatment + date + treatment*date, 
+                            random = ~ 1 | id,
+                            data = mc2.cumdrone.df,
+                            na.action = na.exclude)
+
+ACF(mc2.corr.model.cdrone) # 1st order lag: 0.8272
+acf(mc2.cumdrone.df$csum_drones)
+```
+
+##### Full model
+```{r}
+mc2.cumdrone.df$treatment <- as.factor(mc2.cumdrone.df$treatment)
+mc2.model.1.cdrone.gam = gamm(csum_drones ~ treatment + date + treatment*date, 
+                            random = list(id = ~ 1),
+                            family = "poisson",
+                            correlation = corAR1(form = ~ date | id),
+                            data = mc2.cumdrone.df,
+                            na.action = na.exclude)
+summary(mc2.model.1.cdrone.gam$gam)
+summary(mc2.model.1.cdrone.gam$lme)
+```

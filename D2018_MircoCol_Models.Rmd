@@ -116,20 +116,21 @@ mc1.gwm.df
 
 Plot groupwise means from above
 ```{r}
-pd = position_dodge(.2)
+pd = position_dodge(0.2)
 ggplot(mc1.gwm.df, aes(x = date,
                        y = Mean,
-                color = treatment)) +
-    geom_errorbar(aes(ymin = Percentile.lower,
-                      ymax = Percentile.upper),
-                   width = 0.2, 
+       color = treatment)) +
+  geom_errorbar(aes(ymin = Percentile.lower,
+                    ymax = Percentile.upper),
+                  width = 0.2, 
                   size = 0.7, 
                   position = pd) +
-    geom_point(size = 4, 
-               position = pd) +
-    theme_black() +
-    theme(axis.title = element_text(face = "bold")) +
-    ylab("Least square mean mass")
+  geom_point(size = 4, 
+             position = pd) +
+  theme_black() +
+  theme(axis.title = element_text(face = "bold")) +
+  ylab("Least square mean mass") + 
+  xlab("Date")
 ```
 
 ##### Model diagnostics
@@ -171,7 +172,7 @@ cdrone.model.1 = lme(csum_drones ~ treatment + date + treatment*date,
                      random = ~ 1 | id,
                      data = mc1.cumdrone.df,
                      correlation = corAR1(form = ~ date | id,
-                                         value = 0.751),
+                                          value = 0.751),
                      na.action = na.exclude,
                      method = "REML")
 Anova(cdrone.model.1)
@@ -222,7 +223,7 @@ ggplot(data = mc1.drone.cld,
                   color = "white") + 
   theme_black() + 
   theme(legend.position = "none") +
-  geom_text(mapping = aes(y = upper.CL + 1),
+  geom_text(mapping = aes(y = upper.CL + 1.5),
              color = "white") + 
   ylab("Least square mean drone production") + 
   xlab("Treatment")
@@ -274,8 +275,368 @@ acf(residuals(cdrone.model.1))
 ```
 
 #### ANOVA for total drone production
+##### Define & summarize model
+```{r} 
+mc1.drone.df <- mc1.drone.df %>%
+  filter(id != 2.4)
+mc1.drone.lm <- lm(total_males ~ treatment,
+                   data = mc1.drone.df)
+tidy(mc1.drone.lm)
+anova(mc1.drone.lm)
+```
 
-#### ANOVA for drone IT distance
+##### LS means calculation
+```{r}
+tdrone.marginal <- lsmeans(mc1.drone.lm,  ~ treatment)
 
-#### ANOVA for drone mass
+tdrone.cld <- cld(tdrone.marginal,
+                  alpha   = 0.05, 
+                  Letters = letters,
+                  adjust  = "tukey")
+tdrone.cld
+```
 
+##### Plot LS means
+```{r}
+tdrone.cld$.group=gsub(" ", "", tdrone.cld$.group)
+ggplot(data = tdrone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  theme(legend.position = "none") +
+  geom_text(mapping = aes(y = upper.CL + 2),
+             color = "white") + 
+  ylab("Least square mean drone production") + 
+  xlab("Treatment")
+```
+
+#### RM ANOVA for drone IT distance
+For this, need to average by date in order to avoid issues fitting temporal correlation structure. 
+```{r} 
+mc1.drone.itmod.df <- mc1.drone.it.df %>%
+  ungroup() %>%
+  group_by(date, id, treatment) %>%
+  dplyr::summarise(mean.it.distance = mean(it.distance))
+```
+
+##### Temporal correlation structure
+```{r}
+it.corr.model = lme(mean.it.distance ~ treatment + date + treatment*date, 
+                    random = ~ 1 | id,
+                    data = mc1.drone.itmod.df,
+                    na.action = na.exclude)
+
+ACF(it.corr.model) # Lag 1: 0.314
+acf(mc1.drone.it.df$it.distance)
+```
+
+##### Full model
+```{r}
+it.model.1 = lme(mean.it.distance ~ treatment + date + treatment*date, 
+              random = ~ 1 | id,
+              data = mc1.drone.itmod.df,
+              correlation = corAR1(form = ~ date | id ,
+                                   value = 0.137),
+              na.action = na.exclude,
+              method = "REML")
+Anova(it.model.1)
+```
+
+##### Fixed effects only w/comparison
+```{r}
+it.model.1.fixed = gls(mean.it.distance ~ treatment + date + treatment*date,
+                       data = mc1.drone.itmod.df,
+                       method = "REML",
+                       na.action = na.exclude)
+
+anova(it.model.1, it.model.1.fixed)
+```
+
+##### Null model w/comparison
+```{r}
+it.model.null <- lme(mean.it.distance ~ 1,
+                    random = ~ 1 | id,
+                    data = mc1.drone.itmod.df,
+                    na.action = na.exclude)
+
+nagelkerke(it.model.1, it.model.null)
+```
+
+##### LS Means estimates
+```{r}
+it.marginal <- lsmeans(it.model.1, ~ treatment:date)
+
+it.cld <- cld(it.marginal,
+              alpha   = 0.05, 
+              Letters = letters,
+              adjust  = "tukey")
+it.cld
+```
+```{r}
+it.cld$.group = gsub(" ", "", it.cld$.group)
+ggplot(data = it.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  geom_text(mapping = aes(y = upper.CL + 0.25),
+             color = "white") + 
+  ylab("Least square mean drone IT distance") + 
+  xlab("Treatment") + 
+  theme(legend.position = "none")
+```
+
+##### Groupwise estimated means across exp
+```{r}
+mc1.drone.itmod.df$treatment <- as.factor(mc1.drone.itmod.df$treatment)
+it.gwm.df <- groupwiseMean( # This cannot have missing values for mean to be calc'd
+  mean.it.distance ~ treatment + date,
+  data = mc1.drone.itmod.df
+  )
+
+it.gwm.df
+```
+
+Plot groupwise means from above
+```{r}
+pd = position_dodge(.2)
+ggplot(it.gwm.df, aes(x = date,
+                      y = Mean,
+                color = treatment)) +
+    geom_errorbar(aes(ymin = Trad.lower,
+                      ymax = Trad.upper),
+                  width = 0.2, 
+                  size = 0.7, 
+                  position = pd) +
+    geom_point(size = 4, 
+               position = pd) +
+    theme_black() +
+    theme(axis.title = element_text(face = "bold")) +
+    ylab("Least square mean IT distance") + 
+  xlab("Date")
+```
+
+##### Model diagnostics
+```{r}
+it.model.1.resid <- residuals(it.model.1)
+plotNormalHistogram(it.model.1.resid)
+plot(residuals(it.model.1),
+     fitted(it.model.1))
+plot(residuals(it.model.1))
+acf(residuals(it.model.1))
+```
+#### ANOVA for mean drone IT distance
+##### Define & summarize model
+```{r} 
+mc1.drone.it.lm <- lm(it.distance ~ treatment,
+                      data = mc1.drone.it.df)
+tidy(mc1.drone.it.lm)
+anova(mc1.drone.it.lm)
+```
+
+##### LS means calculation
+```{r}
+it.drone.marginal <- lsmeans(mc1.drone.it.lm,  ~ treatment)
+
+it.drone.cld <- cld(it.drone.marginal,
+                    alpha   = 0.05, 
+                    Letters = letters,
+                    adjust  = "tukey")
+it.drone.cld
+```
+
+##### Plot LS means
+```{r}
+it.drone.cld$.group = gsub(" ", "", it.drone.cld$.group)
+ggplot(data = it.drone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  theme(legend.position = "none") +
+  geom_text(mapping = aes(y = upper.CL + 0.25),
+             color = "white") + 
+  ylab("Least square mean drone IT distance") + 
+  xlab("Treatment") + 
+  theme(legend.position = "none")
+```
+
+##### Model diagnostics
+```{r} 
+plot(mc1.drone.it.lm)
+plot(residuals(mc1.drone.it.lm))
+```
+
+#### RM ANOVA for drone mass
+##### Temporal correlation structure
+```{r}
+mass.corr.model = lme(avg.individ.mass ~ treatment + date + treatment*date, 
+                      random = ~ 1 | id,
+                      data = mc1.drone.mass.df,
+                      na.action = na.exclude)
+
+ACF(mass.corr.model) # No sigificant temporal autocorrelation.
+acf(mc1.drone.mass.df$avg.individ.mass)
+```
+
+##### Full model
+```{r}
+mass.model.1 = lme(avg.individ.mass ~ treatment + date + treatment*date, 
+                   random = ~ 1 | id,
+                   data = mc1.drone.mass.df,
+                   na.action = na.exclude,
+                   method = "REML")
+Anova(mass.model.1)
+summary(mass.model.1)
+```
+
+##### Fixed effects only w/comparison
+```{r}
+mass.model.1.fixed = gls(avg.individ.mass ~ treatment + date + treatment*date,
+                         data = mc1.drone.mass.df,
+                         method = "REML",
+                         na.action = na.exclude)
+
+anova(mass.model.1, mass.model.1.fixed)
+```
+
+##### Null model w/comparison
+```{r}
+mass.model.null <- lme(
+  avg.individ.mass ~ 1,
+  random = ~ 1 | id,
+  data = mc1.drone.mass.df,
+  na.action = na.exclude
+  )
+
+nagelkerke(mass.model.1, mass.model.null)
+```
+
+##### LS Means estimates
+```{r}
+mass.marginal <- lsmeans(mass.model.1, ~ treatment:date)
+
+mass.cld <- cld(mass.marginal,
+                alpha   = 0.05, 
+                Letters = letters,
+                adjust  = "tukey")
+mass.cld
+```
+```{r}
+mass.cld$.group = gsub(" ", "", mass.cld$.group)
+ggplot(data = mass.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  geom_text(mapping = aes(y = upper.CL + 0.01),
+             color = "white") + 
+  ylab("Least square mean drone mass") + 
+  xlab("Treatment") + 
+  theme(legend.position = "none")
+```
+
+##### Groupwise estimated means across exp
+```{r}
+mass.gwm.df <- groupwiseMean( # This cannot have missing values for mean to be calc'd
+  avg.individ.mass ~ treatment + date,
+  data = mc1.drone.mass.df
+  )
+
+it.gwm.df
+```
+
+Plot groupwise means from above
+```{r}
+pd = position_dodge(.2)
+ggplot(mass.gwm.df, aes(x = date,
+                      y = Mean,
+                color = treatment)) +
+    geom_errorbar(aes(ymin = Trad.lower,
+                      ymax = Trad.upper),
+                  width = 0.2, 
+                  size = 0.7, 
+                  position = pd) +
+    geom_point(size = 4, 
+               position = pd) +
+    theme_black() +
+    theme(axis.title = element_text(face = "bold")) +
+    ylab("Least square mean drone mass estimate") + 
+  xlab("Date")
+```
+
+##### Model diagnostics
+```{r}
+mass.model.1.resid <- residuals(mass.model.1)
+plotNormalHistogram(mass.model.1.resid)
+plot(residuals(mass.model.1),
+     fitted(mass.model.1))
+plot(residuals(mass.model.1))
+acf(residuals(mass.model.1))
+```
+#### ANOVA for mean drone mass
+##### Define & summarize model
+```{r} 
+mc1.drone.mass.lm <- lm(avg.individ.mass ~ treatment,
+                         data = mc1.drone.mass.df)
+tidy(mc1.drone.mass.lm)
+anova(mc1.drone.mass.lm)
+```
+
+##### LS means calculation
+```{r}
+mass.drone.marginal <- lsmeans(mc1.drone.mass.lm,  ~ treatment)
+
+mass.drone.cld <- cld(mass.drone.marginal,
+                      alpha   = 0.05, 
+                      Letters = letters,
+                      adjust  = "tukey")
+mass.drone.cld
+```
+
+##### Plot LS means
+```{r}
+mass.drone.cld$.group = gsub(" ", "", mass.drone.cld$.group)
+ggplot(data = mass.drone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  theme(legend.position = "none") +
+  geom_text(mapping = aes(y = upper.CL + 0.01),
+             color = "white") + 
+  ylab("Least square mean drone mass") + 
+  xlab("Treatment") + 
+  theme(legend.position = "none")
+```
+
+##### Model diagniostics
+```{r} 
+plot(mc1.drone.mass.lm)
+```

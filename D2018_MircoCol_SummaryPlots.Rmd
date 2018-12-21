@@ -185,7 +185,45 @@ mc1.df %>%
   labs(y = "Cumulative Drone Production",
        x = "Feeding Interval") + 
   theme_black()
+```
 
+```{r}
+mc1.df %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::mutate(fd.day = row_number()) %>%
+  dplyr::mutate(csum_drones = cumsum(n_new_drones)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(treatment, date, fd.day) %>%
+  dplyr::summarise(mean_csum_drones = mean(csum_drones)) %>%
+  dplyr::arrange(treatment, date, fd.day) %>%
+  ggplot(mapping = aes(x = fd.day,
+                       y = mean_csum_drones,
+                       group = treatment)) +
+  geom_line(mapping = aes(color = treatment),
+            alpha = 0.6,
+            size = 1.5) +
+  geom_point(mapping = aes(color = treatment),
+             alpha = 0.75,
+             size = 3) +
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  scale_x_continuous(breaks = unique(mc1.df$fd.day)) +
+  labs(y = "Cumulative Drone Production",
+       x = "Feeding Interval") +
+  theme_black()
 ```
 
 #### Average mass gain - smoothed
@@ -646,7 +684,7 @@ mc2.feed.df %>%
   theme_black()
 ```
 
-#### Drone production bump chart - by treatment
+#### Drone production bump chart - by id
 ```{r}
 
 mc2.df$id <- as.factor(mc2.df$id)
@@ -684,6 +722,45 @@ mc2.df %>%
        x = "Feeding Interval") + 
   theme_black()
 
+```
+```{r}
+mc2.df %>%
+  dplyr::ungroup() %>%
+  dplyr::filter(id != 1.4) %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::mutate(fd.day = row_number()) %>%
+  dplyr::mutate(csum_drones = cumsum(n_new_drones)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(treatment, date, fd.day) %>%
+  dplyr::summarise(mean_csum_drones = mean(csum_drones)) %>%
+  dplyr::arrange(treatment, date, fd.day) %>%
+  ggplot(mapping = aes(x = fd.day,
+                       y = mean_csum_drones,
+                       group = treatment)) +
+  geom_line(mapping = aes(color = treatment),
+            alpha = 0.6,
+            size = 1.5) +
+  geom_point(mapping = aes(color = treatment),
+             alpha = 0.75,
+             size = 3) +
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  scale_x_continuous(breaks = unique(mc2.df$fd.day)) +
+  labs(y = "Cumulative Drone Production",
+       x = "Feeding Interval") +
+  theme_black()
 ```
 
 ## Rate of Microcolony Growth
@@ -822,7 +899,7 @@ mc1.trtslope.df %>%
   labs(x = "Period relative to food pulse",
        y = "Estimated rate of mass gain") + 
   scale_y_continuous(limits = c(-3.25, 3.25),
-                     breaks = seq(-3, 3, by = 1)) + 
+                     breaks = seq(-3, 3, by = 1)) +
   theme_black()
 ```
 
@@ -834,8 +911,8 @@ trt.slopes <- function() {
   for (i in trts) {
     df <- mc2.feed.df %>%
       filter(treatment == i) %>%
-      dlply("pulse_cat", function(.)
-        tidy(lm(mc_mass_true ~ fd.day, data = .))) %>%
+      plyr::dlply("pulse_cat", function(.)
+                  tidy(lm(mc_mass_true ~ fd.day, data = .))) %>%
       bind_rows(.id = "id") %>%
       mutate(treatment = i)
     df.ls[[i]] <- df

@@ -86,8 +86,8 @@ mc1end.df$treatment <- ifelse(mc1end.df$id < 2,
                                     paste("zone.4"))
                            ))
 mc1.df <- mc1.df %>%
-group_by(id) %>%
-  mutate(fd.day = row_number())
+dplyr::group_by(id) %>%
+dplyr::mutate(fd.day = row_number())
 # Correct worker replace/drone removed to be amount actually replaced/removed
 # e.g. 3/5 means 3 of 5 total were replaced/removed 
 mc1.df <- separate(mc1.df, drones_removed,
@@ -286,7 +286,7 @@ mc1.feed.df <- mc1.feed.df %>%
 
 # Write csv file to working directory
 write_csv(mc1.feed.df, "./D2018_MicroCol_Round1_Feed_Clean.csv")
-
+mc1.feed.df <- read_csv("./D2018_MicroCol_Round1_Feed_Clean.csv")
 
 
 # **Drone fitness ---------------------------------------------------------
@@ -327,6 +327,10 @@ mc1.drone.mass.df$treatment <- ifelse(
 )
 
 
+mc1.drone.it.df <- mc1.drone.it.df %>%
+  filter(!is.na(it.distance))
+mc1.drone.mass.df <- mc1.drone.mass.df %>%
+  filter(!is.na(avg.individ.mass))
 
 write_csv(mc1.drone.it.df, "./D2018_MC1_DroneIT_Clean.csv")
 write_csv(mc1.drone.mass.df, "./D2018_MC1_DroneMass_Clean.csv")
