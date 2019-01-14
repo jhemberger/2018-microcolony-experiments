@@ -18,6 +18,7 @@ library(lmtest)
 library(gam)
 library(gamm4)
 library(mgcv)
+library(knitr)
 ```
 
 ### Load in data

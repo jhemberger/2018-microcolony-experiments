@@ -1,8 +1,6 @@
 ---
 title: "2018 Bumble Bee Microcolony Experiment"
-output:
-  html_document:
-    df_print: paged
+output: html_notebook 
 date: "11/29/2018"
 subtitle: Summary figures
 ---
@@ -35,8 +33,8 @@ load(file = "mc1dronemass.Rdata")
 ```{r}
 mc1end.df %>%
   group_by(treatment) %>%
-  summarise(mean.comb.mass = mean(end_mass_comb), 
-            se = sd(end_mass_comb) / sqrt(n())) %>%
+  dplyr::summarise(mean.comb.mass = mean(end_mass_comb), 
+                   se = sd(end_mass_comb) / sqrt(n())) %>%
   ggplot() + 
   geom_col(mapping = aes(x = treatment, 
                          y = mean.comb.mass, 
@@ -231,7 +229,7 @@ mc1.df %>%
 ggplot(data = mc1.feed.df) + 
   geom_smooth(span = 0.75, 
               mapping = aes(x = fd.day, 
-                            y = mc_mass_true, #- mass_box - lag(p_mass_fd), 
+                            y = mc_mass_true, #- mass_box - lag(p_mass_fd),
                             color = treatment,
                             fill = treatment),
               method = "loess") + 
@@ -256,11 +254,11 @@ ggplot(data = mc1.feed.df) +
 #### Cumulative nectar consumptiion grouped by treatment
 ```{r}
 mc1.feed.df %>%
-  group_by(id) %>%
-  mutate(cum_pollen = cumsum(p_mass_cons_avg), 
+  dplyr::group_by(id) %>%
+  dplyr::mutate(cum_pollen = cumsum(p_mass_cons_avg), 
          cum_nectar = cumsum(n_mass_cons)) %>%
-  group_by(date, treatment) %>%
-  summarise(nectar_cons = mean(cum_nectar), 
+  dplyr::group_by(date, treatment) %>%
+  dplyr::summarise(nectar_cons = mean(cum_nectar), 
             nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
             pollen_cons = mean(cum_pollen, na.rm = TRUE), 
             pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
@@ -279,11 +277,11 @@ mc1.feed.df %>%
 #### Cumulative pollen consumption grouped by treatment
 ```{r}
   mc1.feed.df %>%
-  group_by(id) %>%
-  mutate(cum_pollen = cumsum(p_mass_cons_avg), 
+  dplyr::group_by(id) %>%
+  dplyr::mutate(cum_pollen = cumsum(p_mass_cons_avg), 
          cum_nectar = cumsum(n_mass_cons)) %>%
-  group_by(date, treatment) %>%
-  summarise(nectar_cons = mean(cum_nectar), 
+  dplyr::group_by(date, treatment) %>%
+  dplyr::summarise(nectar_cons = mean(cum_nectar), 
             nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
             pollen_cons = mean(cum_pollen, na.rm = TRUE), 
             pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
@@ -317,15 +315,15 @@ mc.massgain$mc_mass_gain[which(diff(mc.massgain$id) != 0) + 1] <- NA
 ##### Average interval mass gain - z-score diverging dot plot
 ```{r}
 mc.massgain %>% 
-  group_by(id, treatment) %>%
-  summarise(mean_intv_massgain = mean(mc_mass_gain, na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(mass_gain_z = round((mean_intv_massgain - mean(mean_intv_massgain, na.rm = TRUE)) / sd(mean_intv_massgain, na.rm = TRUE), digits = 2)) %>%
-  mutate(mass_score = ifelse(mass_gain_z < 0, 
+  dplyr::group_by(id, treatment) %>%
+  dplyr::summarise(mean_intv_massgain = mean(mc_mass_gain, na.rm = TRUE)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(mass_gain_z = round((mean_intv_massgain - mean(mean_intv_massgain, na.rm = TRUE)) / sd(mean_intv_massgain, na.rm = TRUE), digits = 2)) %>%
+  dplyr::mutate(mass_score = ifelse(mass_gain_z < 0, 
                              "below", 
                              "above")) %>%
-  arrange(desc(mass_gain_z)) %>%
-  mutate(z_order = factor(`id`, 
+  dplyr::arrange(desc(mass_gain_z)) %>%
+  dplyr::mutate(z_order = factor(`id`, 
                           levels = `id`)) %>%
   ggplot(aes(x = z_order, 
              y = mass_gain_z, 
@@ -362,14 +360,14 @@ mc.massgain %>%
 ##### Average interval mass gain - raw mass diverging dot plot
 ```{r}
 mc.massgain %>% 
-  group_by(id, treatment) %>%
-  summarise(mean_intv_massgain = round(mean(mc_mass_gain, na.rm = TRUE), digits = 2)) %>%
-  ungroup() %>%
-  mutate(mass_score = ifelse(mean_intv_massgain < 0, 
+  dplyr::group_by(id, treatment) %>%
+  dplyr::summarise(mean_intv_massgain = round(mean(mc_mass_gain, na.rm = TRUE), digits = 2)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(mass_score = ifelse(mean_intv_massgain < 0, 
                              "below", 
                              "above")) %>%
-  arrange(desc(mean_intv_massgain)) %>%
-  mutate(mass_order = factor(`id`, 
+  dplyr::arrange(desc(mean_intv_massgain)) %>%
+  dplyr::mutate(mass_order = factor(`id`, 
                              levels = `id`)) %>%
   ggplot(aes(x = mass_order, 
              y = mean_intv_massgain, 
@@ -470,9 +468,9 @@ mc1.drone.mass.df %>%
 #### Final comb mass
 ```{r}
 mc2.end.df %>%
-  filter(!is.na(end_mass_comb)) %>%
-  group_by(treatment) %>%
-  summarise(mean.comb.mass = mean(end_mass_comb), 
+  dplyr::filter(!is.na(end_mass_comb)) %>%
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(mean.comb.mass = mean(end_mass_comb), 
             se = sd(end_mass_comb) / sqrt(n())) %>%
   ggplot() + 
   geom_col(mapping = aes(x = treatment, 
@@ -484,7 +482,7 @@ mc2.end.df %>%
                                 ymax = mean.comb.mass + se, 
                                 ymin = mean.comb.mass - se),
                   color = "white") +
-  scale_y_continuous(limits = c(0, 10)) + 
+  scale_y_continuous(limits = c(0, 5)) + 
   theme_black()
 ```
 #### Corrected mass time series
@@ -504,8 +502,8 @@ mc2.feed.df %>%
 #### Total drones produced as point range
 ```{r}
 mc2.drone.df %>%
-  group_by(treatment) %>%
-  summarise(mean_drones = mean(total_drones),
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(mean_drones = mean(total_drones),
             sd_drones = sd(total_drones),
             se_drones = sd_drones / sqrt(7)) %>%
   ggplot() + 
@@ -524,8 +522,8 @@ mc2.drone.df %>%
 #### Total drones produced as boxplot
 ```{r}
 mc2.df %>%
-  group_by(id, treatment) %>%
-  summarise(total_drones = sum(n_new_drones, na.rm = TRUE)) %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::summarise(total_drones = sum(n_new_drones, na.rm = TRUE)) %>%
   ggplot(mapping = aes(x = treatment,
                        y = total_drones)) +
   geom_boxplot(mapping = aes(fill = treatment),
@@ -537,13 +535,13 @@ mc2.df %>%
 #### Drone production normalized across MC - diverging dot plot
 ```{r}
 mc2.df %>%
-  group_by(id, treatment) %>%
-  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(drone_z = round((total_males - mean(total_males, na.rm = TRUE)) / sd(total_males, na.rm = TRUE), digits = 2)) %>%
-  mutate(drone_score = ifelse(drone_z < 0, "below", "above")) %>%
-  arrange(desc(drone_z)) %>%
-  mutate(z_order = factor(`id`, 
+  dplyr::group_by(id, treatment) %>%
+  dplyr::summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(drone_z = round((total_males - mean(total_males, na.rm = TRUE)) / sd(total_males, na.rm = TRUE), digits = 2)) %>%
+  dplyr::mutate(drone_score = ifelse(drone_z < 0, "below", "above")) %>%
+  dplyr::arrange(desc(drone_z)) %>%
+  dplyr::mutate(z_order = factor(`id`, 
                           levels = `id`)) %>%
   ggplot(aes(x = z_order, 
              y = drone_z, 
@@ -589,13 +587,13 @@ ggplot() +
 #### Cumulative nectar consumption
 ```{r}
 mc2.feed.df %>%
-  ungroup() %>%
-  group_by(id) %>%
-  filter(!is.na(p_mass_cons_avg)) %>%
-  mutate(cum_pollen = cumsum(p_mass_cons_avg), 
+  dplyr::ungroup() %>%
+  dplyr::group_by(id) %>%
+  dplyr::filter(!is.na(p_mass_cons_avg)) %>%
+  dplyr::mutate(cum_pollen = cumsum(p_mass_cons_avg), 
          cum_nectar = cumsum(n_mass_cons)) %>%
-  group_by(date, treatment) %>%
-  summarise(nectar_cons = mean(cum_nectar), 
+  dplyr::group_by(date, treatment) %>%
+  dplyr::summarise(nectar_cons = mean(cum_nectar), 
             nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
             pollen_cons = mean(cum_pollen, na.rm = TRUE), 
             pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
@@ -615,12 +613,12 @@ mc2.feed.df %>%
 #### Cumulative pollen consumption grouped by treatment
 ```{r}
   mc2.feed.df %>%
-  group_by(id) %>%
-  filter(!is.na(p_mass_cons_avg)) %>%
-  mutate(cum_pollen = cumsum(p_mass_cons_avg), 
+  dplyr::group_by(id) %>%
+  dplyr::filter(!is.na(p_mass_cons_avg)) %>%
+  dplyr::mutate(cum_pollen = cumsum(p_mass_cons_avg), 
          cum_nectar = cumsum(n_mass_cons)) %>%
-  group_by(date, treatment) %>%
-  summarise(nectar_cons = mean(cum_nectar), 
+  dplyr::group_by(date, treatment) %>%
+  dplyr::summarise(nectar_cons = mean(cum_nectar), 
             nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
             pollen_cons = mean(cum_pollen, na.rm = TRUE), 
             pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
@@ -640,17 +638,17 @@ mc2.feed.df %>%
 ##### Average interval mass gain - z-score normalized
 ```{r}
 mc2.feed.df %>% 
-  group_by(id, treatment) %>%
-  summarise(mean_intv_massdiff = mean(mc_mass_diff, 
+  dplyr::group_by(id, treatment) %>%
+  dplyr::summarise(mean_intv_massdiff = mean(mc_mass_diff, 
                                       na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(mass_diff_z = round((mean_intv_massdiff - mean(mean_intv_massdiff, na.rm = TRUE)) / sd(mean_intv_massdiff,                                                                                                          na.rm = TRUE), 
+  dplyr::ungroup() %>%
+  dplyr::mutate(mass_diff_z = round((mean_intv_massdiff - mean(mean_intv_massdiff, na.rm = TRUE)) / sd(mean_intv_massdiff,                                                                                                          na.rm = TRUE), 
                              digits = 2)) %>%
-  mutate(mass_score = ifelse(mass_diff_z < 0, 
+  dplyr::mutate(mass_score = ifelse(mass_diff_z < 0, 
                              "below", 
                              "above")) %>%
-  arrange(desc(mass_diff_z)) %>%
-  mutate(z_order = factor(`id`, 
+  dplyr::arrange(desc(mass_diff_z)) %>%
+  dplyr::mutate(z_order = factor(`id`, 
                           levels = `id`)) %>%
   ggplot(aes(x = z_order, 
              y = mass_diff_z, 
