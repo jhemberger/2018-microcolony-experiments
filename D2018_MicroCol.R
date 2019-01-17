@@ -67,6 +67,8 @@ mass.box.df <- data_frame(id = mc1end.df$id, mass_box = mc1end.df$mass_box)
 mc1.df <- inner_join(mc1.df, mass.box.df, by = "id")
 
 # Create treatment variable
+
+mc1.df$id <- as.numeric(mc1.df$id)
 mc1.df$treatment <- ifelse(mc1.df$id < 2,
                            paste("zone.1"),
                            ifelse(

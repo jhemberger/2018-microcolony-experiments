@@ -56,3 +56,7 @@ For Round 2, 1.4 being removed due to lack of establishment.
 Going to need to explore GAMs for the Round 2 drone - dianostic plots look pretty poor (or try log-transforming)
 
 **12/21:** Played with GAMMs this morning.  From basic diagnostic plots (resid v fitted), terrible fit with AR1 temporal autocorrelation structure.  Probably more my ignorance than anything else.  
+
+**1/14:** Time to maturity (per colony and treatment average), worker mortality (per colony and averaged per treatment).  Calc ASAP. Also inter-period slope calculations
+
+**1/17:** Calculated time to first drones and ran stats on that.  Also calculated worker mortality and ran stats. Need to do a RM ANOVA though to see if worker mortality spikes during dirth periods. 

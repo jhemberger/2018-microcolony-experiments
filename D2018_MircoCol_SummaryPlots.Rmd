@@ -464,6 +464,93 @@ mc1.drone.mass.df %>%
                   color = "white") + 
   theme_black()
 ```
+
+### Worker mortality
+```{r}
+mc1.df %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::filter(id != 2.4) %>%
+  dplyr::summarise(total_worker_death = sum(n_worker_deaths, na.rm = TRUE)) %>%
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(mean_worker_death = mean(total_worker_death), 
+            se = sd(total_worker_death) / sqrt(n())) %>%
+  ggplot() + 
+    geom_col(mapping = aes(x = treatment,
+                           y = mean_worker_death,
+                           fill = treatment,
+                           width = 0.5)) + 
+  geom_pointrange(mapping = aes(x = treatment, y = mean_worker_death, 
+                                ymax = mean_worker_death + se,
+                                ymin = mean_worker_death - se),
+                  color = "white") + 
+  theme_black()
+```
+
+Bump chart - averaged by treatment
+```{r}
+mc1.df$n_worker_deaths[is.na(mc1.df$n_worker_deaths)] <- 0
+mc1.df %>%
+  dplyr::ungroup() %>%
+  dplyr::filter(id != 2.4) %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::mutate(csum_worker_death = cumsum(n_worker_deaths)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(treatment, date, fd.day) %>%
+  dplyr::summarise(mean_csum_worker_death = mean(csum_worker_death)) %>%
+  dplyr::arrange(treatment, date, fd.day) %>%
+  ggplot(mapping = aes(x = fd.day,
+                       y = mean_csum_worker_death,
+                       group = treatment)) +
+  geom_line(mapping = aes(color = treatment),
+            alpha = 0.6,
+            size = 1.5) +
+  geom_point(mapping = aes(color = treatment),
+             alpha = 0.75,
+             size = 3) +
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  scale_x_continuous(breaks = unique(mc1.df$fd.day)) +
+  labs(y = "Mean Cumulative Worker Mortality",
+       x = "Feeding Interval") +
+  theme_black()
+```
+### Time to maturity/drone production
+```{r}
+mc1.df %>%
+  dplyr::filter(id != 2.4) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::mutate(index_to_drone = min(which(n_new_drones > 0)),
+                date_to_drone = date[index_to_drone]) %>%
+  dplyr::select(date, id, treatment, index_to_drone, date_to_drone) %>%
+  dplyr::mutate(days_to_drone = (as.duration(ymd("2018-03-15") %--% date_to_drone) / 86400)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(mean_days_to_drone = mean(days_to_drone),
+                   se = sd(days_to_drone) / sqrt(n())) %>%
+  ggplot(mapping = aes(x = treatment,
+                       y = mean_days_to_drone)) + 
+  geom_col(fill = "indianred1",
+           width = 0.5) + 
+  geom_pointrange(mapping = aes(ymax = mean_days_to_drone + se,
+                                ymin = mean_days_to_drone - se),
+                  color = "white") + 
+  labs(y = "Mean Days to Drone Production",
+       x = "Treatment") + 
+  theme_black()
+```
 ## Round 2 Summary Plots 
 #### Final comb mass
 ```{r}
@@ -721,6 +808,7 @@ mc2.df %>%
   theme_black()
 
 ```
+Averaged by treatment
 ```{r}
 mc2.df %>%
   dplyr::ungroup() %>%
@@ -758,6 +846,93 @@ mc2.df %>%
   scale_x_continuous(breaks = unique(mc2.df$fd.day)) +
   labs(y = "Cumulative Drone Production",
        x = "Feeding Interval") +
+  theme_black()
+```
+### Worker mortality
+```{r}
+mc2.df %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::filter(id != 1.4) %>%
+  dplyr::summarise(total_worker_death = sum(n_worker_deaths, na.rm = TRUE)) %>%
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(mean_worker_death = mean(total_worker_death), 
+            se = sd(total_worker_death) / sqrt(n())) %>%
+  ggplot() + 
+    geom_col(mapping = aes(x = treatment,
+                           y = mean_worker_death,
+                           fill = treatment,
+                           width = 0.5)) + 
+  geom_pointrange(mapping = aes(x = treatment, y = mean_worker_death, 
+                                ymax = mean_worker_death + se,
+                                ymin = mean_worker_death - se),
+                  color = "white") + 
+  theme_black()
+```
+
+Bump chart - averaged by treatment
+```{r}
+mc2.df %>%
+  dplyr::ungroup() %>%
+  dplyr::filter(id != 1.4) %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::mutate(fd.day = row_number()) %>%
+  dplyr::mutate(csum_worker_death = cumsum(n_worker_deaths)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(treatment, date, fd.day) %>%
+  dplyr::summarise(mean_csum_worker_death = mean(csum_worker_death)) %>%
+  dplyr::arrange(treatment, date, fd.day) %>%
+  ggplot(mapping = aes(x = fd.day,
+                       y = mean_csum_worker_death,
+                       group = treatment)) +
+  geom_line(mapping = aes(color = treatment),
+            alpha = 0.6,
+            size = 1.5) +
+  geom_point(mapping = aes(color = treatment),
+             alpha = 0.75,
+             size = 3) +
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  scale_x_continuous(breaks = unique(mc2.df$fd.day)) +
+  labs(y = "Cumulative Worker Mortality",
+       x = "Feeding Interval") +
+  theme_black()
+```
+
+### Time to maturity/drone production
+```{r}
+mc2.df %>%
+  dplyr::filter(id != 1.4, id != 4.2) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::mutate(index_to_drone = min(which(n_new_drones > 0)),
+                date_to_drone = date[index_to_drone]) %>%
+  dplyr::select(date, id, treatment, index_to_drone, date_to_drone) %>%
+  dplyr::mutate(days_to_drone = (as.duration(ymd("2018-06-21") %--% date_to_drone) / 86400)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(mean_days_to_drone = mean(days_to_drone),
+                   se = sd(days_to_drone) / sqrt(n())) %>%
+  ggplot(mapping = aes(x = treatment,
+                       y = mean_days_to_drone)) + 
+  geom_col(fill = "indianred1",
+           width = 0.5) + 
+  geom_pointrange(mapping = aes(ymax = mean_days_to_drone + se,
+                                ymin = mean_days_to_drone - se),
+                  color = "white") + 
+  labs(y = "Mean Days to Drone Production",
+       x = "Treatment") + 
   theme_black()
 ```
 
@@ -813,7 +988,7 @@ mc1.feed.df %>%
   ggplot() + 
   geom_point(mapping = aes(x = fd.day,
                            y = mc_mass_true_intrp,
-                           color = pulse_cat)) + 
+                           color = id)) + 
   geom_smooth(mapping = aes(x = fd.day,
                             y = mc_mass_true_intrp,
                             col = pulse_cat),
@@ -821,13 +996,29 @@ mc1.feed.df %>%
               se = FALSE) + 
   scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
   theme_black()
+```
 
+```{r}
+mc1.feed.df$pulse_cat <- as.character(mc1.feed.df$pulse_cat)
+mc1.feed.df %>%
+  ungroup() %>%
+  filter(treatment == "zone.3") %>%
+  ggplot(mapping = aes(x = fd.day,
+                       y = mc_mass_true_intrp,
+                       color = id)) + 
+  geom_point() + 
+  geom_smooth(mapping = aes(col = id),
+              method = "lm",
+              se = FALSE) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  theme_black()
 ```
 
 
 #### Zone 4
 ```{r}
 mc1.feed.df$pulse_cat <- as.character(mc1.feed.df$pulse_cat)
+mc1.feed.df$id <- as.factor(mc1.feed.df$id)
 mc1.feed.df %>%
   ungroup() %>%
   filter(treatment == "zone.4") %>%

@@ -640,3 +640,124 @@ ggplot(data = mass.drone.cld,
 ```{r} 
 plot(mc1.drone.mass.lm)
 ```
+### ANOVA for days to first drone
+##### Create data frame
+```{r}
+mc1.colinit.df <- mc1.df %>%
+  dplyr::filter(id != 2.4) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(id) %>%
+  dplyr::mutate(index_to_drone = min(which(n_new_drones > 0)),
+                date_to_drone = date[index_to_drone]) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::select(id, treatment, date_to_drone) %>%
+  dplyr::mutate(days_to_drone = (as.duration(ymd("2018-03-15") %--% date_to_drone) / 86400)) %>%
+  dplyr::ungroup()
+mc1.colinit.df <- aggregate(. ~ id, 
+                            mc1.colinit.df, 
+                            FUN = head, 
+                            1)
+mc1.colinit.df$id <- as.numeric(as.character(mc1.colinit.df$id))
+mc1.colinit.df$days_to_drone <- as.numeric(as.character(mc1.colinit.df$days_to_drone))
+mc1.colinit.df
+``` 
+##### Define & summarize model
+```{r} 
+mc1.colinit.lm <- lm(days_to_drone ~ treatment,
+                     data = mc1.colinit.df)
+tidy(mc1.colinit.lm)
+plot(mc1.colinit.lm)
+hist(mc1.colinit.df$days_to_drone)
+anova(mc1.colinit.lm)
+```
+
+##### LS means calculation
+```{r}
+mc1.colinit.marginal <- lsmeans(mc1.colinit.lm,  ~ treatment)
+
+mc1.colinit.cld <- cld(mc1.colinit.marginal,
+                       alpha   = 0.05, 
+                       Letters = letters,
+                       adjust  = "tukey")
+mc1.colinit.cld
+```
+
+##### Plot LS means
+```{r}
+mc1.colinit.cld$.group = gsub(" ", 
+                              "", 
+                              mc1.colinit.cld$.group)
+ggplot(data = mc1.colinit.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(fill = "indianred1",
+           width = 0.5) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  theme(legend.position = "none") +
+  geom_text(mapping = aes(y = upper.CL + 1),
+             color = "white") + 
+  ylab("Least square mean days to drone production") + 
+  xlab("Treatment") + 
+  theme(legend.position = "none")
+```
+
+### RM ANOVA for worker mortality
+
+### ANOVA for total worker mortality 
+##### Create data frame
+```{r}
+mc1.workmort.df <- mc1.df %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::filter(id != 2.4) %>%
+  dplyr::summarise(total_worker_death = sum(n_worker_deaths, 
+                                            na.rm = TRUE))
+mc1.workmort.df
+```
+
+##### Define & summarize model
+```{r} 
+mc1.workmort.lm <- lm(total_worker_death ~ treatment,
+                      data = mc1.workmort.df)
+tidy(mc1.workmort.lm)
+plot(mc1.workmort.lm)
+anova(mc1.workmort.lm)
+```
+
+##### LS means calculation
+```{r}
+mc1.workmort.marginal <- lsmeans(mc1.workmort.lm,  ~ treatment)
+
+mc1.workmort.cld <- cld(mc1.workmort.marginal,
+                       alpha   = 0.05, 
+                       Letters = letters,
+                       adjust  = "tukey")
+mc1.workmort.cld
+```
+
+##### Plot LS means
+```{r}
+mc1.workmort.cld$.group = gsub(" ", 
+                              "", 
+                              mc1.workmort.cld$.group)
+ggplot(data = mc1.workmort.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(fill = "indianred1",
+           width = 0.5) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  theme(legend.position = "none") +
+  geom_text(mapping = aes(y = upper.CL + 1),
+             color = "white") + 
+  ylab("Least square mean worker mortality") + 
+  xlab("Treatment") + 
+  theme(legend.position = "none")
+```

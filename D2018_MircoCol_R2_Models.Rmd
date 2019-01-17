@@ -19,6 +19,8 @@ library(gam)
 library(gamm4)
 library(mgcv)
 library(knitr)
+library(lubridate)
+library(broom)
 ```
 
 ### Load in data
@@ -343,4 +345,65 @@ mc2.model.1.cdrone.gam = gamm(csum_drones ~ treatment + date + treatment*date,
                             na.action = na.exclude)
 summary(mc2.model.1.cdrone.gam$gam)
 summary(mc2.model.1.cdrone.gam$lme)
+```
+
+### ANOVA for days to first drone
+##### Create data frame
+```{r}
+mc2.colinit.df <- mc2.df %>%
+  dplyr::filter(id != 1.4, id != 4.2) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(id) %>%
+  dplyr::mutate(index_to_drone = min(which(n_new_drones > 0)),
+                date_to_drone = date[index_to_drone]) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::select(id, treatment, date_to_drone) %>%
+  dplyr::mutate(days_to_drone = (as.duration(ymd("2018-06-21") %--% date_to_drone) / 86400)) %>%
+  dplyr::ungroup()
+mc2.colinit.df <- aggregate(. ~ id, mc2.colinit.df, FUN = head, 1)
+mc2.colinit.df$id <- as.numeric(as.character(mc2.colinit.df$id))
+mc2.colinit.df$days_to_drone <- as.numeric(as.character(mc2.colinit.df$days_to_drone))
+mc2.colinit.df
+``` 
+##### Define & summarize model
+```{r} 
+mc2.colinit.lm <- lm(days_to_drone ~ treatment,
+                    data = mc2.colinit.df)
+tidy(mc2.colinit.lm)
+hist(mc2.colinit.df$days_to_drone)
+plot(mc2.colinit.lm)
+anova(mc2.colinit.lm)
+```
+
+##### LS means calculation
+```{r}
+mc2.colinit.marginal <- lsmeans(mc2.colinit.lm,  ~ treatment)
+
+mc2.colinit.cld <- cld(mc2.colinit.marginal,
+                       alpha   = 0.05, 
+                       Letters = letters,
+                       adjust  = "tukey")
+mc2.colinit.cld
+```
+
+##### Plot LS means
+```{r}
+mc2.colinit.cld$.group = gsub(" ", "", mc2.colinit.cld$.group)
+ggplot(data = mc2.colinit.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(fill = "indianred1",
+           width = 0.5) + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "white") + 
+  theme_black() + 
+  theme(legend.position = "none") +
+  geom_text(mapping = aes(y = upper.CL + 1),
+             color = "white") + 
+  ylab("Least square mean days to drone production") + 
+  xlab("Treatment") + 
+  theme(legend.position = "none")
 ```
