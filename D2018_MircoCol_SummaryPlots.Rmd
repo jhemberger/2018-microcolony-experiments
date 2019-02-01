@@ -2,7 +2,7 @@
 title: "2018 Bumble Bee Microcolony Experiment"
 output: html_notebook 
 date: "11/29/2018"
-subtitle: Summary figures
+subtitle: "Summary figures""
 ---
 **Name:** Jeremy Hemberger
 **Email:** j.hemberger.wisc@gmail.com
@@ -569,7 +569,7 @@ mc2.end.df %>%
                                 ymax = mean.comb.mass + se, 
                                 ymin = mean.comb.mass - se),
                   color = "white") +
-  scale_y_continuous(limits = c(0, 5)) + 
+  scale_y_continuous(limits = c(0, 10)) + 
   theme_black()
 ```
 #### Corrected mass time series

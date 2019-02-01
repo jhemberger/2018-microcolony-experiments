@@ -60,3 +60,5 @@ Going to need to explore GAMs for the Round 2 drone - dianostic plots look prett
 **1/14:** Time to maturity (per colony and treatment average), worker mortality (per colony and averaged per treatment).  Calc ASAP. Also inter-period slope calculations
 
 **1/17:** Calculated time to first drones and ran stats on that.  Also calculated worker mortality and ran stats. Need to do a RM ANOVA though to see if worker mortality spikes during dirth periods. 
+
+**1/31:** Calculate amount of pollen to produce a drone (on avg) as well as proportion of food consumed per treatment for each pollen and nectar - NEED TO RE-RUN `mc3.feed.df` AS I FOUND RECORDING ERROR.  DO AFTER MEETING AND RE-CHECK ALL RECORDINGS.

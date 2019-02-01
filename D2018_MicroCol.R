@@ -426,10 +426,12 @@ mc2.df <- read_csv("D2018_MicroCol_Round2.csv",
                      "brood",
                      "workers_replaced",
                      "drones_removed",
+                     "drones_frz",
                      "p_mass_rm",
                      "n_mass_rm",
                      "p_mass_fd",
-                     "n_mass_fd"),
+                     "n_mass_fd",
+                     "notes"),
                      na = c(" ", "N/A", "x")
                    )
 mc2.df$date <- mdy(mc2.df$date)

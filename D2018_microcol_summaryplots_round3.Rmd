@@ -1,0 +1,428 @@
+---
+title: "2018 Bumble Bee Microcolony Experiment"
+output: html_notebook 
+date: "1/31/19"
+subtitle: "Summary figures - Round 3"
+---
+**Name:** Jeremy Hemberger
+**Email:** j.hemberger.wisc@gmail.com
+**Institution:** University of Wisconsin - Madison | Department of Entomology
+
+## Load packages
+```{r}
+library(tidyverse)
+library(lubridate)
+library(broom)
+library(plyr)
+```
+
+### Final comb mass
+```{r}
+mc3.end.df %>%
+  group_by(treatment) %>%
+  dplyr::summarise(mean.comb.mass = mean(end_mass_comb), 
+                   se = sd(end_mass_comb) / sqrt(n())) %>%
+  ggplot() + 
+  geom_col(mapping = aes(x = treatment, 
+                         y = mean.comb.mass, 
+                         fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(x = treatment, 
+                                y = mean.comb.mass,
+                                ymax = mean.comb.mass + se, 
+                                ymin = mean.comb.mass - se),
+                  color = "white") +
+  scale_y_continuous(limits = c(0, 10)) + 
+  theme_black()
+```
+
+### Raw mass gain for all microcolony replicates
+```{r}
+mc3.feed.df %>%
+  filter(!is.na(mc_mass_true)) %>%
+  ggplot(na.rm = TRUE) + 
+  geom_line(mapping = aes(x = fd.day, 
+                          y = mc_mass_true, 
+                          group = id, 
+                          color = treatment),
+            na.rm = TRUE,
+            size = 1.1) + 
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  scale_x_continuous(breaks = unique(mc3.feed.df$fd.day)) + 
+  theme_black()
+```
+
+### Drone production
+#### Total drone production: bar 
+```{r}
+mc3.df %>%
+  filter(id != 2.7) %>%
+  group_by(id, treatment) %>%
+  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
+  group_by(treatment) %>%
+  summarise(mean_males = mean(total_males), 
+            se = sd(total_males) / sqrt(n())) %>%
+  ggplot() + 
+  geom_col(mapping = aes(x = treatment,
+                         y = mean_males,
+                         fill = treatment,
+                         width = 0.5)) + 
+  geom_pointrange(mapping = aes(x = treatment, 
+                                y = mean_males, 
+                                ymax = mean_males + se,
+                                ymin = mean_males - se),
+                  color = "white") + 
+  theme_black()
+```
+
+#### Total drone production: box
+```{r}
+mc3.df %>%
+  filter(id != 2.7) %>%
+  group_by(id, treatment) %>%
+  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
+  group_by(treatment) %>%
+  ggplot(mapping = aes(x = treatment, 
+                       y = total_males)) + 
+  geom_boxplot(mapping = aes(fill = treatment),
+               color = "white") + 
+  theme_black()
+```
+
+#### Drone production: diverging dot
+```{r}
+mc3.df %>%
+  filter(id != 2.7) %>%
+  group_by(id, treatment) %>%
+  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(drone_z = round((total_males - mean(total_males, na.rm = TRUE)) / sd(total_males, na.rm = TRUE), digits = 2)) %>%
+  mutate(drone_score = ifelse(drone_z < 0, "below", "above")) %>%
+  arrange(desc(drone_z)) %>%
+  mutate(z_order = factor(`id`, 
+                          levels = `id`)) %>%
+  ggplot(aes(x = z_order, 
+             y = drone_z, 
+             label = drone_z)) + 
+  geom_segment(mapping = aes(y = 0,
+                             x = z_order,
+                             yend = drone_z,
+                             xend = z_order),
+               size = 1.1,
+               color = "white",
+               alpha = 0.25) + 
+  geom_point(stat = "identity", 
+             mapping = aes(col = drone_score), 
+             size = 8,
+             alpha = 0.5) + 
+  scale_color_manual(name = "Drone Production", 
+                     labels = c("Above Average", "Below Average"),
+                     values = c("above" = "green2", "below" = "red2")) + 
+  geom_text(color = "white",
+            size = 2) + 
+  labs(y = "Drone Production Z-Score", 
+       x = "Microcolony ID") + 
+  coord_flip() + 
+  theme_black() 
+```
+
+#### Drone production bump chart - by treatment
+```{r}
+mc3.df$id <- as.factor(mc3.df$id)
+mc3.df %>%
+  filter(id != 2.7) %>%
+  ungroup() %>%
+  group_by(id) %>%
+  mutate(fd.day = row_number()) %>%
+  mutate(csum_drones = cumsum(n_new_drones)) %>% # won't work unless NO NA's
+  arrange(id, date) %>%
+  ggplot(mapping = aes(x = fd.day,
+                       y = csum_drones,
+                       group = id)) + 
+  geom_line(mapping = aes(color = treatment), 
+            alpha = 0.6,
+            size = 1.5) + 
+  geom_point(mapping = aes(color = treatment),
+             alpha = 0.75,
+             size = 3) + 
+  annotate("rect",
+           xmin = 4,
+           xmax = 6,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  annotate("rect",
+           xmin = 11,
+           xmax = 13,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  scale_x_continuous(breaks = unique(mc3.df$fd.day)) +
+  labs(y = "Cumulative Drone Production",
+       x = "Feeding Interval") + 
+  theme_black()
+```
+
+```{r}
+mc3.df %>%
+  dplyr::filter(id != 2.7) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::mutate(fd.day = row_number()) %>%
+  dplyr::mutate(csum_drones = cumsum(n_new_drones)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(treatment, date, fd.day) %>%
+  dplyr::summarise(mean_csum_drones = mean(csum_drones)) %>%
+  dplyr::arrange(treatment, date, fd.day) %>%
+  ggplot(mapping = aes(x = fd.day,
+                       y = mean_csum_drones,
+                       group = treatment)) +
+  geom_line(mapping = aes(color = treatment),
+            alpha = 0.6,
+            size = 1.5) +
+  geom_point(mapping = aes(color = treatment),
+             alpha = 0.75,
+             size = 3) +
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) +
+  scale_x_continuous(breaks = unique(mc3.df$fd.day)) +
+  labs(y = "Cumulative Drone Production",
+       x = "Feeding Interval") +
+  theme_black()
+```
+
+### Mass Gain
+#### Smoothed growth curve
+```{r}
+ggplot(data = mc3.feed.df) + 
+  geom_smooth(span = 0.75, 
+              mapping = aes(x = fd.day, 
+                            y = mc_mass_true, #- mass_box - lag(p_mass_fd),
+                            color = treatment,
+                            fill = treatment),
+              method = "loess") + 
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "white",
+           alpha = 0.2) + 
+  scale_x_continuous(breaks = unique(mc3.feed.df$fd.day)) + 
+  theme_black()
+```
+
+### Cumulative nectar consumption: by treatment
+```{r}
+mc3.feed.df %>%
+  dplyr::group_by(id) %>%
+  filter(!is.na(p_mass_cons_avg),
+         !is.na(n_mass_cons)) %>%
+  dplyr::mutate(cum_pollen = cumsum(p_mass_cons_avg), 
+                cum_nectar = cumsum(n_mass_cons)) %>%
+  dplyr::group_by(date, treatment) %>%
+  dplyr::summarise(nectar_cons = mean(cum_nectar), 
+                   nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
+                   pollen_cons = mean(cum_pollen, na.rm = TRUE), 
+                   pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
+  ggplot() +
+  geom_pointrange(mapping = aes(x = date,
+                      y = nectar_cons,
+                      ymin = nectar_cons - nectar_se,
+                      ymax = nectar_cons + nectar_se,
+                      color = treatment)) +
+  geom_smooth(mapping = aes(x = date,
+                            y = nectar_cons,
+                            color = treatment), se = FALSE) +
+  theme_black()
+```
+
+### Cumulative pollen consumption: by treatment
+```{r}
+  mc3.feed.df %>%
+  filter(!is.na(p_mass_cons_avg)) %>%
+  dplyr::group_by(id) %>%
+  dplyr::mutate(cum_pollen = cumsum(p_mass_cons_avg), 
+                cum_nectar = cumsum(n_mass_cons)) %>%
+  dplyr::group_by(date, treatment) %>%
+  dplyr::summarise(nectar_cons = mean(cum_nectar), 
+            nectar_se = (sd(cum_nectar) / (sqrt(n()))), 
+            pollen_cons = mean(cum_pollen, na.rm = TRUE), 
+            pollen_se = (sd(cum_pollen, na.rm = TRUE) / (sqrt(n())))) %>%
+  ggplot() +
+  geom_pointrange(mapping = aes(x = date,
+                                y = pollen_cons,
+                                ymin = pollen_cons - pollen_se,
+                                ymax = pollen_cons + pollen_se,
+                                color = treatment)) +
+  geom_smooth(mapping = aes(x = date,
+                            y = pollen_cons,
+                            color = treatment), se = FALSE) +
+  theme_black()
+```
+
+### Drone fitness
+
+### Worker mortality
+```{r}
+mc3.df %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::filter(id != 2.7) %>%
+  dplyr::summarise(total_worker_death = sum(n_worker_deaths, na.rm = TRUE)) %>%
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(mean_worker_death = mean(total_worker_death), 
+                   se = sd(total_worker_death) / sqrt(n())) %>%
+  ggplot() + 
+    geom_col(mapping = aes(x = treatment,
+                           y = mean_worker_death,
+                           fill = treatment,
+                           width = 0.5)) + 
+  geom_pointrange(mapping = aes(x = treatment, y = mean_worker_death, 
+                                ymax = mean_worker_death + se,
+                                ymin = mean_worker_death - se),
+                  color = "white") + 
+  theme_black()
+```
+
+### Time to maturity/drone production
+```{r}
+mc3.df %>%
+  dplyr::filter(id != 2.7) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(id, treatment) %>%
+  dplyr::mutate(index_to_drone = min(which(n_new_drones > 0)),
+                date_to_drone = date[index_to_drone]) %>%
+  dplyr::select(date, id, treatment, index_to_drone, date_to_drone) %>%
+  dplyr::mutate(days_to_drone = (as.duration(ymd("2018-11-10") %--% date_to_drone) / 86400)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(treatment) %>%
+  dplyr::summarise(mean_days_to_drone = mean(days_to_drone, na.rm = TRUE),
+                   se = sd(days_to_drone, na.rm = TRUE) / sqrt(n())) %>%
+  ggplot(mapping = aes(x = treatment,
+                       y = mean_days_to_drone)) + 
+  geom_col(fill = "indianred1",
+           width = 0.5) + 
+  geom_pointrange(mapping = aes(ymax = mean_days_to_drone + se,
+                                ymin = mean_days_to_drone - se),
+                  color = "white") + 
+  labs(y = "Mean Days to Drone Production",
+       x = "Treatment") + 
+  theme_black()
+```
+
+### Rate of microcolony growth
+#### Zone 1
+```{r}
+mc3.feed.df$pulse_cat <- as.character(mc3.feed.df$pulse_cat)
+mc3.feed.df %>%
+  ungroup() %>%
+  filter(treatment == "zone.1") %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = fd.day,
+                           y = mc_mass_true,
+                           color = pulse_cat)) + 
+  geom_smooth(mapping = aes(x = fd.day,
+                            y = mc_mass_true,
+                            col = pulse_cat),
+              method = "lm",
+              se = FALSE) + 
+  scale_x_continuous(breaks = unique(mc3.feed.df$fd.day)) + 
+  theme_black()
+
+```
+#### Zone 2
+
+#### Zone 3
+
+#### Zone 4
+
+#### Avg. growth by time
+```{r}
+trt.slopes <- function() {
+  trts <- unique(mc3.feed.df$treatment)
+  df.ls <- list() 
+  for (i in trts) {
+    df <- mc3.feed.df %>%
+      filter(treatment == i) %>%
+      plyr::dlply("pulse_cat", function(.)
+                  tidy(lm(mc_mass_true ~ fd.day, data = .))) %>%
+      bind_rows(.id = "id") %>%
+      mutate(treatment = i)
+    df.ls[[i]] <- df
+  }
+  df.end <- bind_rows(df.ls)
+  assign("mc3.trtslope.df",
+         df.end,
+         envir = .GlobalEnv)
+}
+trt.slopes()
+mc3.trtslope.df
+```
+
+```{r}
+mc3.trtslope.df$id <- as.factor(mc3.trtslope.df$id)
+mc3.trtslope.df$id <- factor(mc3.trtslope.df$id, levels = c("b1",
+                                                            "p1",
+                                                            "a1.b2",
+                                                            "p2",
+                                                            "a2"))
+mc3.trtslope.df %>%
+  filter(term != "(Intercept)") %>%
+  ggplot() + 
+  geom_pointrange(mapping = aes(x = id,
+                                y = estimate,
+                                ymin = estimate - std.error,
+                                ymax = estimate + std.error,
+                                color = treatment),
+                  size = 1) + 
+  geom_line(mapping = aes(x = id,
+                           y = estimate,
+                           group = treatment,
+                           color = treatment),
+            size = 1.25,
+            alpha = 0.75) + 
+  geom_hline(yintercept = 0,
+             color = "white",
+             size = 1.25,
+             alpha = 0.25) + 
+  labs(x = "Period relative to food pulse",
+       y = "Estimated rate of mass gain") + 
+  scale_y_continuous(limits = c(-3, 3),
+                     breaks = seq(-3, 3, by = 1)) + 
+  theme_black()
+```
+
