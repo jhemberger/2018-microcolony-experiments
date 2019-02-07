@@ -1,0 +1,131 @@
+---
+title: "2018 Bumble Bee Microcolony Experiment"
+output: html_notebook 
+date: "2/5/19"
+subtitle: "Summary figures - Combined"
+---
+**Name:** Jeremy Hemberger | 
+**Email:** j.hemberger.wisc@gmail.com | 
+**Institution:** University of Wisconsin - Madison | Department of 
+
+
+## Load packages
+```{r}
+library(tidyverse) 
+library(lubridate) 
+library(broom)
+library(zoo) 
+```
+
+## Load data
+```{r}
+mc1.df <- read_csv("./D2018_MicroCol_Round1_Feed_Clean.csv")
+mc1.feed.df <- read_csv("./D2018_MicroCol_Round1_Feed_Clean.csv")
+mc1.end.df <- 
+
+mc2.df <- read_csv("./D2018_MicroCol_Round2_Clean.csv")
+mc2.feed.df <- read_csv("./D2018_MicroCol_Round2_Feed_Clean.csv")
+mc2.end.df <- 
+
+mc3.df <- read_csv("./D2018_microcol_round3_clean.csv")
+mc3.feed.df <- read_csv("./D2018_microcol_round3_feed_clean")
+mc3.end.df <- 
+
+```
+## Combine data
+```{r}
+mc.all.df <- mc1.df %>%
+  filter(id != 2.4) %>%
+  select(id, date, n_new_drones, n_worker_deaths, treatment) %>%
+  bind_rows(select(mc2.df, 
+                   id, date, n_new_drones, n_worker_deaths, treatment),
+            .id = "round") %>%
+  bind_rows(select(mc3.df, 
+                   id, date, n_new_drones, n_worker_deaths, treatment),
+            .id = "round2") 
+mc.all.df$round[is.na(mc.all.df$round)] <- 3
+mc.all.df$round2 <- NULL
+
+mc.end.all.df <- mc1.end.df %>%
+  select(id, end_mass_comb, treatment) %>%
+  bind_rows(select(mc2.end.df,
+                   id, end_mass_comb, treatment),
+            .id = "round") %>%
+  bind_rows(select(mc3.end.df,
+                   id, end_mass_comb, treatment),
+            .id = "round2")
+mc.end.all.df$round[is.na(mc.end.all.df$round)] <- 3
+mc.end.all.df$round2 <- NULL
+```
+
+## Summary figures
+### Final brood mass
+```{r}
+pos <- position_dodge
+mc.end.all.df %>%
+  group_by(round, treatment) %>%
+  summarise(mean_comb_mass = mean(end_mass_comb),
+            se = sd(end_mass_comb) / sqrt(n())) %>%
+  ggplot() + 
+  geom_col(mapping = aes(x = treatment,
+                         y = mean_comb_mass,
+                         fill = round),
+           color = "gray20",
+           width = .5,
+           alpha = 0.8,
+           position = "dodge") + 
+  geom_pointrange(mapping = aes(x = treatment, 
+                                y = mean_comb_mass,
+                                ymax = mean_comb_mass + se, 
+                                ymin = mean_comb_mass - se),
+                  position = position_dodge2(0.5)) + 
+  scale_fill_manual(values = c("goldenrod1", "gray10", "orange4")) + 
+  xlab(label = "Treatment") +
+  ylab(label = "Mean Brood Mass") + 
+  scale_y_continuous(limits = c(0, 10),
+                     expand = c(0, 0)) + 
+  theme_bw() + 
+  theme(legend.position = "right")
+```
+
+
+### Drone production  
+#### Total drones | bar plot
+```{r}
+mc.all.df %>%
+  group_by(round, treatment, id) %>%
+  summarise(total_males = sum(n_new_drones, na.rm = TRUE)) %>%
+  group_by(round, treatment) %>%
+  summarise(mean_males = mean(total_males), 
+            se = sd(total_males, na.rm = TRUE) / sqrt(n())) %>%
+  ggplot() + 
+  geom_col(mapping = aes(x = treatment,
+                         y = mean_males,
+                         fill = round),
+           width = 0.5,
+           position = "dodge",
+           color = "gray20",
+           alpha = 0.7) + 
+  geom_pointrange(mapping = aes(x = treatment, 
+                                y = mean_males, 
+                                ymax = mean_males + se,
+                                ymin = mean_males - se),
+                  position = position_dodge2(width = 0.5)) + 
+  scale_fill_manual(values = c("goldenrod1", "gray10", "orange4")) + 
+  xlab(label = "Treatment") +
+  ylab(label = "Mean Drones Produced") + 
+  scale_y_continuous(limits = c(0, 40),
+                     expand = c(0, 0)) + 
+  theme_bw() + 
+  theme(legend.position = "right",
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+
+#### Cumulative drone bump chart
+
+
+### Worker mortality
+
+

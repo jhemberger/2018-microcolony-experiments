@@ -1,0 +1,319 @@
+---
+title: "2018 Resource Pulse Microcolony Analysis - Round 1"
+subtitle: "Data cleanup and summarization"
+date: "2/1/2018"
+output: html_notebook
+---
+
+### Import packages
+```{r}
+library(tidyverse)
+library(lubridate)
+library(zoo)
+```
+
+### Import data
+```{r}
+mc1.df <- read_csv("D2018_MicroCol_Round1.csv", skip = 2, 
+                   col_names = c(
+                     "id",
+                     "date",
+                     "time",
+                     "initials",
+                     "n_new_drones",
+                     "n_drones",
+                     "n_worker_deaths",
+                     "age_class",
+                     "workers_replaced",
+                     "drones_removed",
+                     "activity",
+                     "dom_worker",
+                     "mc_mass",
+                     "p_mass_rm",
+                     "n_mass_rm",
+                     "p_mass_fd",
+                     "n_mass_fd",
+                     "n_culled",
+                     "frozen?",
+                     "temp",
+                     "humidity"
+                   ), 
+                   na = c("-", "", " "))
+# Change date column to an actual date format
+mc1.df$date <- paste(mc1.df$date, "2018", sep = "/")
+mc1.df$date <- mdy(mc1.df$date)
+
+# Remove end values from data frame that aren't used in plotting/analysis
+# 1.5 was repeated in data entry 
+mc1.df <- mc1.df[-c(409:425), ]
+
+# Remove unused columns from data frame
+mc1.df$initials = NULL
+mc1.df$time = NULL
+mc1.df$n_culled = NULL
+mc1.df$dom_worker = NULL
+mc1.df$`frozen?` = NULL
+mc1.df$age_class = NULL
+
+# Bind final observations not on MC data sheets
+mc1.end.df <- read_csv("D2018_MicroCol_Breakdown.csv", skip = 1,
+                       col_names = c("id", 
+                                     "end_mc_mass", 
+                                     "end_mass_comb", 
+                                     "mass_box", 
+                                     "date"))
+mc1.df$id <- as.numeric(mc1.df$id)
+mc1.df$treatment <- ifelse(mc1.df$id < 2,
+                           paste("zone.1"),
+                           ifelse(
+                             mc1.df$id < 3 & mc1.df$id > 1,
+                             paste("zone.2"),
+                             ifelse(mc1.df$id < 4 & mc1.df$id > 3, 
+                                    paste("zone.3"), 
+                                    paste("zone.4"))
+                           ))
+mc1.end.df$treatment <- ifelse(mc1.end.df$id < 2,
+                           paste("zone.1"),
+                           ifelse(
+                             mc1.end.df$id < 3 & mc1.end.df$id > 1,
+                             paste("zone.2"),
+                             ifelse(mc1.end.df$id < 4 & mc1.end.df$id > 3, 
+                                    paste("zone.3"), 
+                                    paste("zone.4"))
+                           ))
+mc1.df <- mc1.df %>%
+dplyr::group_by(id) %>%
+dplyr::mutate(fd_day = row_number())
+mc1.df$id <- as.factor(mc1.df$id)
+```
+
+### Calculate food consumption/colony growth
+#### Pull relevant vars
+```{r}
+mc1.feed.df <- data_frame(id = mc1.df$id, 
+                   date = mc1.df$date,
+                   mc_mass = mc1.df$mc_mass,
+                   p_mass_rm = mc1.df$p_mass_rm, 
+                   p_mass_fd = mc1.df$p_mass_fd, 
+                   n_mass_fd = mc1.df$n_mass_fd, 
+                   n_mass_rm = mc1.df$n_mass_rm,
+                   treatment = mc1.df$treatment,
+                   fd_day = mc1.df$fd_day)
+```
+
+#### Colony initiation mass + pollen added
+```{r}
+mc1.feed.init <- mc1.feed.df[mc1.feed.df$fd_day == 1, ]
+mc1.feed.init$n_mass_rm <- NA
+mc1.feed.init$n_mass_fd <- NA
+mc1.feed.init$p_mass_fd <- 2.000
+mc1.feed.init$fd_day <- 0
+
+mc1.feed.df$p_mass_rm[is.na(mc1.feed.df$p_mass_fd)] <- 0.00 # Add 0 for start position on replicate
+mc1.feed.df$p_mass_fd[is.na(mc1.feed.df$p_mass_fd)] <- 2.00 # Initial feed for all treatments
+# mc1.feed.df <- mc1.feed.df %>%
+#   bind_rows(mc1.feed.init) %>%
+#   arrange(id, fd_day) %>%
+#   filter(id != 2.4)
+```
+
+#### Pollen start and stop points, etc.
+```{r}
+pollen.subtract.r1 <- mc1.feed.df %>%
+  filter(!is.na(p_mass_rm))
+pollen.subtract.r1 <- as.vector(pollen.subtract.r1$p_mass_rm)
+pollen.subtract.r1 <- tail(pollen.subtract.r1, -1)
+start.r1 <- which(!is.na(mc1.feed.df$p_mass_rm))
+stop.r1 <- start.r1 - 1 # stop points are 1 behind the start
+start.r1 <- head(start.r1, -1) # trim off last start index
+stop.r1 <- tail(stop.r1, -1) # trim off first stop index to correctly align
+
+print(start.r1)
+print(stop.r1)
+
+```
+
+#### Calculate total pollen provided/consumed
+```{r}
+pollen.sum.r1 <- c(rep(0, length(start.r1))) # Initialize pollen.sum vector
+for (i in 1:length(start.r1)) {
+    for (j in start.r1[i]:stop.r1[i]) {
+      pollen.sum.r1[i] <- pollen.sum.r1[i] + mc1.feed.df$p_mass_fd[j]
+  }
+}
+pollen.subtract.r1[pollen.subtract.r1 == 0] <- NA # Replace 0's (start points) with NA
+pollen.consumed.r1 <- pollen.sum.r1 - pollen.subtract.r1 # Calculate differences - NA's 
+# for very last feed as we didn't measure final pollen remaining
+length(pollen.subtract.r1) == length(pollen.sum.r1 - pollen.subtract.r1) # Check to see that
+```
+
+##### Add pollen consumed column
+```{r}
+mc1.feed.df$p_mass_cons <- NA # Create column for pollen consumption
+mc1.feed.df$p_mass_cons[stop.r1 + 1] <- pollen.consumed.r1
+```
+
+#### Calculate average daily pollen/nectar consumption
+```{r}
+mc1.feed.df$p_mass_cons_avg <- NA 
+fd.days.r1 <- ((stop.r1 - start.r1) + 1)
+mc1.feed.df$p_mass_cons_avg[which(!is.na(mc1.feed.df$p_mass_cons)) - 1] <-
+  mc1.feed.df$p_mass_cons[which(!is.na(mc1.feed.df$p_mass_cons))] / fd.days.r1
+mc1.feed.df$p_mass_cons_avg[mc1.feed.df$fd_day == 17] <- 0
+mc1.feed.df <- fill(mc1.feed.df, 
+                    p_mass_cons_avg, 
+                    .direction = "up")
+mc1.feed.df$p_mass_cons_avg[mc1.feed.df$p_mass_cons_avg == 0] <- NA
+mc1.feed.df$n_mass_cons <- NA
+mc1.feed.df$n_mass_rm[which(is.na(mc1.feed.df$n_mass_rm))] <- 0.00 
+mc1.feed.df$n_mass_cons <- mc1.feed.df$n_mass_fd - lead(mc1.feed.df$n_mass_rm)
+mc1.feed.df <- mc1.feed.df %>%
+  mutate(n_mass_cons = lag(n_mass_cons, 1))
+mc1.feed.df$n_mass_cons[which(mc1.feed.df$n_mass_rm == 0)] <- NA
+mc1.feed.df$n_mass_cons[which(is.na(mc1.feed.df$n_mass_cons))] <- 0.00
+```
+
+### Calculate true mass 
+```{r}
+# Old way to do fd.days.count
+x <- list()
+y <- 0
+for (i in fd.days.r1) {
+  y <- y + 1
+  if (i == 4) {
+    z <- 3:0
+  } else {
+    z <- 3:1
+  }
+  x[[y]] <- z
+}
+fd_days_count.r1 <- unlist(x)
+fd_days_count.r1 <- c(fd_days_count.r1, c(NA, NA, NA))
+mc1.feed.df$fd_day_count <- fd_days_count.r1
+# mc1.feed.df <- mc1.feed.df %>%
+#   ungroup() %>%
+#   group_by(id) %>%
+#   mutate(fd.day.count = c(1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 1 ,2))
+mc1.feed.df <- mc1.feed.df %>%
+  group_by(id) %>%
+  mutate(mc_mass_init = mc_mass[fd_day == 1] - 2)
+mc1.feed.df <- mc1.feed.df %>%
+  ungroup() %>%
+  mutate(mc_mass_true = ifelse(
+    fd_day_count == 1,
+    ((mc_mass - mc_mass_init) + p_mass_cons_avg),
+    ifelse(
+      fd_day_count == 2,
+      (((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) + p_mass_cons_avg),
+      ifelse(
+        fd_day_count == 3,
+        ((((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) - lag(p_mass_fd, n = 2)) + p_mass_cons_avg),
+        ifelse(fd_day_count == 0,
+               ((((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) - lag(p_mass_fd, n = 2)) - lag(p_mass_fd, n = 3)) + p_mass_cons_avg, 0)
+      )
+    )
+  ))
+
+mc1.feed.df <- mc1.feed.df %>%
+  ungroup() %>%
+  arrange(id, fd_day)
+mc1.end.df <- mc1.end.df %>%
+  ungroup() %>%
+  arrange(id)
+mc1.feed.df$mc_mass_true[mc1.feed.df$fd_day == 17] <- mc1.end.df$end_mass_comb
+```
+
+#### Interpolate missing `mc_mass_true` values
+```{r}
+mc1.feed.df <- mc1.feed.df %>%
+  ungroup() %>%
+  group_by(id) %>%
+  mutate(mc_mass_true_intrp = na.approx(mc_mass_true, 
+                                        maxgap = 4,
+                                        rule = 2))
+```
+
+#### Remove last 3 masses
+These aren't accurate given that we didn't measure pollen consumption for when the exp. ended for this round.
+```{r}
+mc1.feed.df$mc_mass_true_intrp[is.na(mc1.feed.df$p_mass_cons_avg)] <- NA
+```
+
+
+### Create time category relative to pulse
+```{r}
+mc1.feed.df <- mc1.feed.df %>%
+  ungroup() %>%
+  mutate(pulse_cat = ifelse(
+    fd_day <= 4, 
+    "b1",
+    ifelse(
+      fd_day > 4 & fd_day <= 7,
+      "p1",
+      ifelse(
+        fd_day > 7 & fd_day <= 11,
+        "a1.b2",
+        ifelse(fd_day >11 & fd_day <= 14,
+               "p2",
+               "a2")
+      )
+    )
+  ))
+mc1.feed.df$pulse_cat <- as.factor(mc1.feed.df$pulse_cat)
+```
+
+### Clean drone data
+#### Import data
+```{r}
+mc1.drone.it.df <- read_csv("./D2018_MC1_DroneIT.csv")
+mc1.drone.mass.df <- read_csv("./D2018_MC1_DroneMass.csv")
+```
+
+#### Add vars, summarise
+```{r}
+mc1.drone.it.df$X5 <- NULL
+mc1.drone.it.df$date <- mdy(mc1.drone.it.df$date)
+mc1.drone.it.df <- mc1.drone.it.df %>%
+  fill(date, 
+       id, 
+       .direction = "down")
+mc1.drone.it.df$treatment <- ifelse(
+  mc1.drone.it.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc1.drone.it.df$id < 3 & mc1.drone.it.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc1.drone.it.df$id < 4 & mc1.drone.it.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
+)
+mc1.drone.mass.df$treatment <- ifelse(
+  mc1.drone.mass.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc1.drone.mass.df$id < 3 & mc1.drone.mass.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc1.drone.mass.df$id < 4 & mc1.drone.mass.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
+)
+mc1.drone.it.df <- mc1.drone.it.df %>%
+  filter(!is.na(it.distance))
+mc1.drone.mass.df <- mc1.drone.mass.df %>%
+  filter(!is.na(avg.individ.mass))
+```
+
+### Write cleaned data
+```{r}
+write_csv(mc1.df, "./D2018_microcol_round1_clean.csv") 
+write_csv(mc1.feed.df, "./D2018_microcol_round1_feed_clean.csv")
+write_csv(mc1.drone.it.df, "./D2018_microcol_round1_droneIT_clean.csv")
+write_csv(mc1.drone.mass.df, "./D2018_microcol_round1_droneMASS_clean.csv")
+```
+

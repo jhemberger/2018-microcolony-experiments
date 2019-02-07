@@ -1,7 +1,7 @@
 ---
-title: "2018 Resource Pulse Microcolony Analysis - Round 2"
-subtitle: Analysis and model construction/selection
-date: 12/18/2018
+title: "2018 Resource Pulse Microcolony Analysis - Round 3"
+subtitle: "Data cleanup and summarization"
+date: "2/1/2018"
 output: html_notebook
 ---
 
@@ -73,7 +73,7 @@ mc3.end.df$treatment <- ifelse(
 )
 mc3.df <- mc3.df %>%
   group_by(id) %>%
-  mutate(fd.day = row_number())
+  mutate(fd_day = row_number())
 ```
 
 ### Calculate food consumption/colony growth
@@ -87,21 +87,22 @@ mc3.feed.df <- tibble(id= mc3.df$id,
                       n_mass_fd = mc3.df$n_mass_fd,
                       n_mass_rm = mc3.df$n_mass_rm,
                       treatment = mc3.df$treatment,
-                      fd.day = mc3.df$fd.day)
+                      fd_day = mc3.df$fd_day)
 ```
 
 #### Colony initiation mass + pollen added
 ```{r}
-mc3.feed.init <- mc3.feed.df[mc3.feed.df$fd.day == 1, ]
+mc3.feed.init <- mc3.feed.df[mc3.feed.df$fd_day == 1, ]
 mc3.feed.init$n_mass_rm <- NA
 mc3.feed.init$n_mass_fd <- NA
 mc3.feed.init$p_mass_fd <- 3.000
-mc3.feed.init$fd.day <- 0
+mc3.feed.init$fd_day <- 0
 
 mc3.feed.df <- mc3.feed.df %>%
   bind_rows(mc3.feed.init) %>%
-  arrange(id, fd.day) %>%
+  arrange(id, fd_day) %>%
   filter(id != 2.7)
+mc3.df$id <- as.factor(mc3.df$id)
 ```
 
 #### Pollen start and stop points, etc.
@@ -158,9 +159,9 @@ mc3.feed.df$p_mass_cons[which(mc3.feed.df$p_mass_rm == 0)] <- 0.00
 #### Calculate average daily pollen/nectar consumption
 ```{r}
 mc3.feed.df$p_mass_cons_avg <- NA
-fd.days.r3 <- ((stop.r3 - start.r3) + 1)
+fd_days.r3 <- ((stop.r3 - start.r3) + 1)
 mc3.feed.df$p_mass_cons_avg[which(!is.na(mc3.feed.df$p_mass_cons))] <-
-  mc3.feed.df$p_mass_cons[which(!is.na(mc3.feed.df$p_mass_cons))] / fd.days.r3
+  mc3.feed.df$p_mass_cons[which(!is.na(mc3.feed.df$p_mass_cons))] / fd_days.r3
 mc3.feed.df <- fill(mc3.feed.df, 
                     p_mass_cons_avg, 
                     .direction = "up")
@@ -178,31 +179,37 @@ mc3.feed.df$treatment <- as.factor(mc3.feed.df$treatment)
 ```{r}
 mc3.feed.df <- mc3.feed.df %>%
   group_by(id) %>%
-  mutate(fd.day.count = c(0, rep(seq(3, 1, by = -1), 5), 0, 0))
+  mutate(fd_day_count = c(0, rep(seq(3, 1, by = -1), 5), 0, 0))
 
 mc3.feed.df <- mc3.feed.df %>%
   group_by(id) %>%
-  mutate(mc_mass_init = mc_mass[fd.day == 0] - 3)
+  mutate(mc_mass_init = mc_mass[fd_day == 0] - 3)
 mc3.feed.df <- mc3.feed.df %>%
   ungroup() %>%
   mutate(mc_mass_true = ifelse(
-    fd.day.count == 3,
+    fd_day_count == 3,
     ((mc_mass - mc_mass_init) + p_mass_cons_avg),
     ifelse(
-      fd.day.count == 2,
+      fd_day_count == 2,
       (((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) + p_mass_cons_avg),
       ifelse(
-        fd.day.count == 1,
+        fd_day_count == 1,
         ((((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) - lag(p_mass_fd, n = 2)) + p_mass_cons_avg),
         0
         )
       )
     ))
 mc3.feed.df$mc_mass_true[mc3.feed.df$mc_mass_true == 0] <- NA
-mc3.feed.df$mc_mass_true[mc3.feed.df$fd.day == 0] <- 0.00
+mc3.feed.df$mc_mass_true[mc3.feed.df$fd_day == 0] <- 0.00
 mc3.feed.df$date[mc3.feed.df$mc_mass_true == 0] <- "2018-11-10"
 mc3.feed.df[82, 3] <- 425.91 # Fix mis-recording in data frame
 mc3.feed.df[473, 5] <- 1.59# Fix mis-recording in data frame
+```
+
+#### Calculate avg. mass difference
+```{r}
+mc3.feed.df <- mc3.feed.df %>%
+  mutate(mc_mass_diff = c(NA, diff(mc_mass_true)))
 ```
 
 ### Create time category relative to pulse
@@ -210,15 +217,15 @@ mc3.feed.df[473, 5] <- 1.59# Fix mis-recording in data frame
 mc3.feed.df <- mc3.feed.df %>%
   ungroup() %>%
   mutate(pulse_cat = ifelse(
-    fd.day <= 3, 
+    fd_day <= 3, 
     "b1",
     ifelse(
-      fd.day > 3 & fd.day <= 6,
+      fd_day > 3 & fd_day <= 6,
       "p1",
       ifelse(
-        fd.day > 6 & fd.day <= 10,
+        fd_day > 6 & fd_day <= 10,
         "a1.b2",
-        ifelse(fd.day >10 & fd.day <= 13,
+        ifelse(fd_day >10 & fd_day <= 13,
                "p2",
                "a2")
       )

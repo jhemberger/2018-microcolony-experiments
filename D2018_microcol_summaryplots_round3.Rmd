@@ -4,8 +4,8 @@ output: html_notebook
 date: "1/31/19"
 subtitle: "Summary figures - Round 3"
 ---
-**Name:** Jeremy Hemberger
-**Email:** j.hemberger.wisc@gmail.com
+**Name:** Jeremy Hemberger | 
+**Email:** j.hemberger.wisc@gmail.com | 
 **Institution:** University of Wisconsin - Madison | Department of Entomology
 
 ## Load packages
@@ -41,7 +41,7 @@ mc3.end.df %>%
 mc3.feed.df %>%
   filter(!is.na(mc_mass_true)) %>%
   ggplot(na.rm = TRUE) + 
-  geom_line(mapping = aes(x = fd.day, 
+  geom_line(mapping = aes(x = fd_day, 
                           y = mc_mass_true, 
                           group = id, 
                           color = treatment),
@@ -61,7 +61,7 @@ mc3.feed.df %>%
            ymax = Inf,
            fill = "white",
            alpha = 0.2) + 
-  scale_x_continuous(breaks = unique(mc3.feed.df$fd.day)) + 
+  scale_x_continuous(breaks = unique(mc3.feed.df$fd_day)) + 
   theme_black()
 ```
 
@@ -172,7 +172,7 @@ mc3.df %>%
            ymax = Inf,
            fill = "white",
            alpha = 0.2) + 
-  scale_x_continuous(breaks = unique(mc3.df$fd.day)) +
+  scale_x_continuous(breaks = unique(mc3.df$fd_day)) +
   labs(y = "Cumulative Drone Production",
        x = "Feeding Interval") + 
   theme_black()
@@ -212,7 +212,7 @@ mc3.df %>%
            ymax = Inf,
            fill = "white",
            alpha = 0.2) +
-  scale_x_continuous(breaks = unique(mc3.df$fd.day)) +
+  scale_x_continuous(breaks = unique(mc3.df$fd_day)) +
   labs(y = "Cumulative Drone Production",
        x = "Feeding Interval") +
   theme_black()
@@ -223,7 +223,7 @@ mc3.df %>%
 ```{r}
 ggplot(data = mc3.feed.df) + 
   geom_smooth(span = 0.75, 
-              mapping = aes(x = fd.day, 
+              mapping = aes(x = fd_day, 
                             y = mc_mass_true, #- mass_box - lag(p_mass_fd),
                             color = treatment,
                             fill = treatment),
@@ -242,7 +242,7 @@ ggplot(data = mc3.feed.df) +
            ymax = Inf,
            fill = "white",
            alpha = 0.2) + 
-  scale_x_continuous(breaks = unique(mc3.feed.df$fd.day)) + 
+  scale_x_continuous(breaks = unique(mc3.feed.df$fd_day)) + 
   theme_black()
 ```
 
@@ -324,9 +324,8 @@ mc3.df %>%
   dplyr::filter(id != 2.7) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(id, treatment) %>%
-  dplyr::mutate(index_to_drone = min(which(n_new_drones > 0)),
+  dplyr::summarise(index_to_drone = min(which(n_new_drones > 0)),
                 date_to_drone = date[index_to_drone]) %>%
-  dplyr::select(date, id, treatment, index_to_drone, date_to_drone) %>%
   dplyr::mutate(days_to_drone = (as.duration(ymd("2018-11-10") %--% date_to_drone) / 86400)) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(treatment) %>%

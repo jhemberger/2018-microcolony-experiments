@@ -1,4 +1,4 @@
-id,date,time,initials,temp,humidity,activity,mc_mass,n_drones,n_new_drones,n_worker_deaths,brood,workers_replaced,drones_removed,drones_frz,p_mass_rm,n_mass_rm,p_mass_fd,n_mass_fd,notes,treatment,fd_day
+id,date,time,initials,temp,humidity,activity,mc_mass,n_drones,n_new_drones,n_worker_deaths,brood,workers_replaced,drones_removed,drones_frz,p_mass_rm,n_mass_rm,p_mass_fd,n_mass_fd,notes,treatment,fd.day
 1.1,2018-11-13,21:37:00,GW,27.7,74,C,431.21,0,0,0,H,,,,NA,18.1,1.04,13.21,,zone.1,1
 1.1,2018-11-16,16:40:00,GW,26.1,52,C,432.03,0,0,1,"E,H",1-Jan,,,NA,8.74,1.03,15.15,,zone.1,2
 1.1,2018-11-20,19:01:00,GW,26.4,35,C,432.9,0,0,0,"E,H",,,,3.12,8.05,0.98,14,,zone.1,3

@@ -62,3 +62,27 @@ Going to need to explore GAMs for the Round 2 drone - dianostic plots look prett
 **1/17:** Calculated time to first drones and ran stats on that.  Also calculated worker mortality and ran stats. Need to do a RM ANOVA though to see if worker mortality spikes during dirth periods. 
 
 **1/31:** Calculate amount of pollen to produce a drone (on avg) as well as proportion of food consumed per treatment for each pollen and nectar - NEED TO RE-RUN `mc3.feed.df` AS I FOUND RECORDING ERROR.  DO AFTER MEETING AND RE-CHECK ALL RECORDINGS.
+
+**2/1:** Efficiency of conversion or correction factor for mass gain.  Control mass loss of water in pollen?  Why don't we see same pattern with pollen consumption as weight gain - conversion issues?  Need to figure out way to explain this.   RM ANOVA for pollen/nectar consumption for R2/R3 - accounting for colony.  Double check time to maturity - double of round 2 - doesn't seem quite right...
+
+All 3 rounds - Summary stats table for all 3 rounds.  Total mass, brood mass, number of drones produced, worker mortality, avg. food provided and consumption.
+
+4-5 figs for MS 
+
+Basic and Applied Ecology? Ecosphere? 
+
+Supp Material: 
+- Treatment design and feed schedule, 
+
+Dropped from analysis (did not initiate): 
+- Round 1: 2.4
+- Round 2: 1.4
+- Round 3: 2.7
+
+**2/2:** To do for the next week while Claudio is out:
+- [x] Refactor cleanup code for all 3 rounds.  
+- [x] Re-run all cleanup from scratch to ensure that results are consistent.  
+- [ ] Re-analyze rounds 1-2, first analysis for round 3.  RM ANOVA/ANOVA for pollen/nectar
+- [ ] Select 4-5 figures for manuscript 
+- [ ] Create summary stats table for all rounds/treatments - with significant differences indicated 
+

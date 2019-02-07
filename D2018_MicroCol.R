@@ -488,7 +488,7 @@ mc2.df <- mc2.df %>%
   dplyr::mutate(fd.day = row_number())
 
 mc2.feed.df <- mc2.feed.df %>%
-  mutate(mc_mass_diff = c(NA, diff(mc_mass_true)))
+  mutate(mc_mass_diff = as.integer(c(NA, diff(mc_mass_true))))
 
 write_csv(mc2.df, "./D2018_MicroCol_Round2_Clean.csv")
 mc2.df <- read_csv("./D2018_MicroCol_Round2_Clean.csv")

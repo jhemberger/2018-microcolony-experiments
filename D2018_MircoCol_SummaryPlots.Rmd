@@ -31,7 +31,7 @@ load(file = "mc1dronemass.Rdata")
 #### Final comb mass
 
 ```{r}
-mc1end.df %>%
+mc1.end.df %>%
   group_by(treatment) %>%
   dplyr::summarise(mean.comb.mass = mean(end_mass_comb), 
                    se = sd(end_mass_comb) / sqrt(n())) %>%
@@ -52,10 +52,10 @@ mc1end.df %>%
 #### Raw mass gain for all microcolony replicates
 ```{r}
 mc1.feed.df %>%
-  filter(!is.na(mc_mass_true)) %>%
+  filter(!is.na(mc_mass_true_intrp)) %>%
 ggplot(na.rm = TRUE) + 
-  geom_line(mapping = aes(x = fd.day, 
-                          y = mc_mass_true, 
+  geom_line(mapping = aes(x = fd_day, 
+                          y = mc_mass_true_intrp, 
                           group = id, 
                           color = treatment),
             na.rm = TRUE,
@@ -74,7 +74,7 @@ ggplot(na.rm = TRUE) +
            ymax = Inf,
            fill = "white",
            alpha = 0.2) + 
-  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd_day)) + 
   theme_black()
 ```
 
@@ -150,13 +150,14 @@ mc1.df %>%
 #### Drone production bump chart - by treatment
 ```{r}
 mc1.df$id <- as.factor(mc1.df$id)
+mc1.df$n_new_drones[is.na(mc1.df$n_new_drones)] <- 0
 mc1.df %>%
   ungroup() %>%
   group_by(id) %>%
-  mutate(fd.day = row_number()) %>%
+  mutate(fd_day = row_number()) %>%
   mutate(csum_drones = cumsum(n_new_drones)) %>% # won't work unless NO NA's
   arrange(id, date) %>%
-  ggplot(mapping = aes(x = fd.day,
+  ggplot(mapping = aes(x = fd_day,
                        y = csum_drones,
                        group = id)) + 
   geom_line(mapping = aes(color = treatment), 
@@ -179,7 +180,7 @@ mc1.df %>%
            ymax = Inf,
            fill = "white",
            alpha = 0.2) + 
-  scale_x_continuous(breaks = unique(mc1.df$fd.day)) +
+  scale_x_continuous(breaks = unique(mc1.df$fd_day)) +
   labs(y = "Cumulative Drone Production",
        x = "Feeding Interval") + 
   theme_black()
@@ -189,13 +190,13 @@ mc1.df %>%
 mc1.df %>%
   dplyr::ungroup() %>%
   dplyr::group_by(id, treatment) %>%
-  dplyr::mutate(fd.day = row_number()) %>%
+  dplyr::mutate(fd_day = row_number()) %>%
   dplyr::mutate(csum_drones = cumsum(n_new_drones)) %>%
   dplyr::ungroup() %>%
-  dplyr::group_by(treatment, date, fd.day) %>%
+  dplyr::group_by(treatment, date, fd_day) %>%
   dplyr::summarise(mean_csum_drones = mean(csum_drones)) %>%
-  dplyr::arrange(treatment, date, fd.day) %>%
-  ggplot(mapping = aes(x = fd.day,
+  dplyr::arrange(treatment, date, fd_day) %>%
+  ggplot(mapping = aes(x = fd_day,
                        y = mean_csum_drones,
                        group = treatment)) +
   geom_line(mapping = aes(color = treatment),
@@ -218,7 +219,7 @@ mc1.df %>%
            ymax = Inf,
            fill = "white",
            alpha = 0.2) +
-  scale_x_continuous(breaks = unique(mc1.df$fd.day)) +
+  scale_x_continuous(breaks = unique(mc1.df$fd_day)) +
   labs(y = "Cumulative Drone Production",
        x = "Feeding Interval") +
   theme_black()
@@ -228,8 +229,8 @@ mc1.df %>%
 ```{r}
 ggplot(data = mc1.feed.df) + 
   geom_smooth(span = 0.75, 
-              mapping = aes(x = fd.day, 
-                            y = mc_mass_true, #- mass_box - lag(p_mass_fd),
+              mapping = aes(x = fd_day, 
+                            y = mc_mass_true_intrp, #- mass_box - lag(p_mass_fd),
                             color = treatment,
                             fill = treatment),
               method = "loess") + 
@@ -247,7 +248,7 @@ ggplot(data = mc1.feed.df) +
            ymax = Inf,
            fill = "white",
            alpha = 0.2) + 
-  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd_day)) + 
   theme_black()
 ```
 
@@ -436,8 +437,8 @@ mc1.drone.it.df %>%
             se.it = sd.it / sqrt(total.drones)) %>%
   ggplot(mapping = aes(x = treatment,
                        y = mean.it)) + 
-  geom_col(mapping = aes(fill = treatment,
-                         width = 0.75)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.75) + 
   geom_pointrange(mapping = aes(ymax = mean.it + se.it,
                                 ymin = mean.it - se.it),
                   color = "white") + 
@@ -457,8 +458,8 @@ mc1.drone.mass.df %>%
             se.mass = sd.mass / sqrt(total.drones)) %>%
   ggplot(mapping = aes(x = treatment,
                        y = mean.mass)) + 
-  geom_col(mapping = aes(fill = treatment,
-                         width = 0.75)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.75) + 
   geom_pointrange(mapping = aes(ymax = mean.mass + se.mass,
                                 ymin = mean.mass - se.mass),
                   color = "white") + 
@@ -477,8 +478,8 @@ mc1.df %>%
   ggplot() + 
     geom_col(mapping = aes(x = treatment,
                            y = mean_worker_death,
-                           fill = treatment,
-                           width = 0.5)) + 
+                           fill = treatment),
+             width = 0.5) + 
   geom_pointrange(mapping = aes(x = treatment, y = mean_worker_death, 
                                 ymax = mean_worker_death + se,
                                 ymin = mean_worker_death - se),
@@ -495,10 +496,10 @@ mc1.df %>%
   dplyr::group_by(id, treatment) %>%
   dplyr::mutate(csum_worker_death = cumsum(n_worker_deaths)) %>%
   dplyr::ungroup() %>%
-  dplyr::group_by(treatment, date, fd.day) %>%
+  dplyr::group_by(treatment, date, fd_day) %>%
   dplyr::summarise(mean_csum_worker_death = mean(csum_worker_death)) %>%
-  dplyr::arrange(treatment, date, fd.day) %>%
-  ggplot(mapping = aes(x = fd.day,
+  dplyr::arrange(treatment, date, fd_day) %>%
+  ggplot(mapping = aes(x = fd_day,
                        y = mean_csum_worker_death,
                        group = treatment)) +
   geom_line(mapping = aes(color = treatment),
@@ -521,7 +522,7 @@ mc1.df %>%
            ymax = Inf,
            fill = "white",
            alpha = 0.2) +
-  scale_x_continuous(breaks = unique(mc1.df$fd.day)) +
+  scale_x_continuous(breaks = unique(mc1.df$fd_day)) +
   labs(y = "Mean Cumulative Worker Mortality",
        x = "Feeding Interval") +
   theme_black()
@@ -532,9 +533,8 @@ mc1.df %>%
   dplyr::filter(id != 2.4) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(id, treatment) %>%
-  dplyr::mutate(index_to_drone = min(which(n_new_drones > 0)),
+  dplyr::summarise(index_to_drone = min(which(n_new_drones > 0)),
                 date_to_drone = date[index_to_drone]) %>%
-  dplyr::select(date, id, treatment, index_to_drone, date_to_drone) %>%
   dplyr::mutate(days_to_drone = (as.duration(ymd("2018-03-15") %--% date_to_drone) / 86400)) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(treatment) %>%
@@ -576,7 +576,6 @@ mc2.end.df %>%
 Removed MC 1.4 due to all negative true mass values. 
 ```{r}
 mc2.feed.df %>%
-  filter(id != 1.4) %>%
   ggplot() + 
   geom_line(mapping = aes(x = date, 
                           y = mc_mass_true, 
@@ -588,20 +587,23 @@ mc2.feed.df %>%
 
 #### Total drones produced as point range
 ```{r}
-mc2.drone.df %>%
-  dplyr::group_by(treatment) %>%
-  dplyr::summarise(mean_drones = mean(total_drones),
-            sd_drones = sd(total_drones),
-            se_drones = sd_drones / sqrt(7)) %>%
+mc2.df %>%
+  group_by(id, treatment) %>%
+  summarise(total_males = sum(n_new_drones, 
+                              na.rm = TRUE)) %>%
+  group_by(treatment) %>%
+  summarise(mean_males = mean(total_males,
+                              na.rm  = TRUE), 
+            se = sd(total_males) / sqrt(n())) %>%
   ggplot() + 
   geom_col(mapping = aes(x = treatment,
-                         y = mean_drones,
+                         y = mean_males,
                          fill = treatment,
                          width = 0.5)) + 
   geom_pointrange(mapping = aes(x = treatment, 
-                                y = mean_drones, 
-                                ymax = mean_drones + se_drones,
-                                ymin = mean_drones - se_drones),
+                                y = mean_males, 
+                                ymax = mean_males + se,
+                                ymin = mean_males - se),
                   color = "white") + 
   theme_black()
 ```
@@ -661,9 +663,10 @@ mc2.df %>%
 
 #### Average mass gain - smoothed
 ```{r}
+mc2.feed.df %>%
+  filter(date < "2018-08-06") %>%
 ggplot() + 
-  geom_smooth(data = mc2.feed.df,
-              mapping = aes(x = date, 
+  geom_smooth(mapping = aes(x = date, 
                             y = mc_mass_true,
                             color = treatment,
                             fill = treatment),
@@ -916,9 +919,8 @@ mc2.df %>%
   dplyr::filter(id != 1.4, id != 4.2) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(id, treatment) %>%
-  dplyr::mutate(index_to_drone = min(which(n_new_drones > 0)),
+  dplyr::summarise(index_to_drone = min(which(n_new_drones > 0)),
                 date_to_drone = date[index_to_drone]) %>%
-  dplyr::select(date, id, treatment, index_to_drone, date_to_drone) %>%
   dplyr::mutate(days_to_drone = (as.duration(ymd("2018-06-21") %--% date_to_drone) / 86400)) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(treatment) %>%
@@ -945,15 +947,15 @@ mc1.feed.df %>%
   ungroup() %>%
   filter(treatment == "zone.1") %>%
   ggplot() + 
-  geom_point(mapping = aes(x = fd.day,
+  geom_point(mapping = aes(x = fd_day,
                            y = mc_mass_true_intrp,
                            color = pulse_cat)) + 
-  geom_smooth(mapping = aes(x = fd.day,
+  geom_smooth(mapping = aes(x = fd_day,
                             y = mc_mass_true_intrp,
                             col = pulse_cat),
               method = "lm",
               se = FALSE) + 
-  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd_day)) + 
   theme_black()
 
 ```
@@ -965,15 +967,15 @@ mc1.feed.df %>%
   ungroup() %>%
   filter(treatment == "zone.2") %>%
   ggplot() + 
-  geom_point(mapping = aes(x = fd.day,
+  geom_point(mapping = aes(x = fd_day,
                            y = mc_mass_true_intrp,
                            color = pulse_cat)) + 
-  geom_smooth(mapping = aes(x = fd.day,
+  geom_smooth(mapping = aes(x = fd_day,
                             y = mc_mass_true_intrp,
                             col = pulse_cat),
               method = "lm",
               se = FALSE) + 
-  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd_day)) + 
   theme_black()
 
 ```
@@ -986,15 +988,15 @@ mc1.feed.df %>%
   ungroup() %>%
   filter(treatment == "zone.3") %>%
   ggplot() + 
-  geom_point(mapping = aes(x = fd.day,
+  geom_point(mapping = aes(x = fd_day,
                            y = mc_mass_true_intrp,
-                           color = id)) + 
-  geom_smooth(mapping = aes(x = fd.day,
+                           color = pulse_cat)) + 
+  geom_smooth(mapping = aes(x = fd_day,
                             y = mc_mass_true_intrp,
                             col = pulse_cat),
               method = "lm",
               se = FALSE) + 
-  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd_day)) + 
   theme_black()
 ```
 
@@ -1003,14 +1005,14 @@ mc1.feed.df$pulse_cat <- as.character(mc1.feed.df$pulse_cat)
 mc1.feed.df %>%
   ungroup() %>%
   filter(treatment == "zone.3") %>%
-  ggplot(mapping = aes(x = fd.day,
+  ggplot(mapping = aes(x = fd_day,
                        y = mc_mass_true_intrp,
                        color = id)) + 
   geom_point() + 
   geom_smooth(mapping = aes(col = id),
               method = "lm",
               se = FALSE) + 
-  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd_day)) + 
   theme_black()
 ```
 
@@ -1023,15 +1025,15 @@ mc1.feed.df %>%
   ungroup() %>%
   filter(treatment == "zone.4") %>%
   ggplot() + 
-  geom_point(mapping = aes(x = fd.day,
+  geom_point(mapping = aes(x = fd_day,
                            y = mc_mass_true_intrp,
                            color = pulse_cat)) + 
-  geom_smooth(mapping = aes(x = fd.day,
+  geom_smooth(mapping = aes(x = fd_day,
                             y = mc_mass_true_intrp,
                             color = pulse_cat),
               method = "lm",
               se = FALSE) + 
-  scale_x_continuous(breaks = unique(mc1.feed.df$fd.day)) + 
+  scale_x_continuous(breaks = unique(mc1.feed.df$fd_day)) + 
   theme_black()
 ```
 
@@ -1045,7 +1047,7 @@ trt.slopes <- function() {
     df <- mc1.feed.df %>%
       filter(treatment == i) %>%
       dlply("pulse_cat", function(.)
-        tidy(lm(mc_mass_true_intrp ~ fd.day, data = .))) %>%
+        tidy(lm(mc_mass_true_intrp ~ fd_day, data = .))) %>%
       bind_rows(.id = "id") %>%
       mutate(treatment = i)
     df.ls[[i]] <- df
@@ -1101,7 +1103,7 @@ trt.slopes <- function() {
     df <- mc2.feed.df %>%
       filter(treatment == i) %>%
       plyr::dlply("pulse_cat", function(.)
-                  tidy(lm(mc_mass_true ~ fd.day, data = .))) %>%
+                  tidy(lm(mc_mass_true ~ fd_day, data = .))) %>%
       bind_rows(.id = "id") %>%
       mutate(treatment = i)
     df.ls[[i]] <- df
