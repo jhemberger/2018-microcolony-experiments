@@ -1,0 +1,73 @@
+---
+title: "2018 Resource Pulse Microcolony Analysis - Round 3"
+subtitle: Analysis and model construction/selection
+date: "2/7/2018"
+output: html_notebook
+---
+
+**Name:** Jeremy Hemberger
+**Email:** j.hemberger.wisc@gmail.com
+**Institution:** University of Wisconsin - Madison | Department of Entomology
+
+## Import packages 
+```{r echo = TRUE, results = "hide"}
+library(psych)
+library(nlme) #lmer can't use temporal corrleation structures
+library(car)
+library(multcompView)
+library(lsmeans)
+library(tidyverse)
+library(rcompanion)
+library(lmtest)
+library(gam)
+library(gamm4)
+library(mgcv)
+library(knitr)
+library(lubridate)
+library(broom)
+```
+
+## Load in data
+```{r}
+mc3.df <- read_csv("./D2018_microcol_round3_clean.csv")
+mc3.end.df <- read_csv("./D2018_MicroCol_Round3_BroodMass.csv")
+mc3.feed.df <- read_csv("./D2018_microcol_round3_feed_clean.csv")
+mc3.drone.df <- read_csv("./D2018_microcol_round3_drone.csv")
+mc3.drone.it.df <- read_csv()
+mc3.drone.mass.df <- read_csv() 
+
+mc3.drone.df <- mc3.drone.df %>%
+  filter(id != 2.7)
+```
+
+## RM ANOVA on mass gain
+
+
+## RM ANOVA on drone production
+
+## ANOVA on total drone production
+```{r}
+mc3.drone.lm <- lm(total_drones ~ treatment,
+                   data = mc3.drone.df)
+tidy(mc3.drone.lm)
+anova(mc3.drone.lm)
+```
+
+
+## LMM on total drone production
+```{r}
+mc3.drone.df$id <- as.factor(mc3.drone.df$id)
+mc3.drone.df$treatment <- as.factor(mc3.drone.df$treatment)
+mc3.drone.lmm <- lme(total_drones ~ treatment,
+                     random = ~ 1 | id,
+                     data = mc3.drone.df,
+                     na.action = na.exclude)
+anova(mc3.drone.lmm)
+tidy(mc3.drone.lmm)
+summary(mc3.drone.lmm)
+```
+
+## ANOVA/LMM for days to first drone
+
+
+## LMM

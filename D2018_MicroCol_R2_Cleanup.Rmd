@@ -198,6 +198,7 @@ mc2.feed.df <- mc2.feed.df %>%
     ))
 mc2.feed.df$mc_mass_true[mc2.feed.df$mc_mass_true == 0] <- NA
 mc2.feed.df$mc_mass_true[mc2.feed.df$fd_day == 0] <- 0.00
+mc2.feed.df$date[mc2.feed.df$mc_mass_true == 0] <- "2018-06-18"
 ```
 
 #### Calculate avg. mass difference
@@ -228,11 +229,20 @@ mc2.feed.df <- mc2.feed.df %>%
   ))
 mc2.feed.df$pulse_cat <- as.factor(mc2.feed.df$pulse_cat)
 ```
+### Drone summary/cleanup
+```{r}
+mc2.drone.df <- mc2.df %>%
+  ungroup() %>%
+  group_by(id, treatment) %>%
+  summarise(total_drones = sum(n_new_drones, 
+                               na.rm = TRUE))
+```
 
 ### Write cleaned data
 ```{r}
 write_csv(mc2.df, "D2018_microcol_round2_clean.csv")
 write_csv(mc2.feed.df, "D2018_microcol_round2_feed_clean.csv")
+write_csv(mc2.drone.df, "./D2018_microcol_round3_drone.csv")
 ```
 
 ```{r}

@@ -82,7 +82,24 @@ Dropped from analysis (did not initiate):
 **2/2:** To do for the next week while Claudio is out:
 - [x] Refactor cleanup code for all 3 rounds.  
 - [x] Re-run all cleanup from scratch to ensure that results are consistent.  
-- [ ] Re-analyze rounds 1-2, first analysis for round 3.  RM ANOVA/ANOVA for pollen/nectar
-- [ ] Select 4-5 figures for manuscript 
+- [x] ~~Re-analyze rounds 1-2, first analysis for round 3.  RM ANOVA/ANOVA for pollen/nectar~~ 
+- [x] Select 4-5 figures for manuscript 
 - [ ] Create summary stats table for all rounds/treatments - with significant differences indicated 
 
+**2/7:** All cleanup code is refactored - working on re-analyzing now.  Likely going to combine the data and analyze with a "round" term.  I think we're most likely to see treatment differences that way.  YEP.  gains statistical power, and we can account for round differences with a `rep` term in the model
+
+Need to go through all experiment notes and figure out which colonies need to be dropped due to non-initiation, escapees, etc.
+
+**2/10:** In doing `coAR1` autocorr. structure, the combinations must be unique!  For me, can't have two dates that are the same within a grouping factor (e.g., the microcolony id) 
+
+**2/11:** Figures for manuscript: 
+- [x] Final brood mass
+- [x] Total drone production 
+- [x] Mass over time
+- [x] Drone production bump chart
+- [ ] Growth by time period (before, during, after pulses) 
+- [ ] Drone fitness metrics? Not likely going to show differences after analyzing first round.  
+
+I don't think we'll need any tables as the figures tell most of the story. 
+
+Day to first drone could be an artifact of our starting conditions: we wait until there is evidence of brood before we start the treatments so the first drones could be independent of treatment.

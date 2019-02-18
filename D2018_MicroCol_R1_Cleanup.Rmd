@@ -239,6 +239,11 @@ These aren't accurate given that we didn't measure pollen consumption for when t
 mc1.feed.df$mc_mass_true_intrp[is.na(mc1.feed.df$p_mass_cons_avg)] <- NA
 ```
 
+#### Calculate avg. mass difference
+```{r}
+mc1.feed.df <- mc1.feed.df %>%
+  mutate(mc_mass_diff = c(NA, diff(mc_mass_true_intrp)))
+```
 
 ### Create time category relative to pulse
 ```{r}
@@ -263,6 +268,14 @@ mc1.feed.df$pulse_cat <- as.factor(mc1.feed.df$pulse_cat)
 ```
 
 ### Clean drone data
+```{r}
+mc1.drone.df <- mc1.df %>%
+  ungroup() %>%
+  group_by(id, treatment) %>%
+  summarise(total_drones = sum(n_new_drones, 
+                               na.rm = TRUE))
+```
+
 #### Import data
 ```{r}
 mc1.drone.it.df <- read_csv("./D2018_MC1_DroneIT.csv")
@@ -313,6 +326,7 @@ mc1.drone.mass.df <- mc1.drone.mass.df %>%
 ```{r}
 write_csv(mc1.df, "./D2018_microcol_round1_clean.csv") 
 write_csv(mc1.feed.df, "./D2018_microcol_round1_feed_clean.csv")
+write_csv(mc1.drone.df, "./D2018_microcol_round3_drone.csv")
 write_csv(mc1.drone.it.df, "./D2018_microcol_round1_droneIT_clean.csv")
 write_csv(mc1.drone.mass.df, "./D2018_microcol_round1_droneMASS_clean.csv")
 ```

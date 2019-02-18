@@ -5,6 +5,10 @@ date: 12/18/2018
 output: html_notebook
 ---
 
+**Name:** Jeremy Hemberger
+**Email:** j.hemberger.wisc@gmail.com
+**Institution:** University of Wisconsin - Madison | Department of Entomology
+
 ### Import packages 
 ```{r echo = TRUE, results = "hide"}
 library(psych)

@@ -5,6 +5,10 @@ date: 11/28/2018
 output: html_notebook
 ---
 
+**Name:** Jeremy Hemberger
+**Email:** j.hemberger.wisc@gmail.com
+**Institution:** University of Wisconsin - Madison | Department of Entomology
+
 ### Import packages 
 ```{r echo = TRUE, results = "hide"}
 library(psych)
@@ -44,7 +48,7 @@ model.1 = lme(mc_mass_true_intrp ~ treatment + date + treatment*date,
               random = ~ 1 | id,
               data = mc1.feed.df,
               correlation = corAR1(form = ~ date | id,
-                                   value = 0.2819),
+                                   value = 0.31456),
               na.action = na.exclude,
               method = "REML")
 Anova(model.1)
@@ -248,15 +252,14 @@ pd = position_dodge(.2)
 ggplot(mc1.drones.gwm.df, aes(x = date,
                               y = Mean,
                               color = treatment)) +
-  
   geom_errorbar(aes(ymin = Percentile.lower,
-                      ymax = Percentile.upper),
+                    ymax = Percentile.upper),
                   width = 0.2, 
                   size = 0.7, 
                   position = pd) +
   geom_point(size = 4, 
-               position = pd,
-               alpha = 0.75) +
+             position = pd,
+             alpha = 0.75) +
   theme_black() +
   theme(axis.title = element_text(face = "bold")) +
   ylab("Least-square mean cumulative drone production") + 

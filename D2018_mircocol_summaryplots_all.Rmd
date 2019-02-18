@@ -84,8 +84,7 @@ mc.end.all.df %>%
   ylab(label = "Mean Brood Mass") + 
   scale_y_continuous(limits = c(0, 10),
                      expand = c(0, 0)) + 
-  theme_bw() + 
-  theme(legend.position = "right")
+  theme_microcol()
 ```
 
 
@@ -116,10 +115,7 @@ mc.all.df %>%
   ylab(label = "Mean Drones Produced") + 
   scale_y_continuous(limits = c(0, 40),
                      expand = c(0, 0)) + 
-  theme_bw() + 
-  theme(legend.position = "right",
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+  theme_microcol()
 ```
 
 

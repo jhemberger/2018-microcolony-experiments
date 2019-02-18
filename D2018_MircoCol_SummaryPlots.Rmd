@@ -4,8 +4,10 @@ output: html_notebook
 date: "11/29/2018"
 subtitle: "Summary figures""
 ---
+
 **Name:** Jeremy Hemberger
 **Email:** j.hemberger.wisc@gmail.com
+**Institution:** University of Wisconsin - Madison | Department of Entomology
 
 ## Load packages
 ```{r}

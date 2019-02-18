@@ -233,11 +233,19 @@ mc3.feed.df <- mc3.feed.df %>%
   ))
 mc3.feed.df$pulse_cat <- as.factor(mc3.feed.df$pulse_cat)
 ```
+### Drone cleanup 
+```{r}
+mc3.drone.df <- mc3.df %>%
+  ungroup() %>%
+  group_by(id, treatment) %>%
+  summarise(total_drones = sum(n_new_drones, na.rm = TRUE))
+```
 
 ### Save all data to working directory
 #### All Round 3
 ```{r}
 write_csv(mc3.df, "D2018_microcol_round3_clean.csv")
-write_csv(mc3.feed.df, "D2018_microcol_round3_feed_clean")
+write_csv(mc3.feed.df, "D2018_microcol_round3_feed_clean.csv")
+write_csv(mc3.drone.df, "D2018_microcol_round3_drone.csv")
 ```
 
