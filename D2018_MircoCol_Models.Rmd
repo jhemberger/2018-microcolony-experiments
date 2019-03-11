@@ -10,7 +10,7 @@ output: html_notebook
 **Institution:** University of Wisconsin - Madison | Department of Entomology
 
 ### Import packages 
-```{r echo = TRUE, results = "hide"}
+```{r Import libraries`, include=FALSE}
 library(psych)
 library(nlme) #lmer can't use temporal corrleation structures
 library(car)

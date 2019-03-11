@@ -25,7 +25,6 @@ library(mgcv)
 library(knitr)
 library(lubridate)
 library(broom)
-library(svglite)
 ```
 
 ## Load in data
@@ -97,13 +96,11 @@ mc.feed.all.df <- mc.feed.all.df %>%
                                   rule = 2))
 ```
 
-
-
 ## RM ANOVA on mass gain
 #### Temporal correlation structure
 ```{r}
 mcall.mass.model = lme(mc_mass_true ~ treatment + rep + date + treatment * date,
-                       random = ~ 1 | id,
+                       random = ~ 1 + treatment | id,
                        data = mc.feed.all.df,
                        na.action = na.exclude)
 ACF(mcall.mass.model)
@@ -113,11 +110,13 @@ acf(mc.feed.all.df$mc_mass_true,
 
 #### Full model
 ```{r}
-mcall.mass.model.1 = lme(mc_mass_true ~ treatment + rep + date + treatment*date, 
-                         random = ~ 1 | id,
+mc.feed.all.df$unique <- paste(mc.feed.all.df$rep,
+                               mc.feed.all.df$id, 
+                               sep = "_")
+mcall.mass.model.1 = lme(mc_mass_true ~ treatment + date + rep, 
+                         random = ~ 1 + treatment | unique,
                          data = mc.feed.all.df,
-                         correlation = corAR1(form = ~ date | id,
-                                              value = 0.304686),
+                         correlation = corAR1(),
                          na.action = na.exclude,
                          method = "REML")
 Anova(mcall.mass.model.1)
@@ -128,7 +127,7 @@ summary(mcall.mass.model.1)
 
 #### Fixed effects only w/comparison
 ```{r}
-mcall.mass.model.1.fixed <- gls(mc_mass_true ~ treatment + date + treatment*date,
+mcall.mass.model.1.fixed <- gls(mc_mass_true ~ treatment + date,
                                 data = mc.feed.all.df,
                                 method = "REML",
                                 na.action = na.exclude)
@@ -143,11 +142,27 @@ anova(mcall.mass.model.1, mcall.mass.model.1.fixed)
 #### Null model w/comparison
 ```{r}
 mcall.mass.model.null <- lme(mc_mass_true ~ 1,
-                             random = ~ 1 | id,
+                             random = ~ 1 + treatment | id,
                              data = mc.feed.all.df,
                              na.action = na.exclude)
 nagelkerke(mcall.mass.model.1,
            mcall.mass.model.null)
+```
+
+#### LSMeans calculation
+```{r}
+mcall.mass.marginal <- lsmeans(mcall.mass.model.1,
+                               ~ treatment:date,
+                               adjust = "tukey")
+contrast(mcall.mass.marginal,
+         alpha = 0.05,
+         method = "pairwise",
+         adjust = "tukey")
+mcall.mass.cld <- cld(mcall.mass.marginal,
+                      alpha = 0.05,
+                      Letters = letters,
+                      adjust = "tukey")
+mcall.mass.cld
 ```
 
 #### Groupwise estimated means
@@ -163,6 +178,7 @@ mcall.mass.gwm.df
 ```{r}
 mcall.mass.gwm.df %>%
   ungroup() %>%
+  filter(fd_day != 0) %>%
   group_by(treatment) %>%
   mutate(Mean = na.approx(Mean, 
                           maxgap = 4,
@@ -225,27 +241,28 @@ ggplot(mapping = aes(x = fd_day,
   xlab("Interval Feeding Day") + 
   scale_x_continuous(breaks = unique(mcall.mass.gwm.df$fd_day)) + 
   scale_y_continuous(limits = c(0, 10.5)) + 
-  ggsave("mean_mass_fitted.eps")
+  ggsave("mean_mass_fitted.eps",
+         width = 7,
+         height = 7)
 ```
 
 
 #### Model diagnostics 
 ```{r}
-plotNormalHistogram(residuals(mcall.mass.model.1))
-plot(residuals(mcall.mass.model.1),
+plotNormalHistogram(residuals(mcall.mass.model.1, type = "normalized"))
+plot(residuals(mcall.mass.model.1, type = "normalized"),
      fitted(mcall.mass.model.1))
-plot(residuals(mcall.mass.model.1))
-acf(residuals(mcall.mass.model.1),
+plot(residuals(mcall.mass.model.1, type = "normalized"))
+acf(residuals(mcall.mass.model.1, type = "normalized"),
     na.action = na.exclude)
 ```
-
 
 
 ## LMM on brood mass
 #### Model specification
 ```{r}
-mcall.brood.lmm <- lme(end_mass_comb ~ treatment + round,
-                       random = ~ 1 | id,
+mcall.brood.lmm <- lme(end_mass_comb ~ treatment * round,
+                       random = ~ 1 + treatment | id,
                        data = mc.end.all.df,
                        na.action = na.exclude)
 tidy(mcall.brood.lmm)
@@ -262,6 +279,10 @@ plot(mcall.brood.lmm, which = 1 :4)
 #### LS means Calculation
 ```{r}
 mcall.brood.marginal <- lsmeans(mcall.brood.lmm, ~ treatment)
+contrast(mcall.brood.marginal,
+         alpha = 0.05,
+         method = "pairwise",
+         adjust = "tukey")
 mcall.brood.cld <- cld(mcall.brood.marginal,
                        alpha = 0.05,
                        Letters = letters,
@@ -302,53 +323,92 @@ ggplot(data = mcall.brood.cld,
                     name = "Treatment") + 
   theme(legend.justification = c(1, 1), 
         legend.position = c(1, 1)) +
-  ggsave("mean_broodmass_fitted.eps")
+  ggsave("mean_broodmass_fitted.eps",
+         width = 4,
+         height = 3.25)
 ```
 
 
 
-## RM ANOVA on drone production
-
-#### Bump chart for cumulative drone production 
-##### Re-make `mc.drone.all.df` tibble 
+## RM ANOVA on cumulative drone production
+#### Re-make `mc.drone.all.df` tibble 
 ```{r}
-mc.drone.all.df <- bind_rows(mc1.df %>%
+mc.all.drone.cum.df <- bind_rows(mc1.df %>%
   group_by(id) %>%
   mutate(csum_drones = cumsum(n_new_drones)) %>%
-  select(id, treatment, fd_day, csum_drones), 
+  select(id, treatment, date, fd_day, csum_drones), 
   mc2.df %>%
   group_by(id) %>%
   mutate(csum_drones = cumsum(n_new_drones)) %>%
-  select(id, treatment, fd_day, csum_drones),
-  mc3.df %>%
+  select(id, treatment, date, fd_day, csum_drones),
+  mc3.df %>% 
   group_by(id) %>%
   mutate(csum_drones = cumsum(n_new_drones)) %>%
-  select(id, treatment, fd_day, csum_drones), 
-  .id = "rep") 
+  select(id, treatment, date, fd_day, csum_drones), 
+  .id = "rep")%>%
+  filter(!is.na(csum_drones))
 ```
 
-##### Plot bumpchart
+#### Temporal correlation structure
 ```{r}
-mc.drone.all.df %>%
-  group_by(treatment, fd_day) %>%
-  summarise(mean_csum_drones = round(mean(csum_drones, na.rm = TRUE)),
-            se_mean_csum_drones = sd(csum_drones, na.rm = TRUE) / sqrt(n())) %>%
-  mutate(trt_cat = ifelse(treatment == "zone.1", "constant", 
-                          ifelse(treatment == "zone.2", "constant", "pulse"))) %>%
-  ggplot(mapping = aes(x = fd_day,
-                       y = mean_csum_drones,
-                       group = treatment)) +
-  geom_errorbar(mapping = aes(ymin = mean_csum_drones - se_mean_csum_drones,
-                              ymax = mean_csum_drones + se_mean_csum_drones),
-                size = 0.7,
-                width = 0,
-                color = "black") + 
-  geom_line(mapping = aes(color = treatment),
-            alpha = 1,
-            size = 1.5) +
-  geom_point(mapping = aes(color = treatment),
-             alpha = 1,
-             size = 3) +
+mcall.drone.model <- lme(csum_drones ~ treatment + date,
+                         random = ~ 1 + treatment | id,
+                         data = mc.all.drone.cum.df,
+                         na.action = na.exclude)
+ACF(mcall.drone.model)
+acf(mc.all.drone.cum.df$csum_drones)
+```
+
+#### Full model
+```{r}
+mcall.drone.model.1 <- lme(csum_drones ~ treatment + date,
+                           random = ~ 1 + treatment | id,
+                           data = mc.all.drone.cum.df,
+                           correlation = corAR1(form = ~ date | id,
+                                               value = 0.8256),
+                           na.action = na.exclude,
+                           method = "REML")
+Anova(mcall.drone.model.1)
+anova(mcall.drone.model.1)
+summary(mcall.drone.model.1)
+tidy(mcall.drone.model.1)
+```
+
+
+#### Null model comparison
+```{r}
+mcall.drone.null <- lme(csum_drones ~ 1,
+                        random = ~ 1 + treatment | id,
+                        data = mc.all.drone.cum.df,
+                        na.action = na.exclude) 
+nagelkerke(mcall.drone.model.1, mcall.drone.null)
+```
+
+#### Groupwise estimated means
+```{r}
+mcall.drone.gwm.df <- groupwiseMean(csum_drones ~ treatment + fd_day,
+                                    data = mc.all.drone.cum.df,
+                                    conf = 0.95, 
+                                    digits = 3, 
+                                    traditional = FALSE,
+                                    percentile = TRUE)
+mcall.drone.gwm.df
+```
+
+
+#### Plot groupwise means
+```{r}
+mcall.drone.gwm.df %>%
+  ungroup() %>%
+  group_by(treatment) %>%
+  mutate(trt_cat = ifelse(treatment == "zone.1", 
+                          "constant", 
+                          ifelse(treatment == "zone.2", 
+                                 "constant", 
+                                 "pulse"))) %>%
+ggplot(mapping = aes(x = fd_day,
+                     y = Mean,
+                     group = treatment)) + 
   annotate("rect",
            xmin = 3.5,
            xmax = 6.5,
@@ -363,6 +423,25 @@ mc.drone.all.df %>%
            ymax = Inf,
            fill = "black",
            alpha = 1) +
+  geom_errorbar(
+    mapping = aes(ymin = Percentile.lower,
+                  ymax = Percentile.upper),
+    width = 0,
+    size = 0.7,
+    #position = position_dodge(0.2),
+    color = "black") + 
+  geom_point(mapping = aes(color = treatment),
+             size = 4,
+             #position = position_dodge(0.2),
+             alpha = 1) + 
+  geom_line(mapping = aes(color = treatment),
+            alpha = 1,
+            size = 1.5) +
+  # geom_smooth(mapping = aes(color = treatment),
+  #             alpha = 0.5,
+  #             size = 2.0,
+  #             se = FALSE,
+  #             span = 0.6) + 
   theme_microcol() + 
   scale_color_manual(values = c("#9FC3EA", 
                                 "#172A3A", 
@@ -372,31 +451,164 @@ mc.drone.all.df %>%
                                "100% - Constant",
                                "100% - Variable",
                                "50% - Variable"),
-                     name = "Treatment") + 
+                    name = "Treatment") + 
   theme(legend.justification = c(0, 1), 
         legend.position = c(0, 1)) + 
-  scale_x_continuous(breaks = unique(mc.drone.all.df$fd_day)) +
   facet_grid(rows = vars(trt_cat)) + 
-  labs(y = "Cumulative Drone Production",
-       x = "Feeding Interval") + 
-  ggsave("mean_drone_bump_fitted.eps")
+  ylab("Least square mean cumulative drone production") +
+  xlab("Interval Feeding Day") + 
+  scale_x_continuous(breaks = unique(mcall.drone.gwm.df$fd_day)) + 
+  scale_y_continuous(limits = c(0, 30)) + 
+  ggsave("mean_drone_fitted.eps",
+         width = 7,
+         height = 7)
+```
+
+#### Model diagnostics
+
+## RM ANOVA on average drone production
+#### Gather data
+```{r}
+mc.all.drone.avg.df <- bind_rows(mc1.df %>%
+  select(id, treatment, date, fd_day, n_new_drones), 
+  mc2.df %>%
+  select(id, treatment, date, fd_day, n_new_drones), 
+  mc3.df %>% 
+  select(id, treatment, date, fd_day, n_new_drones), 
+  .id = "rep")%>%
+  filter(!is.na(n_new_drones))
+```
+
+#### Temporal correlation structure
+```{r}
+mcall.drone.avg.model <- lme(n_new_drones ~ treatment + date,
+                             random = ~ 1 + treatment | id,
+                             data = mc.all.drone.avg.df,
+                             na.action = na.exclude)
+ACF(mcall.drone.avg.model)
+acf(mc.all.drone.avg.df$n_new_drones)
+```
+
+#### Full model
+```{r}
+mcall.drone.avg.model.1 <- lme(n_new_drones ~ treatment + date,
+                               random = ~ 1 + treatment | id,
+                               data = mc.all.drone.avg.df,
+                               correlation = corAR1(form = ~ date | id,
+                                                    value = 0.2567),
+                               na.action = na.exclude,
+                               method = "REML")
+Anova(mcall.drone.avg.model.1)
+anova(mcall.drone.avg.model.1)
+summary(mcall.drone.avg.model.1)
+tidy(mcall.drone.avg.model.1)
+```
+
+#### Null model comparison
+```{r}
+mcall.drone.avg.null <- lme(n_new_drones ~ 1,
+                            random = ~ 1 + treatment | id,
+                            data = mc.all.drone.avg.df,
+                            na.action = na.exclude)
+nagelkerke(mcall.drone.avg.model.1,
+           mcall.drone.avg.null)
+```
+
+#### Groupwise estimated means
+```{r}
+mcall.drone.avg.gwm.df <- groupwiseMean(n_new_drones ~ treatment + fd_day,
+                                        data = mc.all.drone.avg.df,
+                                        conf = 0.95, 
+                                        digits = 3, 
+                                        traditional = FALSE,
+                                        percentile = TRUE)
+mcall.drone.avg.gwm.df
+```
+
+#### Plot groupwise means
+```{r}
+mcall.drone.avg.gwm.df %>%
+  ungroup() %>%
+  group_by(treatment) %>%
+  mutate(trt_cat = ifelse(treatment == "zone.1", 
+                          "constant", 
+                          ifelse(treatment == "zone.2", 
+                                 "constant", 
+                                 "pulse"))) %>%
+ggplot(mapping = aes(x = fd_day,
+                     y = Mean,
+                     group = treatment)) + 
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "black",
+           alpha = 0.15) +
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "black",
+           alpha = 0.15) +
+  geom_errorbar(
+    mapping = aes(ymin = Percentile.lower,
+                  ymax = Percentile.upper),
+    width = 0,
+    size = 0.7,
+    #position = position_dodge(0.2),
+    color = "black") + 
+  geom_point(mapping = aes(color = treatment),
+             size = 4,
+             #position = position_dodge(0.2),
+             alpha = 1) + 
+  geom_line(mapping = aes(color = treatment),
+            alpha = 1,
+            size = 1.5) +
+  # geom_smooth(mapping = aes(color = treatment),
+  #             alpha = 0.5,
+  #             size = 2.0,
+  #             se = FALSE,
+  #             span = 0.6) + 
+  theme_microcol() + 
+  scale_color_manual(values = c("#9FC3EA", 
+                                "#172A3A", 
+                                "#E6AF2E",
+                                "#F3E37C"),
+                     labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(0, 1), 
+        legend.position = c(0, 1)) + 
+  facet_grid(rows = vars(trt_cat)) + 
+  ylab("Least square mean average daily drone production") +
+  xlab("Interval Feeding Day") + 
+  scale_x_continuous(breaks = unique(mcall.drone.avg.gwm.df$fd_day)) + 
+  scale_y_continuous(limits = c(0, 5)) + 
+  ggsave("mean_dronesperday_fitted.eps",
+         width = 7,
+         height = 7)
 ```
 
 ## LMM on total drone production
 #### Model specification 
 ```{r}
-mcall.drone.lmm <- lme(total_drones ~ treatment + rep,
-                       random = ~ 1 | id,
+mcall.drone.lmm <- lme(total_drones ~ treatment * rep,
+                       random = ~ 1 + treatment | id,
                        data = mc.drone.all.df,
                        na.action = na.exclude)
 tidy(mcall.drone.lmm)
 summary(mcall.drone.lmm)
 anova(mcall.drone.lmm)
 
-plotNormalHistogram(mcall.drone.lmm.resid)
+mcall.drone.resid <- resid(mcall.drone.lmm, type = "normalized")
+plotNormalHistogram(resid(mcall.drone.lmm))
 plot(residuals(mcall.drone.lmm),
      fitted(mcall.drone.lmm))
-plotNormalHistogram(mc.drone.all.df$total_drones) # May be better off with log transforming resp. 
+plotNormalHistogram(mc.drone.all.df$total_drones)
 ```
 
 #### LS means Calculation
@@ -439,8 +651,10 @@ ggplot(data = mcall.drone.cld,
                                "100% - Constant",
                                "100% - Variable",
                                "50% - Variable"),
-                    name = "Treatment") +
-  ggsave("mean_drone_fitted.eps")
+                    name = "Treatment") + 
+  ggsave("mean_dronetotal_fitted.eps",
+         width = 4,
+         height = 3.5)
 ```
 
 
@@ -481,10 +695,11 @@ mc.all.t2drone.df <- mc.all.t2drone.df %>%
 
 #### Model specification
 ```{r}
-mcall.t2drone.lmm <- lme(days_to_drone ~ treatment + rep,
-                         random = ~ 1 | id,
+mcall.t2drone.lmm <- lme(days_to_drone ~ treatment * rep,
+                         random = ~ 1 + treatment | id,
                          data = mc.all.t2drone.df,
-                         na.action = na.exclude)
+                         na.action = na.exclude,
+                         control=list(maxIter=10000, niterEM=10000))
 tidy(mcall.t2drone.lmm)
 summary(mcall.t2drone.lmm)
 anova(mcall.t2drone.lmm)
@@ -572,10 +787,10 @@ mc.all.work.df <- mc.all.work.df %>%
 
 #### Model specification
 ```{r}
-mcall.work.lmm <- lme(total_worker_deaths ~ treatment + rep,
-                         random = ~ 1 | id,
-                         data = mc.all.work.df,
-                         na.action = na.exclude)
+mcall.work.lmm <- lme(total_worker_deaths ~ treatment * rep,
+                      random = ~ 1 + treatment | id,
+                      data = mc.all.work.df,
+                      na.action = na.exclude)
 
 tidy(mcall.work.lmm)
 summary(mcall.work.lmm)
@@ -633,8 +848,6 @@ ggplot(data = mcall.work.cld,
   ggsave("mean_work_fitted.eps")
 ```
 
-
-
 ## RM ANOVA on pollen/nectar consumption
 #### Pollen
 ##### Gather data
@@ -652,7 +865,7 @@ mc.feed.all.mod.df <- mc.feed.all.df %>%
 ##### Temporal correlation structure
 ```{r}
 mcall.fcon.model = lme(total_p_cons ~ treatment + rep + date + treatment * date,
-                       random = ~ 1 | id,
+                       random = ~ 1 + treatment | id,
                        data = mc.feed.all.mod.df,
                        na.action = na.exclude)
 ACF(mcall.fcon.model)
@@ -662,11 +875,10 @@ acf(mc.feed.all.df$total_p_cons,
 
 ##### Full model
 ```{r}
-mcall.fcon.model.1 = lme(total_p_cons ~ treatment + rep + date + treatment*date, 
-                         random = ~ 1 | id,
+mcall.fcon.model.1 = lme(total_p_cons ~ treatment + rep + date, 
+                         random = ~ 1 + treatment | id,
                          data = mc.feed.all.mod.df,
-                         correlation = corAR1(form = ~ date | id,
-                                              value = 0.8981),
+                         correlation = corAR1(),
                          na.action = na.exclude,
                          method = "REML")
 Anova(mcall.fcon.model.1)
@@ -745,18 +957,21 @@ mcall.fcon.gwm.df %>%
   facet_grid(rows = vars(trt_cat)) + 
   ylab("Least square mean cumulative pollen consumption") +
   xlab("Interval Feeding Day") + 
-  scale_x_continuous(breaks = unique(mcall.fcon.gwm.df$fd_day))
+  scale_x_continuous(breaks = unique(mcall.fcon.gwm.df$fd_day)) + 
+    ggsave("mean_pollen_fitted.eps",
+         width = 7,
+         height = 7)
 ```
 
 
 ##### Model diagnostics 
 ```{r}
-plotNormalHistogram(residuals(mcall.fcon.model.1))
-plot(residuals(mcall.fcon.model.1),
+plotNormalHistogram(residuals(mcall.fcon.model.1, type = "normalized"))
+plot(residuals(mcall.fcon.model.1, type = "normalized"),
      fitted(mcall.fcon.model.1))
 plot(mcall.fcon.model.1)
-plot(residuals(mcall.fcon.model.1))
-acf(residuals(mcall.fcon.model.1))
+plot(residuals(mcall.fcon.model.1, type = "normalized"))
+acf(residuals(mcall.fcon.model.1, type = "normalized"))
 ```
 
 
@@ -821,8 +1036,8 @@ mc.feed.all.df %>%
 #### Nectar
 ##### Temporal correlation structure
 ```{r}
-mcall.ncon.model = lme(total_n_cons ~ treatment + rep + date + treatment * date,
-                       random = ~ 1 | id,
+mcall.ncon.model = lme(total_n_cons ~ treatment + rep + date,
+                       random = ~ 1 + treatment | id,
                        data = mc.feed.all.mod.df,
                        na.action = na.exclude)
 ACF(mcall.ncon.model)
@@ -832,11 +1047,10 @@ acf(mc.feed.all.mod.df$total_n_cons,
 
 ##### Full model
 ```{r}
-mcall.ncon.model.1 = lme(total_p_cons ~ treatment + rep + date + treatment*date, 
-                         random = ~ 1 | id,
+mcall.ncon.model.1 = lme(total_n_cons ~ treatment + rep + date, 
+                         random = ~ 1 + treatment | id,
                          data = mc.feed.all.mod.df,
-                         correlation = corAR1(form = ~ date | id,
-                                              value = 0.84326),
+                         correlation = corAR1(),
                          na.action = na.exclude,
                          method = "REML")
 Anova(mcall.ncon.model.1)
@@ -915,20 +1129,22 @@ mcall.ncon.gwm.df %>%
   facet_grid(rows = vars(trt_cat)) + 
   ylab("Least square mean cumulative nectar consumption") +
   xlab("Interval Feeding Day") + 
-  scale_x_continuous(breaks = unique(mcall.fcon.gwm.df$fd_day))
+  scale_x_continuous(breaks = unique(mcall.fcon.gwm.df$fd_day)) + 
+    ggsave("mean_nectar_fitted.eps",
+         width = 7,
+         height = 7)
 ```
 
 
 ##### Model diagnostics 
 ```{r}
-plotNormalHistogram(residuals(mcall.ncon.model.1))
-plot(residuals(mcall.ncon.model.1),
+plotNormalHistogram(residuals(mcall.ncon.model.1, type = "normalized"))
+plot(residuals(mcall.ncon.model.1, type = "normalized"),
      fitted(mcall.ncon.model.1))
 plot(mcall.ncon.model.1)
-plot(residuals(mcall.ncon.model.1))
-acf(residuals(mcall.ncon.model.1))
+plot(residuals(mcall.ncon.model.1, type = "normalized"))
+acf(residuals(mcall.ncon.model.1, type = "normalized"))
 ```
-
 
 ##### Plotting raw summarised
 ```{r}
@@ -1056,8 +1272,8 @@ mc.all.npcons.df <- mc.feed.all.df %>%
 #### Pollen
 ##### Model specification/diagnostics
 ```{r}
-mcall.pcons.lmm <- lme(total_p_cons ~ treatment + rep,
-                       random = ~ 1 | id,
+mcall.pcons.lmm <- lme(total_p_cons ~ treatment * rep,
+                       random = ~ 1 + treatment | id,
                        data = mc.all.npcons.df,
                        na.action = na.exclude)
 
@@ -1113,14 +1329,17 @@ ggplot(data = mcall.pcons.cld,
                                "50% - Variable"),
                     name = "Treatment") + 
   theme(legend.justification = c(1, 1), 
-        legend.position = c(1, 1))
+        legend.position = c(1, 1)) + 
+  ggsave("mean_tpollen_fitted.eps",
+         width = 4,
+         height = 3.5)
 ```
 
 #### Nectar
 ##### Model specification/diagnostics
 ```{r}
-mcall.ncons.lmm <- lme(total_n_cons ~ treatment + rep,
-                       random = ~ 1 | id,
+mcall.ncons.lmm <- lme(total_n_cons ~ treatment * rep,
+                       random = ~ 1 + treatment | id,
                        data = mc.all.npcons.df,
                        na.action = na.exclude)
 
@@ -1176,7 +1395,10 @@ ggplot(data = mcall.ncons.cld,
                                "50% - Variable"),
                     name = "Treatment") + 
   theme(legend.justification = c(1, 1), 
-        legend.position = c(1, 1))
+        legend.position = c(1, 1)) + 
+  ggsave("mean_tnectar_fitted.eps",
+         width = 4,
+         height = 3.5)
 ```
 
 ## RM ANOVA on avg daily worker mortality
@@ -1202,13 +1424,14 @@ mc.all.work.df <- bind_rows(
          date,
          n_worker_deaths,
          fd_day),
-  .id = "rep")
+  .id = "rep") %>%
+  filter(!is.na(n_worker_deaths))
 ```
 
 #### Temporal correlation structure
 ```{r}
-mcall.work.model = lme(n_worker_deaths ~ treatment + rep + date + treatment*date, 
-                       random = ~ 1 | id,
+mcall.work.model = lme(n_worker_deaths ~ treatment + rep + date, 
+                       random = ~ 1 + treatment | id,
                        data = mc.all.work.df,
                        na.action = na.exclude)
 
@@ -1217,13 +1440,14 @@ ACF(mcall.work.model) # 1st order lag: 0.8272
 
 #### Full model
 ```{r}
-mcall.work.model.1 = lme(n_worker_deaths ~ treatment + rep + date + treatment*date, 
-                         random = ~ 1 | id,
+mcall.work.model.1 = lme(n_worker_deaths ~ treatment + rep + date, 
+                         random = ~ 1 + treatment | id,
                          data = mc.all.work.df,
                          correlation = corAR1(form = ~ date | id,
-                                              value = 0.1708),
+                                              value = 0.178),
                          na.action = na.exclude,
                          method = "REML")
+
 Anova(mcall.work.model.1)
 summary(mcall.work.model.1)
 anova(mcall.work.model.1)
@@ -1306,12 +1530,15 @@ mcall.work.gwm.df %>%
 
 #### Model diagnostics 
 ```{r}
-plotNormalHistogram(residuals(mcall.work.model.1))
-plot(residuals(mcall.work.model.1),
+mcall.work.residuals <- resid(mcall.work.model.1, type = "normalized")
+plotNormalHistogram(mcall.work.residuals)
+plot(mcall.work.residuals,
      fitted(mcall.work.model.1))
 plot(mcall.work.model.1)
-plot(residuals(mcall.work.model.1))
-acf(residuals(mcall.work.model.1))
+plot(mcall.work.residuals)
+acf(mcall.work.residuals)
+qqnorm(mcall.work.residuals)
+qqline(mcall.work.residuals)
 ```
 
 ## RM ANOVA on cumulative daily worker mortality
@@ -1337,16 +1564,16 @@ mc.all.work.df <- bind_rows(
          n_worker_deaths,
          fd_day),
   .id = "rep")
-mc.all.work.df <- mc.all.work.df %>%
+mc.all.work.cum.df <- mc.all.work.df %>%
   filter(!is.na(n_worker_deaths)) %>%
   mutate(cum_worker_deaths = cumsum(n_worker_deaths))
 ```
 
 #### Temporal correlation structure
 ```{r}
-mcall.cumwork.model = lme(cum_worker_deaths ~ treatment + rep + date + treatment*date, 
-                          random = ~ 1 | id,
-                          data = mc.all.work.df,
+mcall.cumwork.model = lme(cum_worker_deaths ~ treatment + rep + date, 
+                          random = ~ 1 + treatment | id,
+                          data = mc.all.work.cum.df,
                           na.action = na.exclude)
 
 ACF(mcall.cumwork.model) # 1st order lag: 0.8272
@@ -1354,11 +1581,11 @@ ACF(mcall.cumwork.model) # 1st order lag: 0.8272
 
 #### Full model
 ```{r}
-mcall.cumwork.model.1 = lme(cum_worker_deaths ~ treatment + rep + date + treatment*date, 
-                            random = ~ 1 | id,
-                            data = mc.all.work.df,
+mcall.cumwork.model.1 = lme(cum_worker_deaths ~ treatment + rep + date, 
+                            random = ~ 1 + treatment | id,
+                            data = mc.all.work.cum.df,
                             correlation = corAR1(form = ~ date | id,
-                                                value = 0.9492),
+                                                value = 0.9495),
                             na.action = na.exclude,
                             method = "REML")
 Anova(mcall.cumwork.model.1)
@@ -1371,7 +1598,7 @@ tidy(mcall.cumwork.model.1)
 ```{r}
 mcall.cumwork.gwm.df <- groupwiseMean( # This cannot have missing values for mean to be calc'd
   cum_worker_deaths ~ treatment + fd_day,
-  data = mc.all.work.df,
+  data = mc.all.work.cum.df,
   conf = 0.95,
   digits = 3
   )
@@ -1443,34 +1670,38 @@ mcall.cumwork.gwm.df %>%
 
 #### Model diagnostics
 ```{r}
-plotNormalHistogram(residuals(mcall.cumwork.model.1))
-plot(residuals(mcall.cumwork.model.1),
+plotNormalHistogram(residuals(mcall.cumwork.model.1, type = "normalized"))
+plot(residuals(mcall.cumwork.model.1, type = "normalized"),
      fitted(mcall.cumwork.model.1))
 plot(mcall.cumwork.model.1)
-plot(residuals(mcall.cumwork.model.1))
-acf(residuals(mcall.cumwork.model.1))
+plot(residuals(mcall.cumwork.model.1, type = "normalized"))
+acf(residuals(mcall.cumwork.model.1, type = "normalized"))
 ```
 
 ## Growth periods 
 ```{r}
 mc.feed.all.df %>%
   ungroup() %>%
+  filter(fd_day != 0) %>%
   ggplot() + 
   geom_point(mapping = aes(x = fd_day,
                            y = mc_mass_true,
                            color = pulse_cat)) + 
   geom_smooth(mapping = aes(x = fd_day,
                             y = mc_mass_true_intrp,
-                            color = pulse_cat),
+                            color = interaction(pulse_cat, id)),
               method = "lm",
               se = FALSE) + 
   scale_x_continuous(breaks = unique(mc.feed.all.df$fd_day)) + 
   theme_microcol() + 
   facet_grid(vars(treatment)) + 
-  ggsave("periodgrowthraw.eps")
+  theme(legend.position = "none")
   
+temp <- mc.feed.all.df %>%
+  select(date, fd_day, treatment, pulse_cat, mc_mass_true)
 ```
 
+This works for single model fits per trt/fd_day combination
 ```{r}
 trt.slopes <- function() {
   trts <- unique(mc.feed.all.df$treatment)
@@ -1490,9 +1721,264 @@ trt.slopes <- function() {
          envir = .GlobalEnv)
 }
 trt.slopes()
-
 ```
 
+This code is for individual regressions for each colony, during each period of time so that we can run ANOVA on each period to test btwn treatments 
+```{r}
+mc.all.trtslope.df <- mc.feed.all.df %>%
+  group_by(pulse_cat, id) %>%
+  do({
+    mod = lm(mc_mass_true ~ fd_day, data = .)
+    tibble(intercept = coef(mod)[1],
+           slope.estimate = coef(mod)[2])
+  })
+mc.all.trtslope.df$id <- as.character(mc.all.trtslope.df$id)
+mc.all.trtslope.df$treatment <- ifelse(
+  mc.all.trtslope.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc.all.trtslope.df$id < 3 & mc.all.trtslope.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc.all.trtslope.df$id < 4 & mc.all.trtslope.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
+)
+mc.all.trtslope.df
+```
+
+#### Period LMM/ANOVAs
+##### anova.by.period function
+```{r}
+anova.by.period <- function() {
+  periods <- unique(mc.all.trtslope.df$pulse_cat)
+  df.ls <- list()
+  for(i in periods) {
+    df <- mc.all.trtslope.df %>%
+      filter(pulse_cat == i)
+    lmm <- lme(slope.estimate ~ treatment,
+               random = ~ 1 | id,
+               data = df,
+               na.action = na.omit)
+    lsm <- lsmeans(lmm, 
+                   ~ treatment)
+    cld <- cld(lsm,
+               alpha = 0.05,
+               Letters = letters,
+               adjust = "tukey")
+    df.ls[[i]] <- cld
+  }
+  df.end <- bind_rows(df.ls,
+                      .id = "pulse_cat")
+  assign("mc.all.period.anovas",
+         df.end,
+         envir = .GlobalEnv)
+}
+anova.by.period()
+```
+
+##### Plot lsmeans
+```{r}
+mc.all.period.anovas$pulse_cat <- as.factor(mc.all.period.anovas$pulse_cat)
+mc.all.period.anovas$pulse_cat <- factor(mc.all.period.anovas$pulse_cat, 
+                                       levels = c("b1",
+                                                  "p1",
+                                                  "a1.b2",
+                                                  "p2",
+                                                  "a2"))
+mc.all.period.anovas$.group=gsub(" ", "", mc.all.period.anovas$.group)
+mc.all.period.anovas %>%
+  mutate(trt_cat = ifelse(treatment == "zone.1", 
+                          "constant", 
+                          ifelse(treatment == "zone.2", 
+                                 "constant", 
+                                 "pulse"))) %>%
+  ggplot(mapping = aes(label = .group)) +
+  geom_hline(yintercept = 0,
+             color = "tomato2",
+             size = 1,
+             alpha = 1) + 
+  geom_pointrange(mapping = aes(x = pulse_cat,
+                                y = lsmean,
+                                ymin = lower.CL,
+                                ymax = upper.CL,
+                                color = treatment),
+                  size = 0.75) +
+  geom_line(mapping = aes(x = pulse_cat,
+                          y = lsmean,
+                          group = treatment,
+                          color = treatment),
+            size = 1.25,
+            alpha = 1) +
+  geom_text(mapping = aes(x = pulse_cat,
+                          y = upper.CL + 0.1),
+             color = "black",
+            position = position_dodge2(width = 0.9)) +
+  labs(x = "Period relative to food pulse",
+       y = "Mean estimated rate of mass gain") + 
+  scale_y_continuous(limits = c(-2, 3.5),
+                     breaks = seq(-3, 3, by = 1)) + 
+  theme_microcol() + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  scale_color_manual(values = c("#9FC3EA", 
+                                "#172A3A", 
+                                "#E6AF2E",
+                                "#F3E37C"),
+                     labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                     name = "Treatment") +
+  facet_grid(rows = vars(trt_cat)) + 
+  ggsave("period_growth.eps",
+         width = 7,
+         height = 4)
+```
+##### Average growth rate by treatment
+```{r}
+mcall.growth.lmm <- lme(slope.estimate ~ treatment + pulse_cat,
+                        random = ~ 1 | id,
+                        data = mc.all.trtslope.df)
+mcall.growth.marginal <- lsmeans(mcall.growth.lmm,
+                                 ~ treatment)
+contrast(mcall.growth.marginal,
+         method = "pairwise",
+         alpha = 0.05,
+         adjust = "tukey")
+mcall.growth.cld <- cld(mcall.growth.marginal,
+                        alpha = 0.05,
+                        Letters = letters,
+                        adjust = "tukey")
+mcall.growth.cld
+```
+##### Plot avg. growth rate lsmeans
+```{r}
+mcall.growth.cld$.group=gsub(" ", "", mcall.growth.cld$.group)
+mcall.growth.cld %>%
+  mutate(trt_cat = ifelse(treatment == "zone.1", 
+                          "constant", 
+                          ifelse(treatment == "zone.2", 
+                                 "constant", 
+                                 "pulse"))) %>%
+  ggplot(mapping = aes(x = treatment,
+                       y = lsmean,
+                       label = .group)) + 
+  geom_hline(yintercept = 0,
+             color = "black",
+             size = 0.6,
+             alpha = 1) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 0.1),
+             color = "black") + 
+  scale_y_continuous(limits = c(-0.25, 1.5),
+                     expand = c(0, 0)) +
+  ylab("Least square mean growth rate") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1)) + 
+  # facet_grid(rows = vars(trt_cat))
+  ggsave("avg_growthrate.eps",
+         width = 5,
+         height = 3)
+```
+
+#### Test if trt/period slope is different than 0
+```{r}
+mc.all.trtslope.0.df <- mc.feed.all.df %>%
+  group_by(pulse_cat, treatment) %>%
+  do({
+    tidy(lm(mc_mass_true ~ fd_day,
+             data = .))
+  }) %>%
+  filter(term != "(Intercept)")
+```
+
+
+#### Plot estimates by id
+```{r}
+mc.all.trtslope.df$pulse_cat <- as.factor(mc.all.trtslope.df$pulse_cat)
+mc.all.trtslope.df$pulse_cat <- factor(mc.all.trtslope.df$pulse_cat, 
+                                       levels = c("b1",
+                                                  "p1",
+                                                  "a1.b2",
+                                                  "p2",
+                                                  "a2"))
+mc.all.trtslope.df %>%
+  group_by(treatment, pulse_cat) %>%
+  summarise(mean.slope = mean(slope.estimate),
+            se.slope = sd(slope.estimate) / sqrt(n())) %>%
+  ggplot() + 
+  geom_pointrange(mapping = aes(x = pulse_cat,
+                                y = mean.slope,
+                                ymin = mean.slope - se.slope,
+                                ymax = mean.slope + se.slope,
+                                color = treatment),
+                  size = 1) +
+  geom_line(mapping = aes(x = pulse_cat,
+                          y = mean.slope,
+                          group = treatment,
+                          color = treatment),
+            size = 1.25,
+            alpha = 1) + 
+  geom_hline(yintercept = 0,
+             color = "tomato2",
+             size = 1,
+             alpha = 1) + 
+  labs(x = "Period relative to food pulse",
+       y = "Mean estimated rate of mass gain") + 
+  scale_y_continuous(limits = c(-3.25, 3.25),
+                     breaks = seq(-3, 3, by = 1)) + 
+  theme_microcol() + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  scale_color_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment")
+  
+```
+
+
+#### Plot single estimates
 ```{r}
 mc.all.trtslope.df$id <- as.factor(mc1.trtslope.df$id)
 mc.all.trtslope.df$id <- factor(mc1.trtslope.df$id, levels = c("b1",
@@ -1500,6 +1986,8 @@ mc.all.trtslope.df$id <- factor(mc1.trtslope.df$id, levels = c("b1",
                                                             "a1.b2",
                                                             "p2",
                                                             "a2"))
+mc.all.trtslope.df <- mc.all.trtslope.df %>%
+  filter(term != "(Intercept)")
 mc.all.trtslope.df %>%
   filter(term != "(Intercept)") %>%
   ggplot() + 
@@ -1544,3 +2032,164 @@ mc.all.trtslope.df %>%
                     name = "Treatment")
 ```
 
+## How much food to make a drone?
+#### Gather data
+```{r}
+mc.feed.total.df <- mc.feed.all.df %>%
+  ungroup() %>%
+  group_by(id, rep, treatment) %>%
+  summarise(total_p_cons = sum(p_mass_cons, 
+                               na.rm = TRUE),
+            total_n_cons = sum(n_mass_cons,
+                               na.rm = TRUE),
+            total_p_fd = sum(p_mass_fd,
+                             na.rm = TRUE),
+            total_n_fd = sum(p_mass_fd,
+                             na.rm = TRUE))
+mc.feed2drone.df <- mc.feed.total.df %>%
+  left_join(select(mc.drone.all.df,
+                   id, total_drones, rep),
+            by = c("id" = "id", "rep" = "rep")) %>%
+  mutate(p_per_drone = total_p_cons / total_drones,
+         n_per_drone = total_n_cons / total_drones) %>%
+  filter(p_per_drone != Inf)
+mc.feed2drone.df
+```
+
+#### LMM pollen per male
+```{r}
+mcall.pdrone.lmm <- lme(p_per_drone ~ treatment + rep,
+                        random = ~ 1 + treatment | unique,
+                        data = mc.feed2drone.df,
+                        na.action = na.exclude)
+tidy(mcall.pdrone.lmm)
+summary(mcall.pdrone.lmm)
+anova(mcall.pdrone.lmm)
+
+plotNormalHistogram(residuals(mcall.pdrone.lmm))
+plot(residuals(mcall.pdrone.lmm),
+     fitted(mcall.pdrone.lmm))
+plotNormalHistogram(mc.feed2drone.df$p_per_drone)
+```
+
+```{r}
+mcall.pdrone.marginal <- lsmeans(mcall.pdrone.lmm, ~ treatment)
+contrast(mcall.pdrone.marginal,
+         method = "pairwise",
+         alpha = 0.05,
+         adjust = "tukey")
+mcall.pdrone.cld <- cld(mcall.pdrone.marginal,
+                       alpha = 0.05,
+                       Letters = letters,
+                       adjust = "tukey")
+mcall.pdrone.cld
+```
+
+##### Plot LS means
+```{r}
+mcall.pdrone.cld$.group=gsub(" ", "", mcall.pdrone.cld$.group)
+ggplot(data = mcall.pdrone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 0.1),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, 1.25),
+                     expand = c(0, 0)) +
+  ylab("LSM pollen to produce drone (grams)") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1)) + 
+  ggsave("mean_tpollen_fitted.eps",
+         width = 4,
+         height = 3.5)
+```
+
+#### LMM nectar per male
+```{r}
+mc.feed2drone.df$unique <- paste(mc.feed2drone.df$rep,
+                                 mc.feed2drone.df$id,
+                                 sep = ".")
+mcall.ndrone.lmm <- lme(n_per_drone ~ treatment + rep,
+                        random = ~ 1 + treatment | unique,
+                        data = mc.feed2drone.df,
+                        na.action = na.exclude,
+                        control=list(maxIter=10000, niterEM=10000))
+tidy(mcall.ndrone.lmm)
+summary(mcall.ndrone.lmm)
+anova(mcall.ndrone.lmm)
+
+plotNormalHistogram(residuals(mcall.ndrone.lmm))
+plot(residuals(mcall.ndrone.lmm),
+     fitted(mcall.ndrone.lmm))
+plotNormalHistogram(mc.feed2drone.df$n_per_drone)
+```
+
+```{r}
+mcall.ndrone.marginal <- lsmeans(mcall.ndrone.lmm, ~ treatment)
+contrast(mcall.ndrone.marginal,
+         method = "pairwise",
+         alpha = 0.05,
+         adjust = "tukey")
+mcall.ndrone.cld <- cld(mcall.ndrone.marginal,
+                       alpha = 0.05,
+                       Letters = letters,
+                       adjust = "tukey")
+mcall.ndrone.cld
+```
+
+##### Plot LS means
+```{r}
+mcall.ndrone.cld$.group=gsub(" ", "", mcall.ndrone.cld$.group)
+ggplot(data = mcall.ndrone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 1),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, 25),
+                     expand = c(0, 0)) +
+  ylab("LSM nectar to produce drone (grams)") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1)) + 
+  ggsave("mean_tpollen_fitted.eps",
+         width = 4,
+         height = 3.5)
+```

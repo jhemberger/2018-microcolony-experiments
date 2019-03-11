@@ -10,7 +10,7 @@ Treatment | Description
 **Zone 3** | 100% of ad-lib ration for both pollen and nectar.  However, rations are reduced for the bulk of the feeding dates, and the difference is made up during two "pulses" of pollen and nectar during weeks 2 and 6.  Simulates a landscape with low levels of food availability, and then large mass-flowering events.
 **Zone 4** | 60% of ad-lib ration for both pollen and nectar.  Like `Zone 3`, execpt with reduced food availability.
 
-![Microcolony resource variation concept figure](/MC_ResourceVar_Concept-01.png)
+![Microcolony resource variation concept figure](./MC_ResourceVar_Concept-01.png)
 _**Figure 1** Concept diagram showing food amount as measured by total food abundance over a given time (e.g., growing season - x-axis) and the variability of food availability over time (y-axis).  Actual landscapes are shown in the graph on the right_
 
 Total experiment food availability: `Zone 1` == `Zone 4` | `Zone 2` == `Zone 3`
@@ -26,7 +26,6 @@ Total experiment food availability: `Zone 1` == `Zone 4` | `Zone 2` == `Zone 3`
 #### Every Third (Weekly) Feed Tasks
 - [ ] Remove all pollen previously provided and mass remaining pollen.  Record on MC data sheet.
 
-
 #### Other Tasks
 - [ ] Ensure nectar wicks are prepped
 - [ ] Fill huimidifer reserviors
@@ -39,7 +38,7 @@ Rations should be prepared the day of feeding, or the day before at most.  Make 
 3. Prepare nectar reserviors on a lunch tray.  Use a catheter syringe to alloquot the amount given by the ration data sheet.
 4. Place lids on reservoirs and place fully soaked cotton nectar wick in the feeder tube.
 
-![Mircocolony feed schedule data sheet](/MC_FeedSched-01.png)
+![Mircocolony feed schedule data sheet](./MC_FeedSched-01.png)
 
 ## Microcolony Feeding and Data Collection
 Prepare the rearing room bench by turning scale on, getting all necessary tools, and placing lunch tray on scale and taring the scale.  The steps of feeding and recording data on the microcolony are important.  Follow them exactly!  Each microcolony has its own data sheet.

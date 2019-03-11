@@ -97,9 +97,11 @@ Need to go through all experiment notes and figure out which colonies need to be
 - [x] Total drone production 
 - [x] Mass over time
 - [x] Drone production bump chart
-- [ ] Growth by time period (before, during, after pulses) 
+- [x] Growth by time period (before, during, after pulses) 
 - [ ] Drone fitness metrics? Not likely going to show differences after analyzing first round.  
 
 I don't think we'll need any tables as the figures tell most of the story. 
 
 Day to first drone could be an artifact of our starting conditions: we wait until there is evidence of brood before we start the treatments so the first drones could be independent of treatment.
+
+**2/18:** Need to compare all temporal RM lme's to models without (using AIC). 
