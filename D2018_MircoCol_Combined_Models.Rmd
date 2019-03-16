@@ -25,6 +25,7 @@ library(mgcv)
 library(knitr)
 library(lubridate)
 library(broom)
+library(stargazer)
 ```
 
 ## Load in data
@@ -2192,4 +2193,72 @@ ggplot(data = mcall.ndrone.cld,
   ggsave("mean_tpollen_fitted.eps",
          width = 4,
          height = 3.5)
+```
+
+## 2-way ANOVA: mass
+```{r}
+mc.end.all.df <- mc.end.all.df %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+mcall.mass.2way.lmm <- lme(end_mass_comb ~ trt_pulse * trt_total + round,
+                           random = ~ 1 + treatment | id,
+                           data = mc.end.all.df,
+                           na.action = na.exclude)
+tidy(mcall.mass.2way.lmm)
+summary(mcall.mass.2way.lmm)
+anova(mcall.mass.2way.lmm)
+
+plotNormalHistogram(residuals(mcall.mass.2way.lmm))
+plot(residuals(mcall.mass.2way.lmm),
+     fitted(mcall.mass.2way.lmm))
+plotNormalHistogram(mc.end.all.df$end_mass_comb)
+plot(mcall.mass.2way.lmm, which = 1 :4)
+```
+
+#### Calc LS Means
+```{r}
+mcall.mass.2way.marginal <- lsmeans(mcall.mass.2way.lmm, ~ trt_pulse:trt_total)
+mcall.mass.2way.cld <- cld(mcall.mass.2way.marginal,
+                           alpha = 0.05,
+                           Letters = letters,
+                           adjust = "tukey")
+mcall.mass.2way.cld
+```
+
+## Test 2-way ANOVA: drones
+```{r}
+mc.drone.all.df <- mc.drone.all.df %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+mcall.drone.2way.lmm <- lme(total_drones ~ trt_pulse * trt_total + rep,
+                            random = ~ 1 + treatment | id,
+                            data = mc.drone.all.df,
+                            na.action = na.exclude)
+tidy(mcall.drone.2way.lmm)
+summary(mcall.drone.2way.lmm)
+anova(mcall.drone.2way.lmm)
+
+plotNormalHistogram(residuals(mcall.drone.2way.lmm))
+plot(residuals(mcall.drone.2way.lmm),
+     fitted(mcall.drone.2way.lmm))
+plotNormalHistogram(mc.drone.all.df$total_drones)
+plot(mcall.drone.2way.lmm, which = 1 :4)
+```
+
+#### Calc LS Means
+```{r}
+mcall.drone.2way.marginal <- lsmeans(mcall.drone.2way.lmm, ~ trt_pulse:trt_total)
+mcall.drone.2way.cld <- cld(mcall.drone.2way.marginal,
+                            alpha = 0.05,
+                            Letters = letters,
+                            adjust = "tukey")
+mcall.drone.2way.cld
 ```

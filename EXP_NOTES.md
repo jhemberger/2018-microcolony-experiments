@@ -105,3 +105,17 @@ I don't think we'll need any tables as the figures tell most of the story.
 Day to first drone could be an artifact of our starting conditions: we wait until there is evidence of brood before we start the treatments so the first drones could be independent of treatment.
 
 **2/18:** Need to compare all temporal RM lme's to models without (using AIC). 
+
+**3/15:** Need to re-run all end-of-experiment models using 2-way ANOVA analysis in order to parse out total vs. pulse trt effects.  LS means for mass, drone production appear the same, but we now have the interaction effect to measure whether the pulse or the total amount of food is behind the effect. 
+
+For total growth, there is a significant interaction: effect of total food depends on pulse.
+
+For drone production, no interaction: drone production depends only on total food abundance.
+
+For growth rate, 
+
+For worker mortality,
+
+For pollen consumption,
+
+For nectar consumption, 
