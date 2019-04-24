@@ -236,6 +236,28 @@ mc2.drone.df <- mc2.df %>%
   group_by(id, treatment) %>%
   summarise(total_drones = sum(n_new_drones, 
                                na.rm = TRUE))
+mc2.drone.mass.df <- read_csv("./D2018_mc2_dronemass.csv", 
+                              skip = 1,
+                              col_names = c("date",
+                                            "id",
+                                            "n_drones",
+                                            "total_mass",
+                                            "avg_drone_mass",
+                                            "notes"))
+mc2.drone.mass.df$date <- mdy(mc2.drone.mass.df$date)
+mc2.drone.mass.df$treatment <- ifelse(
+  mc2.drone.mass.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc2.drone.mass.df$id < 3 & mc2.drone.mass.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc2.drone.mass.df$id < 4 & mc2.drone.mass.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
+)
 ```
 
 ### Write cleaned data
@@ -243,6 +265,7 @@ mc2.drone.df <- mc2.df %>%
 write_csv(mc2.df, "D2018_microcol_round2_clean.csv")
 write_csv(mc2.feed.df, "D2018_microcol_round2_feed_clean.csv")
 write_csv(mc2.drone.df, "./D2018_microcol_round3_drone.csv")
+write_csv(mc2.drone.mass.df, "./D2018_microcol_round3_dronemass.csv")
 ```
 
 ```{r}

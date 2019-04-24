@@ -1,0 +1,1305 @@
+---
+title: "2018 Resource Pulse Microcolony Analysis - Final manuscipt analyses"
+subtitle: Analysis and model construction/selection
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_notebook
+---
+
+**Name:** Jeremy Hemberger
+**Email:** j.hemberger.wisc@gmail.com
+**Institution:** University of Wisconsin - Madison | Department of Entomology
+
+# Import packages 
+```{r echo = TRUE, results = "hide"}
+library(psych)
+library(nlme) #lmer can't use temporal corrleation structures
+library(car)
+library(multcompView)
+library(lsmeans)
+library(tidyverse)
+library(rcompanion)
+library(lmtest)
+library(gam)
+library(gamm4)
+library(mgcv)
+library(knitr)
+library(lubridate)
+library(broom)
+library(stargazer)
+library(jtools)
+```
+
+# Load in data
+```{r}
+mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
+mc2.df <- read_csv("./D2018_MicroCol_Round2_Clean.csv")
+mc3.df <- read_csv("./D2018_microcol_round3_clean.csv")
+mc.end.all.df <- read_csv("./microcol_final_endmass.csv")
+mc.feed.all.df <- read_csv("./microcol_final_mass.csv")
+mc.dronemass.all.df <- read_csv("./microcol_final_dronemass.csv")
+mc.dronemass.all.df$trt_total <- as.character(mc.dronemass.all.df$trt_total)
+
+```
+
+# Models and plots
+## MASS
+### 2-way ANOVA: end mass
+##### Model specification
+```{r}
+endmass.lmm <- lme(end_mass_comb ~ trt_pulse * trt_total + round,
+                   random = ~ 1 | id,
+                   data = mc.end.all.df,
+                   na.action = na.exclude)
+endmass.marginal <- lsmeans(endmass.lmm, ~ trt_pulse:trt_total)
+endmass.cld <- cld(endmass.marginal,
+                   alpha = 0.05,
+                   Letters = letters,
+                   adjust = "tukey")
+endmass.cld$treatment <- c("zone.4", 
+                           "zone.1", 
+                           "zone.3", 
+                           "zone.2")
+endmass.eff <- contrast(endmass.marginal,
+                        alpha = 0.05,
+                        method = "eff",
+                        adjust = "tukey")
+endmass.pairwise <- contrast(endmass.marginal,
+                             alpha = 0.05,
+                             method = "pairwise",
+                             adjust = "tukey")
+summary(endmass.lmm)
+anova(endmass.lmm)
+endmass.cld
+endmass.eff
+endmass.pairwise
+```
+
+##### Plots
+```{r}
+endmass.cld$.group=gsub(" ", "", endmass.cld$.group)
+ggplot(data = endmass.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 0.5),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, 10),
+                     expand = c(0, 0)) +
+  ylab("Least square mean brood mass") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
+```
+
+
+### RM ANOVA: mass
+##### Model specification
+```{r}
+mass.rmlmm = lme(mc_mass_true ~ trt_total * trt_pulse * rep + date,
+                 random = ~ 1 + treatment | id,
+                 data = mc.feed.all.df,
+                 na.action = na.exclude)
+mass.acf <- ACF(mass.rmlmm)
+mass.acf <- mass.acf %>%
+  filter(lag == 1) %>%
+  select(ACF)
+mass.rmlmm.1 = lme(mc_mass_true ~ trt_total * trt_pulse * rep + date, 
+                   random = ~ 1 + treatment | id,
+                   data = mc.feed.all.df,
+                   correlation = corAR1(form = ~ date | id,
+                                        value = mass.acf),
+                   na.action = na.exclude,
+                   method = "REML")
+mass.gwm.df <- groupwiseMean(mc_mass_true ~ treatment + fd_day,
+                             data = mc.feed.all.df,
+                             conf = 0.95,
+                             digits = 3)
+summary(mass.rmlmm.1)
+anova(mass.rmlmm.1)
+```
+
+##### Plots
+```{r}
+mcall.mass.gwm.df %>%
+  ungroup() %>%
+  filter(fd_day != 0) %>%
+  group_by(treatment) %>%
+  mutate(Mean = na.approx(Mean, 
+                          maxgap = 4,
+                          rule = 2)) %>%
+  mutate(trt_cat = ifelse(treatment == "zone.1", 
+                          "constant", 
+                          ifelse(treatment == "zone.2", 
+                                 "constant", 
+                                 "pulse"))) %>%
+ggplot(mapping = aes(x = fd_day,
+                     y = Mean,
+                     group = treatment)) + 
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "black",
+           alpha = 1) +
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "black",
+           alpha = 1) +
+  geom_errorbar(
+    mapping = aes(ymin = Trad.lower,
+                  ymax = Trad.upper),
+    width = 0,
+    size = 0.7,
+    color = "black") + 
+  geom_point(mapping = aes(color = treatment),
+             size = 4,
+             alpha = 1) + 
+  geom_line(mapping = aes(color = treatment),
+            alpha = 1,
+            size = 1.5) +
+  theme_microcol() + 
+  scale_color_manual(values = c("#9FC3EA", 
+                                "#172A3A", 
+                                "#E6AF2E",
+                                "#F3E37C"),
+                     labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(0, 1), 
+        legend.position = c(0, 1)) + 
+  facet_grid(rows = vars(trt_cat)) + 
+  ylab("Least square mean mass") +
+  xlab("Interval Feeding Day") + 
+  scale_x_continuous(breaks = unique(mcall.mass.gwm.df$fd_day)) + 
+  scale_y_continuous(limits = c(0, 10.5))
+```
+
+### 2-way ANOVA: period growth rates
+##### Model specification
+```{r}
+mc.all.trtslope.df <- mc.feed.all.df %>%
+  group_by(pulse_cat, id) %>%
+  do({
+    mod = lm(mc_mass_true ~ fd_day, data = .)
+    tibble(intercept = coef(mod)[1],
+           slope.estimate = coef(mod)[2])
+  })
+mc.all.trtslope.df$id <- as.character(mc.all.trtslope.df$id)
+mc.all.trtslope.df$treatment <- ifelse(
+  mc.all.trtslope.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc.all.trtslope.df$id < 3 & mc.all.trtslope.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc.all.trtslope.df$id < 4 & mc.all.trtslope.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
+)
+mc.all.trtslope.df <- mc.all.trtslope.df %>%
+  mutate(pulse_cat_int = ifelse(pulse_cat == "b1",
+                                1, ifelse(
+                                  pulse_cat == "p1",
+                                  2, ifelse(
+                                    pulse_cat == "a1.b2",
+                                    3, ifelse(
+                                      pulse_cat == "p2",
+                                      4, ifelse(
+                                        pulse_cat == "a2", 
+                                        5
+                                      )
+                                    )
+                                  )
+                                )))
+anova.by.period <- function() {
+  periods <- unique(mc.all.trtslope.df$pulse_cat)
+  df.ls <- list()
+  for(i in periods) {
+    df <- mc.all.trtslope.df %>%
+      filter(pulse_cat == i)
+    lmm <- lme(slope.estimate ~ treatment,
+               random = ~ 1 | id,
+               data = df,
+               na.action = na.omit)
+    lsm <- lsmeans(lmm, 
+                   ~ treatment)
+    cld <- cld(lsm,
+               alpha = 0.05,
+               Letters = letters,
+               adjust = "tukey")
+    df.ls[[i]] <- cld
+  }
+  df.end <- bind_rows(df.ls,
+                      .id = "pulse_cat")
+  assign("mc.all.period.anovas",
+         df.end,
+         envir = .GlobalEnv)
+}
+anova.by.period()
+mc.all.period.anovas$pulse_cat <- as.factor(mc.all.period.anovas$pulse_cat)
+mc.all.period.anovas$pulse_cat <- factor(mc.all.period.anovas$pulse_cat, 
+                                         levels = c("b1",
+                                                    "p1",
+                                                    "a1.b2",
+                                                    "p2",
+                                                    "a2"))
+mc.all.period.anovas$.group=gsub(" ", 
+                                 "", 
+                                 mc.all.period.anovas$.group)
+mc.all.trtslope.df <- mc.all.trtslope.df %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+massrate.lmm <- lme(slope.estimate ~ trt_pulse * trt_total + pulse_cat,
+                    random = ~ 1 | id,
+                    data = mc.all.trtslope.df)
+massrate.marginal <- lsmeans(massrate.lmm,
+                             ~ trt_pulse * trt_total)
+massrate.eff <- contrast(massrate.marginal,
+                         method = "eff",
+                         alpha = 0.05,
+                         adjust = "tukey")
+massrate.pairwise <- contrast(massrate.marginal,
+                              method = "pairwise",
+                              alpha = 0.05,
+                              adjust = "tukey")
+massrate.cld <- cld(massrate.marginal,
+                    alpha = 0.05,
+                    Letters = letters,
+                    adjust = "tukey")
+massrate.cld$treatment <- c("zone.1", 
+                            "zone.3", 
+                            "zone.4", 
+                            "zone.2")
+summary(massrate.lmm)
+anova(massrate.lmm)
+massrate.eff
+massrate.pairwise
+massrate.cld
+```
+
+##### Plots
+```{r}
+mc.feed.all.df %>%
+  ungroup() %>%
+  filter(fd_day != 0) %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = fd_day,
+                           y = mc_mass_true,
+                           color = pulse_cat)) + 
+  geom_smooth(mapping = aes(x = fd_day,
+                            y = mc_mass_true_intrp,
+                            color = interaction(pulse_cat, id)),
+              method = "lm",
+              se = FALSE) + 
+  scale_x_continuous(breaks = unique(mc.feed.all.df$fd_day)) + 
+  theme_microcol() + 
+  facet_grid(vars(treatment)) + 
+  theme(legend.position = "none")
+
+massrate.cld$.group=gsub(" ", "", massrate.cld$.group)
+massrate.cld %>%
+  mutate(trt_cat = ifelse(treatment == "zone.1", 
+                          "constant", 
+                          ifelse(treatment == "zone.2", 
+                                 "constant", 
+                                 "pulse"))) %>%
+  ggplot(mapping = aes(x = treatment,
+                       y = lsmean,
+                       label = .group)) + 
+  geom_hline(yintercept = 0,
+             color = "black",
+             size = 0.6,
+             alpha = 1) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 0.1),
+             color = "black") + 
+  scale_y_continuous(limits = c(-0.5, 1.5),
+                     expand = c(0, 0)) +
+  ylab("Least square mean growth rate") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
+```
+
+### RM ANOVA: period growth rates
+##### Model specification
+```{r}
+massgain.rmlmm = lme(slope.estimate ~ trt_total * trt_pulse * pulse_cat_int, 
+                           random = ~ 1 + treatment | id,
+                           data = mc.all.trtslope.df,
+                           na.action = na.exclude)
+massgain.acf <- ACF(massgain.rmlmm)
+massgain.acf <- massgain.acf %>%
+  filter(lag == 1) %>%
+  select(ACF)
+massgain.rmlmm.1 = lme(slope.estimate ~ trt_total * trt_pulse * pulse_cat_int, 
+                       random = ~ 1 + treatment | id,
+                       data = mc.all.trtslope.df,
+                       correlation = corAR1(form = ~ pulse_cat_int | id,
+                                            value = massgain.acf),
+                       na.action = na.exclude,
+                       method = "REML")
+summary(massgain.rmlmm.1)
+anova(massgain.rmlmm.1)
+mc.all.trtslope.0.df <- mc.feed.all.df %>%
+  group_by(pulse_cat, treatment) %>%
+  do({
+    tidy(lm(mc_mass_true ~ fd_day,
+             data = .))
+  }) %>%
+  filter(term != "(Intercept)")
+mc.all.trtslope.0.df
+```
+
+##### Plots
+```{r}
+mc.all.period.anovas %>%
+  mutate(trt_cat = ifelse(treatment == "zone.1", 
+                          "constant", 
+                          ifelse(treatment == "zone.2", 
+                                 "constant", 
+                                 "pulse"))) %>%
+  ggplot(mapping = aes(label = .group)) +
+  geom_hline(yintercept = 0,
+             color = "tomato2",
+             size = 1,
+             alpha = 1) + 
+  geom_pointrange(mapping = aes(x = pulse_cat,
+                                y = lsmean,
+                                ymin = lower.CL,
+                                ymax = upper.CL,
+                                color = treatment),
+                  size = 0.75) +
+  geom_line(mapping = aes(x = pulse_cat,
+                          y = lsmean,
+                          group = treatment,
+                          color = treatment),
+            size = 1.25,
+            alpha = 1) +
+  geom_text(mapping = aes(x = pulse_cat,
+                          y = upper.CL + 0.1),
+             color = "black",
+            position = position_dodge2(width = 0.9)) +
+  labs(x = "Period relative to food pulse",
+       y = "Mean estimated rate of mass gain") + 
+  scale_y_continuous(limits = c(-2, 3.5),
+                     breaks = seq(-3, 3, by = 1)) + 
+  theme_microcol() + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  scale_color_manual(values = c("#9FC3EA", 
+                                "#172A3A", 
+                                "#E6AF2E",
+                                "#F3E37C"),
+                     labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                     name = "Treatment") +
+  facet_grid(rows = vars(trt_cat))
+```
+
+
+
+## DRONES
+### 2-way ANOVA: drone production
+##### Model specification
+```{r}
+drones.lmm <- lme(total_drones ~ trt_pulse * trt_total * rep,
+                  random = ~ 1 | id,
+                  data = mc.drone.all.df,
+                  na.action = na.exclude)
+drone.marginal <- lsmeans(drones.lmm, ~ trt_pulse * trt_total)
+drone.cld <- cld(drone.marginal,
+                 alpha = 0.05,
+                 Letters = letters,
+                 adjust = "tukey")
+drone.cld$treatment <- c("zone.1", 
+                         "zone.4", 
+                         "zone.3", 
+                         "zone.2")
+drone.eff <- contrast(drone.marginal,
+                      alpha = 0.05,
+                      method = "eff",
+                      adjust = "tukey")
+drone.pairwise <- contrast(drone.marginal,
+                           alpha = 0.05,
+                           method = "pairwise",
+                           adjust = "tukey")
+summary(drones.lmm)
+anova(drones.lmm)
+drone.cld
+drone.eff
+drone.pairwise
+```
+##### Plots
+```{r}
+drone.cld$.group=gsub(" ", "", drone.cld$.group)
+ggplot(data = drone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "black") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "none") +
+  geom_text(mapping = aes(y = upper.CL + 1.5),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, 25),
+                     expand = c(0, 0)) +
+  ylab("Least square mean drone production") + 
+  xlab("Treatment") +
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment")
+```
+
+### 2-way ANOVA: days to first drone
+##### Gather data
+```{r}
+mc.all.t2drone.df <- bind_rows(
+  select(mc1.df, 
+         id, 
+         treatment, 
+         date, 
+         n_new_drones, 
+         fd_day),
+  select(mc2.df,
+         id,
+         treatment,
+         date,
+         n_new_drones,
+         fd_day), 
+  select(mc3.df,
+         id,
+         treatment,
+         date,
+         n_new_drones,
+         fd_day),
+  .id = "rep")
+
+mc.all.t2drone.df <- mc.all.t2drone.df %>%
+  group_by(id, rep, treatment) %>%
+  mutate(csum_drones = cumsum(n_new_drones)) %>%
+  mutate(start_date = first(date)) %>%
+  group_by(id, rep, treatment, start_date) %>%
+  summarise(index_to_drone = min(which(csum_drones > 0)),
+            date_to_drone = date[index_to_drone]) %>%
+  mutate(days_to_drone = (as.duration(ymd(start_date) %--% date_to_drone / 86400))) %>%
+  filter(!is.na(days_to_drone))
+mc.all.t2drone.df <- mc.all.t2drone.df %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+```
+
+##### Model specification
+```{r}
+t2drone.lmm <- lme(days_to_drone ~ trt_total * trt_pulse * rep,
+                   random = ~ 1 | id,
+                   data = mc.all.t2drone.df, 
+                   na.action = na.exclude)
+t2drone.marginal <- lsmeans(t2drone.lmm, ~ trt_pulse * trt_total)
+t2drone.cld <- cld(t2drone.marginal,
+                   alpha = 0.05,
+                   Letters = letters,
+                   adjust = "tukey")
+t2drone.cld$treatment <- c("zone.4", 
+                           "zone.2", 
+                           "zone.3", 
+                           "zone.1")
+t2drone.eff <- contrast(t2drone.marginal,
+                        alpha = 0.05,
+                        method = "eff",
+                        adjust = "tukey")
+t2drone.pairwise <- contrast(t2drone.marginal,
+                             alpha = 0.05,
+                             method = "pairwise",
+                             adjust = "tukey")
+summary(t2drone.lmm)
+anova(t2drone.lmm)
+t2drone.cld
+t2drone.eff
+t2drone.pairwise
+```
+##### Plots
+```{r}
+t2drone.cld$.group=gsub(" ", "", t2drone.cld$.group)
+ggplot(data = t2drone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 2),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, 35),
+                     expand = c(0, 0)) +
+  ylab("Least square mean days to first drone") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
+```
+
+### 2-way ANOVA: drone mass
+##### Model specification
+```{r}
+dronemass.lmm <- lm(avg.individ.mass ~ trt_total * trt_pulse * rep,
+                     data = mc.dronemass.all.df,
+                     na.action = na.exclude)
+dronemass.marginal <- lsmeans(dronemass.lmm, ~ trt_pulse * trt_total)
+dronemass.cld <- cld(dronemass.marginal,
+                     alpha = 0.05,
+                     Letters = letters,
+                     adjust = "tukey")
+dronemass.cld$treatment <- c("zone.1", 
+                             "zone.4", 
+                             "zone.2", 
+                             "zone.3")
+dronemass.eff <- contrast(dronemass.marginal,
+                          alpha = 0.05,
+                          method = "eff",
+                          adjust = "tukey")
+dronemass.pairwise <- contrast(dronemass.marginal,
+                               alpha = 0.05,
+                               method = "pairwise",
+                               adjust = "tukey")
+summary(t2drone.lmm)
+anova(t2drone.lmm)
+dronemass.cld
+dronemass.eff
+dronemass.pairwise
+```
+
+##### Plots
+```{r}
+dronemass.cld$.group=gsub(" ", "", dronemass.cld$.group)
+ggplot(data = dronemass.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 0.01),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, .2),
+                     expand = c(0, 0)) +
+  ylab("LS mean mass per drone") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
+```
+
+### 2-way ANOVA: drone IT distance
+##### Model specification
+
+##### Plots
+
+## FOOD CONSUMPTION
+### 2-way ANOVA: total pollen consumption
+##### Gather data
+```{r}
+mc.all.npcons.df <- mc.feed.all.df %>%
+  ungroup() %>%
+  group_by(id, treatment, rep) %>%
+  summarise(total_p_cons = sum(p_mass_cons_avg, 
+                               na.rm = TRUE),
+            total_n_cons = sum(n_mass_cons, 
+                               na.rm = TRUE)) %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+```
+
+##### Model specification
+```{r}
+pcons.lmm <- lme(total_p_cons ~ trt_pulse * trt_total * rep,
+                 random = ~ 1 | id,
+                 data = mc.all.npcons.df,
+                 na.action = na.exclude)
+pcons.marginal <- lsmeans(pcons.lmm, ~ trt_pulse * trt_total)
+pcons.cld <- cld(pcons.marginal,
+                 alpha = 0.05,
+                 Letters = letters,
+                 adjust = "tukey")
+pcons.cld$treatment <- c("zone.1", 
+                         "zone.4", 
+                         "zone.3", 
+                         "zone.2")
+pcons.eff <- contrast(pcons.marginal,
+                      alpha = 0.05,
+                      method = "eff",
+                      adjust = "tukey")
+pcons.pairwise <- contrast(pcons.marginal,
+                           alpha = 0.05,
+                           method = "pairwise",
+                           adjust = "tukey")
+summary(pcons.lmm)
+anova(pcons.lmm)
+pcons.cld
+pcons.eff
+pcons.pairwise
+```
+
+##### Plots
+```{r}
+pcons.cld$.group <- gsub(" ", "", pcons.cld$.group)
+ggplot(data = pcons.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 1),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, 20),
+                     expand = c(0, 0)) +
+  ylab("Least square mean total pollen consumption (grams)") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
+```
+### RM ANOVA: pollen consumption
+##### Gather data
+```{r}
+mc.feed.all.df$p_mass_cons[is.na(mc.feed.all.df$p_mass_cons)] <- 0
+mc.feed.all.df$n_mass_cons[is.na(mc.feed.all.df$n_mass_cons)] <- 0
+mc.feed.all.cum.df <- mc.feed.all.df %>%
+  ungroup() %>%
+  group_by(id, rep) %>%
+  mutate(total_p_cons = cumsum(p_mass_cons_avg),
+         total_n_cons = cumsum(n_mass_cons)) %>%
+  filter(fd_day != 0) %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+```
+
+##### Model specification
+```{r}
+pcons.rmlmm = lme(total_p_cons ~ trt_total * trt_pulse * rep + date,
+                  random = ~ 1 | id,
+                  data = mc.feed.all.cum.df,
+                  na.action = na.exclude)
+pcons.acf <- ACF(pcons.rmlmm)
+pcons.acf <- pcons.acf %>%
+  filter(lag == 1) %>%
+  select(ACF)
+pcons.rmlmm.1 = lme(total_p_cons ~ trt_total * trt_pulse * rep + date, 
+                    random = ~ 1 | id,
+                    data = mc.feed.all.cum.df,
+                    correlation = corAR1(form = ~ date | id,
+                                         value = pcons.acf),
+                    na.action = na.exclude,
+                    method = "REML")
+pcons.gwm.df <- groupwiseMean(total_p_cons ~ treatment + fd_day,
+                              data = mc.feed.all.cum.df,
+                              conf = 0.95,
+                              digits = 3)
+summary(pcons.rmlmm.1)
+anova(pcons.rmlmm.1)
+```
+
+##### Plots
+```{r}
+pcons.gwm.df %>%
+  mutate(trt_cat = ifelse(treatment == "zone.1", 
+                          "constant", 
+                          ifelse(treatment == "zone.2", 
+                                 "constant", 
+                                 "pulse"))) %>%
+  ggplot(mapping = aes(x = fd_day,
+                       y = Mean,
+                       group = treatment)) + 
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "black",
+           alpha = 1) +
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "black",
+           alpha = 1) +
+  geom_errorbar(
+    mapping = aes(ymin = Trad.lower,
+                  ymax = Trad.upper),
+    width = 0,
+    size = 0.7,
+    #position = position_dodge(0.2),
+    color = "black") + 
+  geom_point(mapping = aes(color = treatment),
+             size = 4,
+             #position = position_dodge(0.2),
+             alpha = 1) + 
+  geom_line(mapping = aes(color = treatment),
+            alpha = 1,
+            size = 1.5) +
+  # geom_smooth(mapping = aes(color = treatment),
+  #             alpha = 0.5,
+  #             size = 2.0,
+  #             se = FALSE,
+  #             span = 0.6) + 
+  theme_microcol() + 
+  scale_color_manual(values = c("#9FC3EA", 
+                                "#172A3A", 
+                                "#E6AF2E",
+                                "#F3E37C"),
+                     labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(0, 1), 
+        legend.position = c(0, 1)) + 
+  facet_grid(rows = vars(trt_cat)) + 
+  ylab("Least square mean cumulative pollen consumption") +
+  xlab("Interval Feeding Day") + 
+  scale_x_continuous(breaks = unique(pcons.gwm.df$fd_day))
+```
+
+### 2-way ANOVA: total nectar consumption
+##### Model specification
+```{r}
+ncons.lmm <- lme(total_n_cons ~ trt_pulse * trt_total * rep,
+                 random = ~ 1 | id,
+                 data = mc.all.npcons.df,
+                 na.action = na.exclude)
+ncons.marginal <- lsmeans(ncons.lmm, ~ trt_pulse * trt_total)
+ncons.cld <- cld(ncons.marginal,
+                 alpha = 0.05,
+                 Letters = letters,
+                 adjust = "tukey")
+ncons.cld$treatment <- c("zone.4", 
+                         "zone.1", 
+                         "zone.3", 
+                         "zone.2")
+ncons.eff <- contrast(ncons.marginal,
+                      alpha = 0.05,
+                      method = "eff",
+                      adjust = "tukey")
+ncons.pairwise <- contrast(ncons.marginal,
+                           alpha = 0.05,
+                           method = "pairwise",
+                           adjust = "tukey")
+summary(ncons.lmm)
+anova(ncons.lmm)
+ncons.cld
+ncons.eff
+ncons.pairwise
+```
+
+##### Plots
+```{r}
+ncons.cld$.group=gsub(" ", "", ncons.cld$.group)
+ggplot(data = ncons.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 5),
+            color = "black") + 
+  scale_y_continuous(limits = c(0, 150),
+                     expand = c(0, 0)) +
+  ylab("Least square mean total nectar consumption (grams)") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
+```
+
+### RM ANOVA: nectar consumption
+##### Model specification
+```{r}
+ncons.rmlmm = lme(total_n_cons ~ trt_total * trt_pulse * rep + date,
+                  random = ~ 1 | id,
+                  data = mc.feed.all.cum.df,
+                  na.action = na.exclude)
+ncons.acf <- ACF(ncons.rmlmm)
+ncons.acf <- ncons.acf %>%
+  filter(lag == 1) %>%
+  select(ACF)
+ncons.rmlmm.1 = lme(total_n_cons ~ trt_total * trt_pulse * rep + date, 
+                    random = ~ 1 | id,
+                    data = mc.feed.all.cum.df,
+                    correlation = corAR1(form = ~ date | id,
+                                         value = ncons.acf),
+                    na.action = na.exclude,
+                    method = "REML")
+ncons.gwm.df <- groupwiseMean(total_n_cons ~ treatment + fd_day,
+                              data = mc.feed.all.cum.df,
+                              conf = 0.95,
+                              digits = 3)
+summary(ncons.rmlmm.1)
+anova(ncons.rmlmm.1)
+```
+
+##### Plots
+```{r}
+ncons.gwm.df %>%
+  mutate(trt_cat = ifelse(treatment == "zone.1", 
+                          "constant", 
+                          ifelse(treatment == "zone.2", 
+                                 "constant", 
+                                 "pulse"))) %>%
+  ggplot(mapping = aes(x = fd_day,
+                       y = Mean,
+                       group = treatment)) + 
+  annotate("rect",
+           xmin = 3.5,
+           xmax = 6.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "black",
+           alpha = 1) +
+  annotate("rect",
+           xmin = 10.5,
+           xmax = 13.5,
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "black",
+           alpha = 1) +
+  geom_errorbar(
+    mapping = aes(ymin = Trad.lower,
+                  ymax = Trad.upper),
+    width = 0,
+    size = 0.7,
+    #position = position_dodge(0.2),
+    color = "black") + 
+  geom_point(mapping = aes(color = treatment),
+             size = 4,
+             #position = position_dodge(0.2),
+             alpha = 1) + 
+  geom_line(mapping = aes(color = treatment),
+            alpha = 1,
+            size = 1.5) +
+  # geom_smooth(mapping = aes(color = treatment),
+  #             alpha = 0.5,
+  #             size = 2.0,
+  #             se = FALSE,
+  #             span = 0.6) + 
+  theme_microcol() + 
+  scale_color_manual(values = c("#9FC3EA", 
+                                "#172A3A", 
+                                "#E6AF2E",
+                                "#F3E37C"),
+                     labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(0, 1), 
+        legend.position = c(0, 1)) + 
+  facet_grid(rows = vars(trt_cat)) + 
+  ylab("Least square mean cumulative nectar consumption") +
+  xlab("Interval Feeding Day") + 
+  scale_x_continuous(breaks = unique(ncons.gwm.df$fd_day))
+```
+
+## MISCELLANEOUS
+## 2-way ANOVA: worker mortality 
+##### Gather data
+```{r}
+mc.all.work.df <- bind_rows(
+  select(mc1.df, 
+         id, 
+         treatment, 
+         date, 
+         n_worker_deaths, 
+         fd_day),
+  select(mc2.df,
+         id,
+         treatment,
+         date,
+         n_worker_deaths,
+         fd_day), 
+  select(mc3.df,
+         id,
+         treatment,
+         date,
+         n_worker_deaths,
+         fd_day),
+  .id = "rep")
+mc.all.work.df <- mc.all.work.df %>%
+  group_by(id, rep, treatment) %>%
+  summarise(total_worker_deaths = sum(n_worker_deaths)) %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+```
+
+##### Model specification
+```{r}
+workmort.lmm <- lme(total_worker_deaths ~ trt_pulse * trt_total * rep,
+                    random = ~ 1 | id,
+                    data = mc.all.work.df,
+                    na.action = na.exclude)
+workmort.marginal <- lsmeans(workmort.lmm, ~ trt_pulse * trt_total)
+workmort.cld <- cld(workmort.marginal,
+                    alpha = 0.05,
+                    Letters = letters,
+                    adjust = "tukey")
+workmort.cld$treatment <- c("zone.2", 
+                            "zone.1", 
+                            "zone.3", 
+                            "zone.4")
+workmort.eff <- contrast(workmort.marginal,
+                         alpha = 0.05,
+                         method = "eff",
+                         adjust = "tukey")
+workmort.pairwise <- contrast(workmort.marginal,
+                              alpha = 0.05,
+                              method = "pairwise",
+                              adjust = "tukey")
+summary(workmort.lmm)
+anova(workmort.lmm)
+workmort.cld
+workmort.eff
+workmort.pairwise
+```
+
+##### Plots
+```{r}
+workmort.cld$.group=gsub(" ", "", workmort.cld$.group)
+ggplot(data = workmort.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 1),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, 20),
+                     expand = c(0, 0)) +
+  ylab("Least square mean worker mortality") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
+```
+
+## Pollen per male
+### 2-way ANOVA: worker mortality 
+##### Gather data
+```{r}
+mc.feed.total.df <- mc.feed.all.df %>%
+  ungroup() %>%
+  group_by(id, rep, treatment) %>%
+  summarise(
+    total_p_cons = sum(p_mass_cons,
+                       na.rm = TRUE),
+    total_n_cons = sum(n_mass_cons,
+                       na.rm = TRUE),
+    total_p_fd = sum(p_mass_fd,
+                     na.rm = TRUE),
+    total_n_fd = sum(p_mass_fd,
+                     na.rm = TRUE)
+  )
+mc.feed2drone.df <- mc.feed.total.df %>%
+  left_join(select(mc.drone.all.df,
+                   id, total_drones, rep),
+            by = c("id" = "id", "rep" = "rep")) %>%
+  mutate(p_per_drone = total_p_cons / total_drones,
+         n_per_drone = total_n_cons / total_drones) %>%
+  filter(p_per_drone != Inf)
+mc.feed2drone.df <- mc.feed2drone.df %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+```
+##### Model specification
+```{r}
+pdrone.lmm <- lme(p_per_drone ~ trt_pulse * trt_total * rep,
+                  random = ~ 1 | id,
+                  data = mc.feed2drone.df,
+                  na.action = na.exclude)
+pdrone.marginal <- lsmeans(pdrone.lmm, ~ trt_pulse * trt_total)
+pdrone.cld <- cld(pdrone.marginal,
+                  alpha = 0.05,
+                  Letters = letters,
+                  adjust = "tukey")
+pdrone.cld$treatment <- c("zone.2", 
+                          "zone.4", 
+                          "zone.3", 
+                          "zone.1")
+pdrone.eff <- contrast(pdrone.marginal,
+                       alpha = 0.05,
+                       method = "eff",
+                       adjust = "tukey")
+pdrone.pairwise <- contrast(pdrone.marginal,
+                            alpha = 0.05,
+                            method = "pairwise",
+                            adjust = "tukey")
+summary(pdrone.lmm)
+anova(pdrone.lmm)
+pdrone.cld
+pdrone.eff
+pdrone.pairwise
+```
+
+##### Plots
+```{r}
+pdrone.cld$.group=gsub(" ", "", pdrone.cld$.group)
+ggplot(data = pdrone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 0.1),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, 1.25),
+                     expand = c(0, 0)) +
+  ylab("LSM pollen to produce drone (grams)") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
+```
+
+## Nectar per male
+### 2-way ANOVA: worker mortality 
+##### Model specification
+```{r}
+ndrone.lmm <- lme(n_per_drone ~ trt_pulse * trt_total * rep,
+                  random = ~ 1 | id,
+                  data = mc.feed2drone.df,
+                  na.action = na.exclude)
+ndrone.marginal <- lsmeans(ndrone.lmm, ~ trt_pulse * trt_total)
+ndrone.cld <- cld(ndrone.marginal,
+                  alpha = 0.05,
+                  Letters = letters,
+                  adjust = "tukey")
+ndrone.cld$treatment <- c("zone.2", 
+                          "zone.4", 
+                          "zone.3", 
+                          "zone.1")
+ndrone.eff <- contrast(ndrone.marginal,
+                       alpha = 0.05,
+                       method = "eff",
+                       adjust = "tukey")
+ndrone.pairwise <- contrast(ndrone.marginal,
+                            alpha = 0.05,
+                            method = "pairwise",
+                            adjust = "tukey")
+summary(pdrone.lmm)
+anova(pdrone.lmm)
+ndrone.cld
+ndrone.eff
+ndrone.pairwise
+```
+
+##### Plots
+```{r}
+ndrone.cld$.group=gsub(" ", "", ndrone.cld$.group)
+ggplot(data = ndrone.cld,
+       mapping = aes(x = treatment,
+                     y = lsmean,
+                     label = .group)) + 
+  geom_col(mapping = aes(fill = treatment),
+           width = 0.35,
+           alpha = 1,
+           color = "gray10") + 
+  geom_pointrange(mapping = aes(ymin = lower.CL,
+                                ymax = upper.CL),
+                  color = "black") + 
+  theme_microcol() + 
+  theme(legend.position = "right") +
+  geom_text(mapping = aes(y = upper.CL + 1),
+             color = "black") + 
+  scale_y_continuous(limits = c(0, 25),
+                     expand = c(0, 0)) +
+  ylab("LSM nectar to produce drone (grams)") + 
+  xlab("Treatment") + 
+  scale_fill_manual(values = c("#9FC3EA", 
+                               "#172A3A", 
+                               "#E6AF2E",
+                               "#F3E37C"),
+                    labels = c("50% - Constant",
+                               "100% - Constant",
+                               "100% - Variable",
+                               "50% - Variable"),
+                    name = "Treatment") + 
+  theme(legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
+```
+
+# Model tables 

@@ -239,6 +239,27 @@ mc3.drone.df <- mc3.df %>%
   ungroup() %>%
   group_by(id, treatment) %>%
   summarise(total_drones = sum(n_new_drones, na.rm = TRUE))
+mc3.drone.mass.df <- read_csv("./D2018_mc3_dronemass.csv", 
+                              skip = 1,
+                              col_names = c("date",
+                                            "id",
+                                            "n_drones",
+                                            "total_mass",
+                                            "avg_drone_mass"))
+mc3.drone.mass.df$date <- mdy(mc3.drone.mass.df$date)
+mc3.drone.mass.df$treatment <- ifelse(
+  mc3.drone.mass.df$id < 2,
+  paste("zone.1"),
+  ifelse(
+    mc3.drone.mass.df$id < 3 & mc3.drone.mass.df$id > 1,
+    paste("zone.2"),
+    ifelse(
+      mc3.drone.mass.df$id < 4 & mc3.drone.mass.df$id > 3,
+      paste("zone.3"),
+      paste("zone.4")
+    )
+  )
+)s
 ```
 
 ### Save all data to working directory
