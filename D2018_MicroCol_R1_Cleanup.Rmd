@@ -90,7 +90,7 @@ mc1.df$id <- as.factor(mc1.df$id)
 ### Calculate food consumption/colony growth
 #### Pull relevant vars
 ```{r}
-mc1.feed.df <- data_frame(id = mc1.df$id, 
+mc1.feed.df <- tibble_(id = mc1.df$id, 
                    date = mc1.df$date,
                    mc_mass = mc1.df$mc_mass,
                    p_mass_rm = mc1.df$p_mass_rm, 

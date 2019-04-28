@@ -69,7 +69,7 @@ All 3 rounds - Summary stats table for all 3 rounds.  Total mass, brood mass, nu
 
 4-5 figs for MS 
 
-Basic and Applied Ecology? Ecosphere? 
+Basic and Applied Ecology? ~~Ecosphere?~~ 
 
 Supp Material: 
 - Treatment design and feed schedule, 
@@ -119,3 +119,12 @@ For worker mortality,
 For pollen consumption,
 
 For nectar consumption, 
+
+**4/26:** From CrossValidated: 
+"The `Anova` function in the car package uses Wald Chi-square test to generate the p-values it displays. These can either be Type II or Type III p-values. Type II p-values are calculated using the sums of squares for each main effect conditional on the other main effects. Type III p-values conditions the sums of squares on the interaction term as well.
+
+The regular `anova` and `aov` functions in R compute Type I effects (see link above for details) which is rarely what you are interested and will change depending on the ordering of the terms in the function.
+
+The `summary()` function calculates the p-value based on the t-statistic of the effect (effect divided by standard error). _[Essentially a test if the coefficient is different than 0]_
+
+The last set of p-values are also based on the t-statistic of the effect but they are unadjusted for the other term in the model. In other words the effect of each term is different from the one found in the model fit."

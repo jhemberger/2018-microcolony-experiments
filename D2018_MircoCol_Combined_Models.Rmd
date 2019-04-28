@@ -33,21 +33,73 @@ library(stargazer)
 mc1.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
 mc1.feed.df <- read_csv("./D2018_MicroCol_Round1_Feed_Clean.csv")
 mc1.drone.df <- read_csv("./D2018_microcol_round3_drone.csv")
-mc1.drone.it.df <- 
-mc2.drone.mass.df <- 
-
+mc1.drone.it.df <- read_csv("./D2018_microcol_round1_droneIT_clean.csv") %>%
+  select(id, date, it.distance) %>%
+  mutate(notes = NA) %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+mc1.drone.it.df$date <- mdy(mc1.drone.it.df$date)
+mc1.drone.mass.df <- read_csv("./D2018_MC1_DroneMass_Clean.csv")
 mc2.df <- read_csv("./D2018_MicroCol_Round1_Clean.csv")
-mc2.feed.df <- read_csv("./D2018_MicroCol_Round1_Feed_Clean.csv")
-mc2.drone.df <- read_csv("./D2018_microcol_round3_drone.csv")
-mc2.drone.it.df <- read_csv()
-mc2.drone.mass.df <- read_csv()
+mc2.feed.df <- read_csv("./D2018_MicroCol_Round2_Feed_Clean.csv")
+mc2.drone.df <- read_csv("./D2018_microcol")
+mc2.drone.it.df <- read_csv("./D2018_microcol_round2_droneIT.csv",
+                            skip = 1,
+                            col_names = c("id",
+                                          "date",
+                                          "it.distance",
+                                          "notes")) %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+mc2.drone.it.df$date <- mdy(mc2.drone.it.df$date)
+mc2.drone.mass.df <- read_csv("./D2018_mc2_dronemass.csv",
+                              skip = 1,
+                              col_names = c("date",
+                                            "id",
+                                            "n.drones",
+                                            "drone.mass",
+                                            "avg.individ.mass",
+                                            "notes"))
+mc2.drone.mass.df$date <- mdy(mc2.drone.mass.df$date)
+mc2.drone.mass.df <- mc2.drone.mass.df %>%
+  select(-notes)
 
 mc3.df <- read_csv("./D2018_microcol_round3_clean.csv")
 mc3.end.df <- read_csv("./D2018_MicroCol_Round3_BroodMass.csv")
 mc3.feed.df <- read_csv("./D2018_microcol_round3_feed_clean.csv")
 mc3.drone.df <- read_csv("./D2018_microcol_round3_drone.csv")
-mc3.drone.it.df <- read_csv()
-mc3.drone.mass.df <- read_csv() 
+mc3.drone.it.df <- read_csv("./D2018_microcol_round3_droneIT.csv",
+                            skip = 1,
+                            col_names = c("id",
+                                          "date",
+                                          "it.distance",
+                                          "notes")) %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+mc3.drone.it.df$date <- mdy(mc3.drone.it.df$date)
+mc3.drone.mass.df <- read_csv("./D2018_mc3_dronemass.csv",
+                              skip = 1,
+                              col_names = c("date",
+                                            "id",
+                                            "n.drones",
+                                            "drone.mass",
+                                            "avg.individ.mass",
+                                            "notes")) 
+mc3.drone.mass.df$date <- mdy(mc3.drone.mass.df$date)
+mc3.drone.mass.df <- mc3.drone.mass.df %>%
+  select(-notes)
 ```
 
 ### Adjust `mc1.feed.df` to match 
@@ -78,23 +130,62 @@ mc.all.df <- bind_rows(mc1.df,
                        .id = "rep") # end up doing on fly with specific columns
 mc3.feed.df$id <- as.character(mc3.feed.df$id)
 mc3.feed.df$id <- as.numeric(mc3.feed.df$id)
-mc.feed.all.df <- bind_rows(mc1.feed.df,
+mc.feed.all.df <- bind_rows(mc1.feed.fix.df,
                             mc2.feed.df,
                             mc3.feed.df,
                             .id = "rep")
 mc.feed.all.df$id <- as.character(mc.feed.all.df$id)
 mc.feed.all.df$id <- as.factor(mc.feed.all.df$id)
-mc.drone.all.df <- bind_rows(mc1.drone.df,
+mc1.drone.df <- mc1.df %>%
+  select(id, n_new_drones) %>%
+  group_by(id) %>%
+  summarise(total_drones = sum(n_new_drones)) %>%
+  filter(id != 2.4)
+mc2.drone.df <- mc2.df %>%
+  select(id, n_new_drones) %>%
+  group_by(id) %>%
+  summarise(total_drones = sum(n_new_drones)) %>%
+  filter(id != 1.4)
+mc3.drone.df <- mc3.df %>%
+  select(id, n_new_drones) %>%
+  group_by(id) %>%
+  summarise(total_drones = sum(n_new_drones)) %>%
+  filter(id != 2.7)
+mc.drone.all.df <- bind_rows(mc1.drone.df, 
                              mc2.drone.df,
                              mc3.drone.df,
-                             .id = "rep") 
+                             .id = "rep") %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+
+mc1.drone.mass.df <- mc1.drone.mass.df %>%
+  filter(id != 2.4)
+mc2.drone.mass.df <- mc2.drone.mass.df %>%
+  filter(id != 1.4)
+mc3.drone.mass.df <- mc3.drone.mass.df %>%
+  filter(id != 2.7)
 mc.dronemass.all.df <- bind_rows(mc1.drone.mass.df,
                                  mc2.drone.mass.df,
                                  mc3.drone.mass.df,
                                  .id = "rep")
-# mc.drone.it.all.df <- bind_rows()
-# mc.drone.mass.all.df <- bind_rows()
-
+mc.dronemass.all.df <- mc.dronemass.all.df %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100"))
+mc.dronemass.all.df <- mc.dronemass.all.df %>%
+  mutate(avg.individ.mass = drone.mass / n.drones)
+mc.dronemass.all.df$trt_total <- as.character(mc.dronemass.all.df$trt_total)
+mc.droneit.all.df <- bind_rows(mc1.drone.it.df,
+                               mc2.drone.it.df,
+                               mc3.drone.it.df,
+                               .id = "rep")
 mc.feed.all.df <- mc.feed.all.df %>%
   ungroup() %>%
   group_by(id) %>%
@@ -122,13 +213,78 @@ mc.feed.all.mod.df <- mc.feed.all.mod.df %>%
          trt_total = ifelse(id < 2 | id > 4,
                             "60",
                             "100"))
+
+mc1.feed.fix.df <- mc.feed.all.df %>%
+  filter(rep == 1)
+
+mc1.feed.fix.df <- mc1.feed.fix.df %>%
+  mutate(n_fd_days = ifelse(p_mass_cons != 0,
+                            fd.days.r1,
+                            NA)) %>%
+  mutate(p_mass_cons_avg = p_mass_cons / n_fd_days) %>%
+  mutate_at(c("p_mass_cons_avg"), list(lead), n = 1)
+
+mc1.feed.fix.df$p_mass_cons_avg[mc1.feed.fix.df$fd_day == 17] <- 0
+mc1.feed.fix.df <- fill(mc1.feed.fix.df, 
+                        p_mass_cons_avg, 
+                        .direction = "up")
+mc1.feed.fix.df <- mc1.feed.fix.df %>%
+  ungroup() %>%
+  mutate(mc_mass_true = ifelse(
+    fd_day_count == 1,
+    ((mc_mass - mc_mass_init) + p_mass_cons_avg),
+    ifelse(
+      fd_day_count == 2,
+      (((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) + p_mass_cons_avg),
+      ifelse(
+        fd_day_count == 3,
+        ((((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) - lag(p_mass_fd, n = 2)) + p_mass_cons_avg),
+        ifelse(fd_day_count == 0,
+               ((((mc_mass - mc_mass_init) - lag(p_mass_fd, n = 1)) - lag(p_mass_fd, n = 2)) - lag(p_mass_fd, n = 3)) + p_mass_cons_avg, 0)
+      )
+    )
+  ))
+mc1.feed.fix.df <- mc1.feed.fix.df %>%
+  ungroup() %>%
+  group_by(id) %>%
+  mutate(mc_mass_true_intrp = na.approx(mc_mass_true, 
+                                        maxgap = 4,
+                                        rule = 2)) %>%
+  mutate(mc_mass_true = mc_mass_true_intrp)
+mc.feed.all.fix.df <- mc1.feed.fix.df %>%
+  select(id, date, fd_day, treatment, p_mass_cons, p_mass_cons_avg, n_mass_cons, mc_mass_true, pulse_cat) %>%
+  filter(id != 2.4) %>%
+  bind_rows(mc2.feed.df %>%
+              select(id, date, fd_day, treatment, p_mass_cons, p_mass_cons_avg, n_mass_cons, mc_mass_true, pulse_cat) %>%
+              filter(id != 1.4) %>%
+              filter(fd_day != 0),
+            .id = "rep") %>%
+  bind_rows(mc3.feed.df %>%
+              select(id, date, fd_day, treatment, p_mass_cons, p_mass_cons_avg, n_mass_cons, mc_mass_true, pulse_cat) %>%
+              filter(id != 2.7) %>%
+              filter(fd_day != 0)) %>%
+  mutate(trt_pulse = ifelse(id >= 3, 
+                            "pulse",
+                            "constant"),
+         trt_total = ifelse(id < 2 | id > 4,
+                            "60",
+                            "100")) %>%
+  ungroup() %>%
+  group_by(rep, id) %>%
+  mutate(mc_mass_true = na.approx(mc_mass_true,
+                                  maxgap = 2,
+                                  rule = 3))
+mc.feed.all.fix.df <- mc.feed.all.fix.df %>%
+  filter(fd_day != 0)
 ```
 ## Export data
 ```{r}
-write_csv(mc.feed.all.mod.df, "./")
 write_csv(mc.all.npcons.df, "./")
 write_csv(mc.end.all.df, "./microcol_final_endmass.csv")
-write_csv(mc.feed.all.mod.df, "./microcol_final_mass.csv")
+write_csv(mc.feed.all.fix.df, "./microcol_final_feed.csv")
+write_csv(mc.drone.all.df, "./microcol_final_drones.csv")
+write_csv(mc.dronemass.all.df, "./microcol_final_dronemass.csv")
+write_csv(mc.droneit.all.df, "./microcol_final_droneit.csv")
 
 ```
 
