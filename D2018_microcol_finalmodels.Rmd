@@ -26,6 +26,7 @@ library(knitr)
 library(lubridate)
 library(broom)
 library(stargazer)
+library(xtable)
 ```
 
 # Set global contrast options
@@ -216,6 +217,9 @@ ggplot(data = endmass.cld,
 ### RM ANOVA: mass
 ##### Model specification
 ```{r}
+mc.feed.all.fix.df$rep <- as.factor(mc.feed.all.fix.df$rep)
+mc.feed.all.fix.df$trt_pulse <- as.factor(mc.feed.all.fix.df$trt_pulse)
+mc.feed.all.fix.df$trt_total <- as.factor(mc.feed.all.fix.df$trt_total)
 mass.rmlmm = lme(mc_mass_true ~ trt_total * trt_pulse * rep + date,
                  random = ~ 1 + treatment | id,
                  data = mc.feed.all.fix.df,
@@ -469,7 +473,10 @@ massrate.cld %>%
                                "50% - Variable"),
                     name = "Treatment") + 
   theme(legend.justification = c(1, 1), 
-        legend.position = c(1, 1))
+        legend.position = c(1, 1)) + 
+  ggsave("avg_growthrate.eps",
+         width = 5,
+         height = 3)
 ```
 
 ### RM ANOVA: period growth rates
@@ -554,7 +561,10 @@ mc.all.period.anovas %>%
                                "100% - Variable",
                                "50% - Variable"),
                      name = "Treatment") +
-  facet_grid(rows = vars(trt_cat))
+  facet_grid(rows = vars(trt_cat)) + 
+  ggsave("period_growth.eps",
+         width = 6,
+         height = 4)
 ```
 
 ## DRONES
@@ -730,7 +740,8 @@ ggplot(data = t2drone.cld,
 ### 2-way ANOVA: drone mass
 ##### Model specification
 ```{r}
-dronemass.lmm <- lm(avg.individ.mass ~ trt_total * trt_pulse * rep,
+dronemass.lmm <- lme(avg.individ.mass ~ trt_total * trt_pulse * rep,
+                     random = ~ 1 | id,
                      data = mc.dronemass.all.df,
                      na.action = na.exclude)
 dronemass.marginal <- lsmeans(dronemass.lmm, ~ trt_pulse * trt_total)
@@ -750,8 +761,9 @@ dronemass.pairwise <- contrast(dronemass.marginal,
                                alpha = 0.05,
                                method = "pairwise",
                                adjust = "tukey")
-summary(t2drone.lmm)
-anova(t2drone.lmm)
+summary(dronemass.lmm)
+anova(dronemass.lmm)
+Anova(dronemass.lmm, type = 2)
 dronemass.cld
 dronemass.eff
 dronemass.pairwise
@@ -795,9 +807,10 @@ ggplot(data = dronemass.cld,
 ### 2-way ANOVA: drone IT distance
 ##### Model specification
 ```{r}
-droneit.lmm <- lm(it.distance ~ trt_total * trt_pulse * rep,
-                  data = mc.droneit.all.df,
-                  na.action = na.exclude)
+droneit.lmm <- lme(it.distance ~ trt_total * trt_pulse * rep,
+                  random = ~1 | id,
+                   data = mc.droneit.all.df,
+                   na.action = na.exclude)
 droneit.marginal <- lsmeans(droneit.lmm, ~ trt_pulse * trt_total)
 droneit.cld <- cld(droneit.marginal,
                    alpha = 0.05,
@@ -815,8 +828,8 @@ droneit.pairwise <- contrast(droneit.marginal,
                              alpha = 0.05,
                              method = "pairwise",
                              adjust = "tukey")
-summary(t2drone.lmm)
-anova(t2drone.lmm)
+summary(droneit.lmm)
+anova(droneit.lmm)
 droneit.cld
 droneit.eff
 droneit.pairwise
@@ -1715,56 +1728,67 @@ apropos("*.lmm")
 ### End Mass
 ```{r}
 Anova(endmass.lmm, type = 3)
+anova(endmass.lmm)
 ```
 
 ### Rate of Mass Gain
 ```{r}
 Anova(massrate.lmm, type = 3)
+anova(massrate.lmm)
 ```
 
 ### Drone production
 ```{r}
 Anova(drones.lmm, type = 3)
+anova(drones.lmm)
 ```
 
 ### Days to first drone
 ```{r}
 Anova(t2drone.lmm, type = 3)
+anova(t2drone.lmm)
 ```
 
 ### Drone mass
 ```{r}
 Anova(dronemass.lmm, type = 3)
+anova(dronemass.lmm)
 ```
 
 ### Drone IT
 ```{r}
 Anova(droneit.lmm, type = 3)
+anova(droneit.lmm)
 ```
 
 ### Drone rate
 ```{r}
 Anova(dronerate.lmm, type = 3)
+anova(dronerate.lmm)
 ```
 
 ### Total pollen consumption
 ```{r}
 Anova(pcons.lmm, type = 3)
+anova(pcons.lmm)
 ```
 
 ### Total nectar consumption
 ```{r}
 Anova(ncons.lmm, type = 3)
+anova(ncons.lmm)
 ```
 
 ### Worker mortaility
 ```{r}
-Anova(workmort.lmm, type = 3)
+Anova(workmort.lmm, type = 2)
+anova(workmort.lmm)
 ```
 
 ### Pollen per male
 ```{r}
 Anova(pdrone.lmm, type = 3)
+anova(pdrone.lmm)
 ```
 
 ### Nectar per male
