@@ -26,7 +26,6 @@ library(knitr)
 library(lubridate)
 library(broom)
 library(stargazer)
-library(xtable)
 ```
 
 # Set global contrast options
@@ -1235,7 +1234,7 @@ pcons.rmlmm.1 = lme(total_p_cons ~ trt_total * trt_pulse * rep + date,
                                          value = pcons.acf),
                     na.action = na.exclude,
                     method = "REML")
-pcons.gwm.df <- groupwiseMean(total_p_cons ~ treatment + fd_day,
+pcons.gwm.df <- groupwiseMean(total_p_cons ~ trt_total * trt_pulse + fd_day,
                               data = mc.feed.all.cum.df,
                               conf = 0.95,
                               digits = 3)
@@ -1246,11 +1245,13 @@ anova(pcons.rmlmm.1)
 ##### Plots
 ```{r}
 pcons.gwm.df %>%
-  mutate(trt_cat = ifelse(treatment == "zone.1", 
-                          "constant", 
-                          ifelse(treatment == "zone.2", 
-                                 "constant", 
-                                 "pulse"))) %>%
+  mutate(treatment = ifelse(trt_total == 100 & trt_pulse == "constant",
+                            "zone.2",
+                            ifelse(trt_total == 100 & trt_pulse == "pulse",
+                                   "zone.3",
+                                   ifelse(trt_total == 60 & trt_pulse == "constant",
+                                          "zone.1",
+                                          "zone.4")))) %>%
   ggplot(mapping = aes(x = fd_day,
                        y = Mean,
                        group = treatment)) + 
@@ -1299,7 +1300,7 @@ pcons.gwm.df %>%
                     name = "Treatment") + 
   theme(legend.justification = c(0, 1), 
         legend.position = c(0, 1)) + 
-  facet_grid(rows = vars(trt_cat)) + 
+  facet_grid(rows = vars(trt_pulse)) + 
   ylab("Least square mean cumulative pollen consumption") +
   xlab("Interval Feeding Day") + 
   scale_x_continuous(breaks = unique(pcons.gwm.df$fd_day))

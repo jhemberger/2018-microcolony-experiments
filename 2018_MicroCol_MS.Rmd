@@ -50,33 +50,33 @@ abstract: The loss of flower-rich habitat to agriculture is a key factor contrib
 ---
 
 # Introduction
-Bumble bee declines across Europe and North America are driven by a number of interacting anthropogenic factors [e.g., pesticides, @McArt2017], novel diseases from managed bees [@Brown2016a; @Furst2014] and climate change [@Kerr2015]). There is a growing consensus that habitat loss is the most important driver of decline [@Roulston2011; @Senapathi2015a; @Goulson2016].  In the US Midwest, two centuries of agricultural intensification (defined here as the spatially extensive increase of agrichemical use and proliferation of monocultures [e.g., @Benton2003] has removed bumble bee habitat - supplanting once continuous landscapes of prairie, savanna, and wetlands with highly productive agricultural crops [@Smith1998; @Rhemtulla2007].  Coincident with the transition to primarily agricultural land use in the US, several species of bumble bee have declined precipitously [@Grixti2009; @Cameron2011; @Jacobson2018a].
+Bumble bee declines across Europe and North America are driven by a number of interacting anthropogenic factors [e.g., pesticides, @McArt2017], novel diseases from managed bees [@Brown2016a; @Furst2014] and climate change [@Kerr2015]). There is a growing consensus that habitat loss is the most important driver of decline [@Roulston2011; @Senapathi2015a; @Goulson2016].  In the US Midwest, two centuries of agricultural intensification [defined here as the spatially extensive increase of agrichemical use and proliferation of monocultures e.g., @Benton2003] has removed bumble bee habitat - supplanting once continuous landscapes of prairie, savanna, and wetlands with highly productive agricultural crops [@Smith1998; @Rhemtulla2007].  Coincident with the transition to primarily agricultural land use in the US, several species of bumble bee have declined precipitously [@Grixti2009; @Cameron2011; @Jacobson2018a].
 
-Most importantly, agricultural intensification has led to wholesale change in the abundance and temporal availability of floral resources in the landscape [@Goulson2008; @Schellhorn2015c; @Goulson2015c; @Vaudo2018].  Historically, landscapes containing a continuous supply of diverse floral resources (e.g., tall-grass prairies [@Hines2005]) were prolific, however many of these landscapes have been lost to commodity agriculture [@Smith1998].  Contemporary commodity crop landscapes in the Midwest (e.g., corn and soy), featuring decreased crop diversity in combination with an increased use of herbicides, have significantly reduced flowering plant availability [@Carvell2006b; @Goulson2015c], creating proverbial food deserts for bumble bees aside from small patches of remnant natural habitat.  In contrast, some agricultural landscapes contain mass-flowering crops (e.g., fruit crops, canola) that provide large pulses of floral resources, albeit over a short time period [@Westphal2009a; @Holzschuh2013; @Rundlof2014].  As such, with respect to floral resource abundance, a range of possible landscapes exist in agriculturally dominated regions.  However, the trend has moved toward highly simplified landscapes, with floral resources available only during crop bloom.
+Most importantly, agricultural intensification has led to wholesale change in the abundance and temporal availability of floral resources in the landscape [@Goulson2008; @Williams2012b; @Schellhorn2015c; @Goulson2015c; @Vaudo2018].  Historically, landscapes containing a continuous supply of diverse floral resources [e.g., tall-grass prairies @Hines2005] were prolific, however many of these landscapes have been lost to commodity agriculture [@Smith1998], especially in the American Midwest.  These landscapes, often devoid of flowering weeds, create proverbial food deserts for bumble bees aside from small patches of remnant natural habitat.  In contrast, some agricultural landscapes contain mass-flowering crops (e.g., fruit crops, canola) that provide large pulses of floral resources, albeit over a short time period [@Westphal2009a; @Williams2012b; @Holzschuh2013; @Rundlof2014].  As such, with respect to floral resource abundance, a range of possible landscapes exist in agriculturally dominated regions.  However, the trend has moved toward highly simplified landscapes, with floral resources available only during crop bloom.
 
-The interaction between total floral resource abundance and temporal availability in the landscape can be visualized conceptually, as two potentially independent factors (Fig.1).  In this abstraction, 'Zone 1' landscapes contain few flowers that are constantly available over the course of the growing season.  This can be contrasted with 'Zone 3' landscapes that contain an abundance of flowers, but primarily only during two pulses (e.g., two mass-flowering crops).  This framework allows us to make simple predictions of how bumble bees are likely to respond to changes in floral resource abundance in the landscape.  We might expect, given that bumble bees are obligate flower visitors existing in long-lived colonies, that access do an abundance of flowers that are consistently available over time (e.g., 'Zone 2' landscapes) would be critical for successful colony development.
+The interaction between total floral resource abundance and temporal availability in the landscape can be visualized conceptually, as two potentially independent factors (Fig.1).  In this abstraction, landscapes in the lower left quadrant contain few flowers that are constantly available over the course of the growing season.  This can be contrasted with landscapes in the upper right quadrant that contain an abundance of flowers, but primarily only during two pulses (e.g., two mass-flowering crops).  This framework allows us to make simple predictions of how bumble bees are likely to respond to changes in floral resource abundance in the landscape.  We might expect, given that bumble bees are obligate flower visitors [@Junker2010] existing in long-lived colonies, that access to an abundance of flowers that are consistently available over time (e.g., landscapes in lower right quadrant) would be critical for successful colony development.
 
-Total floral resource abundance is an important factor that contributes to the growth and reproductive success of bumble bee colonies.  For example, worker production is dependent on pollen and nectar influx to the colony; shortfalls can be detrimental to worker output [@Williams2012b; @Cartar1991; @Sutcliffe1988], and reproductive (drone and gyne) output can be enhanced with increased food availability [@Pelletier2003].  Despite variable effect sizes and experimental methodologies, most studies tend to agree that increased flower abundance leads to increased bumble bee abundance [e.g., @Carvell2007; @Blaauw2014] and/or colony performance [e.g., @Spiesman2017].
+Total floral resource abundance is an important factor that contributes to the growth and reproductive success of bumble bee colonies.  For example, worker production is dependent on pollen and nectar influx to the colony; shortfalls can be detrimental to worker output [@Williams2012b; @Cartar1991; @Sutcliffe1988], and reproductive (drone and gyne) output can be enhanced with increased food availability [@Pelletier2003; @Crone2016].  Despite variable effect sizes and experimental methodologies, most studies tend to agree that increased flower abundance leads to increased bumble bee abundance [e.g., @Carvell2007; @Blaauw2014] and/or colony performance [e.g., @Spiesman2017].
 
-While total food availability is key for developing bumble bee colonies, when food is available can be equally important [@Schellhorn2015c].  Because bumble bee colonies have three distinct bottlenecks wherein food availability is crucial to colony success (queen colony establishment, colony worker buildup, and reproductive production), food shortages during any period of the colony life cycle can impair colony function.  As such, continuous availability of flowers in the landscape is believed to be paramount for bumble bees [e.g., Fig1, Zone 2 @Martins2018].  Past work has examined the effect of total food abundance [@Rotheray2017] and temporal availability [@Schmid-Hempel1998a] on colony development independently, however we have yet to test the interactive effect of the two.  Is a lack of food, the temporal availability of food, or both limiting bumble bee colony success?  Parsing these two interacting factors apart could help explain specific mechanisms underlying bumble bee declines in agricultural landscapes, as well as suggest conservation interventions.
+While total food availability is key for developing bumble bee colonies, when food is available is also potentially important [@Schellhorn2015c].  Because bumble bee colonies have three distinct bottlenecks wherein food availability is crucial to colony success (queen colony establishment, colony worker buildup, and reproductive production), food shortages during any period of the colony life cycle can impair colony function.  As such, continuous availability of flowers in the landscape is believed to be paramount for bumble bees [e.g., Fig1, lower right quadrant @Martins2018].  Past work has examined the effect of total food abundance [@Rotheray2017] and temporal availability [@Schmid-Hempel1998a] on colony development independently, however we have yet to test the interactive effect of the two.  Is a lack of food, the temporal availability of food, or both limiting bumble bee colony success?  Parsing these two interacting factors apart could help explain specific mechanisms underlying bumble bee declines in agricultural landscapes, as well as suggest conservation interventions.
 
-To decouple the effects of total food abundance and temporal availability on bumble bee colony development, we designed a 2x2 factorial experiment that varied total food amount and its temporal availability.  Treatment designs were meant to simulate hypothetical scenarios that provide bumble bees either constantly available, or pulsed food resources at two ration levels: 100% and 60% ad-libitum (ad-lib) (Fig.1).  These may represent different modalities of food intake corresponding to different types of agricultural landscapes.  For example, bumble bees might experience landscapes containing few floral resources and only during one short period of time (e.g., Fig1, Zone 4) or a landscape containing many floral resources that are consistently available (e.g., Fig1, Zone 2).
+To decouple the effects of total food abundance and temporal availability on bumble bee colony development, we designed a 2x2 factorial experiment that varied total food amount (both pollen and nectar) and its temporal availability.  Treatment designs were meant to simulate hypothetical scenarios that provide bumble bees either constantly available, or pulsed food resources at two ration levels: full (100% ad-libitum) and reduced (60% ad-libitum) (Fig.1).  These may represent different modalities of food intake corresponding to different types of agricultural landscapes.  For example, bumble bees might experience landscapes containing few floral resources and only during one short period of time (e.g., Fig1, upper left quadrant) or a landscape containing many floral resources that are consistently available (e.g., Fig1, lower right quadrant).
 
-Using microcolonies of the Common Eastern bumble bee (_Bombus impatiens_ Cresson), we tested the following hypotheses: (1) microcolonies provided 100% ad-lib food (pollen and nectar) in constant, equally sized rations would gain the most mass and have the greatest reproductive output (e.g., zone 2); (2) microcolonies provided 100% ad-lib in pulses separated by periods of relative starvation would perform slightly worse compared to those provided 100% ad-lib in equal rations, as _B impatiens'_ population stability in agricultural landscapes suggests resilience to land-use change and variability in food quantity [@Cameron2011; @Grab2019]; (3) microcolonies provided 60% ad-lib would perform worst, regardless of temporal treatment (equal, "zone 1" vs. pulse, "zone 4" rations), as colonies would be too nutritionally stressed, regardless of relatively large, episodic influxes of food in the pulsed colonies.
+Using microcolonies of the Common Eastern bumble bee (_Bombus impatiens_ Cresson), we tested the following hypotheses: (1) microcolonies provided full rations (pollen and nectar) in constant, equally sized portions would gain the most mass and have the greatest reproductive output; (2) microcolonies provided full rations in pulses separated by periods of relative starvation would perform slightly worse compared to those provided full, equally sized rations, as _B. impatiens'_ population stability in agricultural landscapes suggests resilience to land-use change and variability in food quantity [@Cameron2011; @Grab2019]; (3) microcolonies provided reduced rations would perform worst, regardless of if food was presented in equally sized, or pulsed rations, as colonies would be too nutritionally stressed, regardless of relatively large, episodic influxes of food in the pulsed colonies.
 
-## Materials and methods
-#### Experimental design and procedure
+# Materials and methods
+## Experimental design and procedure
 To assess the impact of varying total, and temporal food abundance on bumble bee colony production, we designed a 2x2 factorial experiment utilizing microcolonies of _B. impatiens_.  Microcolonies were used as proxies to full colonies given their ease of establishment and well-documented analogs to full colony development [@Tasei2008; @Dance2017; @Moerman2017].
 
 In three experimental rounds, we established microcolonies from: (Round 1) 10 queen-right colonies sourced from Koppert Biological Systems (Howell, MI) in February of 2018; (Round 2) 10 queen-right colonies from Koppert Biological Systems in May of 2018; (Round 3) 10 queen-right colonies sourced from BioBest Biological (Romulus, MI) in October of 2018.  In each round, microcolony initiation was identical. We removed sets of 5 workers from a random colony and placed sets into 28 acrylic plastic microcolony rearing boxes (10 x 15 x 10 cm), provisioning each with 2 grams of honey bee collected pollen homogenized with nectar and sealed in honey bee wax, as well as ad-libitum nectar through a sub-floor cotton wick and reservoir (ProSweet: MannLake LTD, Minnesota).  To allow microcolony initiation, we left colonies undisturbed for approximately 1 week.  Once we observed evidence of microcolony establishment (egg and larval brood masses visible) in each replicate box, we removed any remaining pollen and nectar, and initiated treatment regimes.  In order to ensure microcolonies had equal capacity to respond to food availability (i.e., 5 workers per box), we replaced any deceased workers throughout the experiment with randomly selected workers from queen-right feeder colonies.
 
-Over 8 weeks, we simulated landscape-scale food availability (both pollen and nectar) in four treatments - each representing a hypothetical landscape whereby total food abundance, and temporal availability were independently altered according to the factorial design (Fig1).  Treatment conditions (hereafter, "zones") were as follows: "Zone 1" microcolonies were fed equal rations at 60% ad-lib levels; "Zone 2" microcolonies were fed equal rations at 100% ad lib levels; "Zone 3" microcolonies were fed in total the same amount of food as Zone 2 microcolonies, but food resources were provided as two large pulses with periods of relative starvation (~60% ad-lib) encompassing the pulses;  "Zone 4" microcolonies temporal availability was the same as Zone 3, but with total food over the experiment equal to Zone 1, and periods of relative starvation between pulses at ~38% ad-lib. Seven microcolonies were randomly assigned to each treatment.  To determine total food rations supplied in each treatment over the course of the experiment, we used measurements reported in [@Rotheray2017] (which reported on ad-lib consumption rates of the ecological analog of _B. impatiens_, _B. terrestris_), scaling total experiment food abundance at 100% ad-lib to 5 workers (approximately 33 grams of pollen and 300 grams of nectar) over 17 feeding intervals (~ 8 weeks).  Reduced-ration treatments were scaled to 60% of that value.
+Over 8 weeks, we simulated landscape-scale food availability of both pollen and nectar in four treatment - low-constant, high-constant, low-pulsed, and high pulsed - each representing a hypothetical landscape whereby total food abundance, and temporal availability were independently altered according to the factorial design (Fig1).  Low-constant microcolonies were fed equal-sized rations at 60% ad lib levels; high-constant microcolonies fed equal-sized rations at 100% ad lib levels. High-pulsed microcolonies were fed 100% ad-lib rations (equal pollen and nectar to high-constant treatment) but food resources were provided as two large pulses with periods of relative starvation (~60% ad-lib) encompassing the pulses. Low-pulsed microcolonies were fed 60% ad lib rations with temporal availability the same as the high-pulsed treatment, with periods of relative starvation at ~38% ad-lib encompassing the pulses.  Seven microcolonies were randomly assigned to each treatment.  To determine the total amount of pollen and nectar to supply in the treatments over the course of the experiment, we used measurements reported in [@Rotheray2017] (which reported on ad-lib consumption rates of the ecological analog of _B. impatiens_, _B. terrestris_), scaling total experiment food abundance at 100% ad-lib to 5 workers (approximately 33 grams of pollen and 300 grams of nectar) over 17 feeding intervals (~ 8 weeks).  Low-ration treatments were scaled to 60% of that value.
 
-Every 3 days (hereafter interval feeding days: IFD), we massed whole microcolonies by placing them on a scale and recording mass to the nearest 0.01 grams.  After massing, we fed microcolonies by providing an appropriately massed pollen ball and nectar cup (see Supplemental Material for feeding schedule and layout of microcolony box) depending on the food treatment.  After every 3 IFDs (every 9 Julian days), we removed and massed the pollen that was not consumed in the microcolony to calculate consumption. Nectar rations were replaced at every IFD - each massed before addition and after removal to determine nectar consumption [similar to @Rotheray2017].  We massed the microcolony before the removal or addition of food to ensure that measurements were comparable between IFDs.
+Every 3 days (hereafter interval feeding days: IFD), we massed whole microcolonies by placing them on a scale and recording mass to the nearest 0.01 grams.  After massing, we fed microcolonies by providing an appropriately massed pollen ball and nectar cup (see Supplemental Material for feeding schedule and layout of microcolony box) depending on the food treatment.  After every 3 IFDs (every 9 Julian days), we removed and massed the pollen that was not consumed in the microcolony to calculate consumption. Nectar rations were replaced at every IFD - each massed before addition and after removal to determine nectar consumption [similar to @Rotheray2017].  Nectar rations were kept in sealed containers with only the nectar wick exposed, thereby minimizing any nectar evaporation.  We massed the microcolony before the removal or addition of food to ensure that measurements were comparable between IFDs.
 
-To determine if treatments affected the relative fitness of each microcolony, we censused colonies at each IFD.  Censusing included tallying worker mortality, drone (male) emergence, and presence of different brood stages within the microcolony.  After tallying drones that had emerged, we removed and froze them for subsequent analysis. We determined average drone wet mass per IFD for each microcolony, individual drone intertegular distance (to nearest 0.01mm using ProgRes CapturePro v2.0).
+To determine if treatments affected the relative fitness of each microcolony, we censused colonies at each IFD.  Censusing included tallying worker mortality and drone (male) emergence.  We then removed and froze drones for subsequent analysis in which we determined average drone wet mass per IFD for each microcolony and individual drone intertegular distance (to nearest 0.01mm using ProgRes CapturePro v2.0).
 
-#### Data analysis
+## Data analysis
 We performed all data management and statistical analyses in R, version 3.5.1 [@rcite]. For each colony, we calculated the estimated "actual" microcolony mass relative to IFD 1.  The goal of this calculation was to best determine how much biomass was being added to the actual brood mass within the microcolony between IFDs while factoring out added, but not consumed, food:
 
 $$
@@ -86,65 +86,65 @@ Pollen Consumed_{IFD = n} - Pollen Added_{IFD = n}
 \end{aligned}
 $$
 
-where $Microcolony Mass_{IFD}$ is the mass of the entire microcolony (including box) at `IFD = n`;  $Microcolony Mass_{IFD = 1}$ is the mass of the entire microcolony on the first IFD: we calculated mass gains relative the mass at IFD = 1; $Pollen Consumed_{IFD = n}$ is the average pollen consumed at `IFD = n`, determined by taking the pollen consumed over the course of 3 IFDs (determined after removing unconsumed pollen every 3 IFDs) and dividing by 3; and $Pollen Added_{IFD = n}$ is the mass of pollen added at at `IFD = n` (see example calculation in Supplemental Material).  In the event that missing data prevented $Estimated Brood Mass_{IFD = n}$ from being determined (< 1% of data), we interpolated the missing values using the `na.approx` function from the R package `zoo` [@zoo].  Nectar storage/consumption within the microcolony was not considered for the $Microcolony Mass_{IFD = n}$ calculation, as we were not able to parse out nectar consumed by workers from nectar moved by workers to honey pots in the brood mass.  At the end of the experiment, we also measured the mass of the brood cluster (including all wax, remaining pupae, larvae, eggs, and nectar) alone after removing them from the microcolony boxes.
+where $Microcolony Mass_{IFD}$ is the mass of the entire microcolony (including box) at `IFD = n`;  $Microcolony Mass_{IFD = 1}$ is the mass of the entire microcolony on the first IFD: we calculated mass gains relative the mass at IFD = 1; $Pollen Consumed_{IFD = n}$ is the average pollen consumed at `IFD = n`, determined by taking the pollen consumed over the course of 3 IFDs (determined after removing unconsumed pollen every 3 IFDs) and dividing by 3; and $Pollen Added_{IFD = n}$ is the mass of pollen added within the last 3-4 IFDs that had not yet been consumed.  In the event that missing data prevented $Estimated Brood Mass_{IFD = n}$ from being determined (< 1% of data), we interpolated the missing values using the `na.approx` function from the R package `zoo` [@zoo].  Nectar storage/consumption within the microcolony was not considered for the $Microcolony Mass_{IFD = n}$ calculation, as we were not able to parse out nectar consumed by workers from nectar moved by workers to honey pots in the brood mass.  At the end of the experiment, we also measured the mass of the brood cluster (including all wax, remaining pupae, larvae, eggs, and nectar) alone after removing them from the microcolony boxes.
 
 To evaluate whether treatments affected end of experiment brood mass, drone production, drone fitness parameters (wet mass and IT distance), or worker mortality, we constructed linear mixed-effects models (LMMs) on the combined data set from all three experimental rounds using the `nlme` package [@nlme].  Each model took the general form of a given response variable as a function of treatment (full-factorial between total food abundance and temporal variability) and experimental round, with random intercept and slope estimates for each microcolony.  We estimated treatment means from LMMs [package: `lsmeans` @lsmeans] and used Tukey corrected pair-wise comparisons [package: `multcomp` @multcomp] to determine significance between treatments.  Additional contrasts and effect sizes were calculated using the `emmeans` package [@emmeans].
 
 We also constructed repeated measures ANOVAs using the `nlme` package to model colony mass, IFD average and cumulative drone production, IFD average and cumulative worker mortality, as well as IFD average and cumulative nectar and pollen consumption throughout the course of the 8-week experiments.  These models took the general form of a given response as a function of treatment, date, and round, with a random slope and intercept estimates for each microcolony.  To account for temporal autocorrelation, each analysis included a first order autocorrelation structure (function: `corAR1`) with a time covariate of measurement date and a grouping factor of colony identity.  We specified the autocorrelation correction using the lag = 1 value from an identical model fitted with no autocorrelation structure.
 
-Lastly, we calculated the growth rate of each microcolony for time periods relative food pulses (Before pulse 1, during pulse 1, after pulse 1 and before pulse 2, during pulse 2, and after pulse2).  This was accomplished by fitting a linear model of microcolony mass as a function of IFD (time) for each replicate microcolony.  We then extracted each slope coefficient (i.e., the growth rate for a given microcolony during an aforementioned time period) and constructed an ANOVA for each time period to determine differences in growth rates among treatments, within time periods.  The _P_-values associated with our initial slope estimates (mass as a function of IFD) were used to test whether growth was different than zero for a given time period.  We also constructed a repeated measures ANOVA for all slope estimates across all time periods to determine if there were statistical differences in temporal microcolony growth rates.
+Lastly, we calculated the growth rate of each microcolony for time periods relative food pulses (Before pulse 1, during pulse 1, after pulse 1 and before pulse 2, during pulse 2, and after pulse2).  This was accomplished by fitting a linear model of microcolony mass as a function of IFD (time) for each replicate microcolony [similar to analysis of @Crone2016, but with linear rather than exponential fitted models].  We then extracted each slope coefficient (i.e., the growth rate for a given microcolony during an aforementioned time period) and constructed an ANOVA for each time period to determine differences in growth rates among treatments, within time periods.  The _P_-values associated with our initial slope estimates (mass as a function of IFD) were used to test whether growth was different than zero for a given time period.  We also constructed a repeated measures ANOVA for all slope estimates across all time periods to determine if there were statistical differences in temporal microcolony growth rates.
 
-## Results
-#### Microcolony establishment
+# Results
+## Microcolony establishment
 Overall, microcolony establishment success was high across experimental rounds, with only 3 of 84  failing to initiate (96% success).  Two additional microcolonies contained a hyper-aggressive worker that killed all original and replacement nest-mates when establishing dominance.  Despite increased aggression, these single-worker colonies still produced males.  However, we removed them from analyses as the response of a single-worker microcolony to treatments was not comparable to standard, five-worker microcolonies.
 
-#### Microcolony growth (mass and food consumption)
-The magnitude, and pattern of microcolony growth depended on treatment throughout the course fo the experiment (Fig 2A,C).  End of experiment microcolony mass was driven by an interaction of both total food abundance, as well as temporal availability (Fig 2B,D: interaction effect, F~1,24~ = 7.77, _P_ = 0.01).  In the constant ration treatments (zones 1 and 2), end of experiment mass for zone 2 microcolonies was, on average, 92% greater than zone 1 microcolonies (Fig 2B, t~24~ = 5.33, _P_ < 0.001).  In the pulsed ration treatments (zones 3 and 4), end of experiment mass for zone 3 microcolonies was, on average, 27% more than zone 4 microcolonies, however the difference was not statistically clear (Fig 2D, t~24~ = 1.77 , _P_ = 0.311).  Average mass at the end of the experiment for the two 100% ad-lib treatments (zones 2 and 3) was 56% greater for zone 2 relative to zone 3 (t = 4.37, _P_ = 0.001).  There was a statistically clear effect of experimental round on end of experiment mass, with rounds 2 and 3 overall weighing less at the end of the experiment relative to round 1 (F~1,45~ = 35.88, _P_ < 0.001).  However, the pattern of end of experiment mass across treatments was consistent between rounds (F~1,45~ = 3.18, _P_ = 0.081).
+## Microcolony growth (mass and food consumption)
+The magnitude, and pattern of microcolony growth depended on treatment throughout the course fo the experiment (Fig 2A,C).  End of experiment microcolony mass was driven by an interaction of both total food abundance, as well as temporal availability (Fig 2B,D: interaction effect, F~1,24~ = 7.77, _P_ = 0.01).  In the constant ration treatments, end of experiment mass for full ration microcolonies was, on average, 92% greater than reduced ration microcolonies (Fig 2B, t~24~ = 5.33, _P_ < 0.001).  In the pulsed ration treatments, end of experiment mass for full ration microcolonies was, on average, 27% more than reduced ration microcolonies, however the difference was not statistically clear (Fig 2D, t~24~ = 1.77 , _P_ = 0.311).  Average mass at the end of the experiment for the two full ration treatments was 56% greater for constant ration microcolonies relative to pulsed ration microcolonies (t = 4.37, _P_ = 0.001).  There was a statistically clear effect of experimental round on end of experiment mass, with rounds 2 and 3 overall weighing less at the end of the experiment relative to round 1 (F~1,45~ = 35.88, _P_ < 0.001).  However, the pattern of end of experiment mass across treatments was consistent between rounds (F~1,45~ = 3.18, _P_ = 0.081).
 
-Microcolony growth rates over the course of the experiment varied by an interaction of both total food abundance and temporal availability (Fig 3: F~1,24~ = 12.13, _P_ = 0.002).  Overall, zone 2 average growth rate was the highest (zone 2 effect: t~24~ = 5.06, _P_ < 0.001), while zone 1 growth rates were only statistically above 0 during one time period (before pulse 1).  Growth rates were similar among pulsed-ration treatments.  Both pulsed-ration treatments experienced negative growth during periods following food pulses (after pulse 1/before pulse2, after pulse 2).  While mass gain was negligible during the first pulse, it was greatest during the second food pulse.
+Microcolony growth rates over the course of the experiment varied by an interaction of both total food abundance and temporal availability (Fig 3: F~1,24~ = 12.13, _P_ = 0.002).  Overall, full, constant ration microcolony average growth rates were the highest (t~24~ = 5.06, _P_ < 0.001), while reduced, constant ration microcolony growth rates were only statistically above 0 during one time period (before pulse 1).  Growth rates were similar among pulsed-ration treatments.  Both pulsed-ration treatments experienced negative growth during periods following food pulses (after pulse 1/before pulse2, after pulse 2).  While mass gain was negligible during the first pulse, it was greatest during the second food pulse.
 
-The effect of treatments on pollen consumption varied by experimental round (F~2,41~ = 5.72, _P_ = 0.006).  Within treatments, only total food abundance affected pollen consumption (F~1,24~ = 22.83, _P_ < 0.001), with constant 100% ration microcolonies consuming the most (Pollen: 14.80 +/- 0.813 grams).  Zone 3 microcolony pollen consumption was not significantly different than zones 1 and 4, despite a 40% difference in pollen availability over the course of the experiment.  Nectar consumption followed a similar pattern with consumption driven by total abundance (Supplemental Fig2: F~1,24~ = 60.98, _P_ < 0.001), however there was no clear interactive effect of experimental round (F~2,41~ = 2.98, _P_ < 0.068).
+The effect of treatments on pollen consumption varied by experimental round (F~2,41~ = 5.72, _P_ = 0.006).  Within treatments, only total food abundance affected pollen consumption (F~1,24~ = 22.83, _P_ < 0.001), with full, constant ration microcolonies consuming the most (Pollen: 14.80 +/- 0.813 grams).  Full, pulsed ration microcolony pollen consumption was not significantly different than reduced constant ration, or reduced, pulsed ration microcolonies, despite a 40% difference in pollen availability over the course of the experiment.  Nectar consumption followed a similar pattern with consumption driven by total abundance (Supplemental Fig2: F~1,24~ = 60.98, _P_ < 0.001), however there was no clear interactive effect of experimental round (F~2,41~ = 2.98, _P_ < 0.068).
 
-#### Microcolony demography (drone production and worker mortality)
-We found that total drone production increased with total food abundance (Fig 4: F~1,24~ = 12.98, _P_ = 0.001).  Zone 2 microcolonies produced numerically the most males, but there was not a clear difference between zones 2 and 3 (t~24~ = 1.59, _P_ = 0.398).  Both 60% ad-lib treatments produced on average 27% fewer drones, regardless of the temporal availability.  There was an effect of experimental round on drone production, with rounds 2 and 3 overall producing fewer drones than in round 1.  However, like with end of experiment mass, the pattern of drone production relative to treatments was similar across experimental rounds (F~1,45~ = 0.94, _P_ = 0.336).  Worker mortality was identical regardless of treatment, with on average 9 worker deaths per microcolony throughout the course of the 8 week experiment (average of 1.1 per week).
+## Microcolony demography (drone production and worker mortality)
+We found that total drone production increased with total food abundance (Fig 4: F~1,24~ = 12.98, _P_ = 0.001).  Full, constant ration microcolonies produced numerically the most males, but there was not a clear difference between full constant and full pulsed ration microcolonies (t~24~ = 1.59, _P_ = 0.398).  Both reduced ration treatments produced on average 27% fewer drones, regardless of the temporal availability.  There was an effect of experimental round on drone production, with rounds 2 and 3 overall producing fewer drones than in round 1.  However, like with end of experiment mass, the pattern of drone production relative to treatments was similar across experimental rounds (F~1,45~ = 0.94, _P_ = 0.336).  Worker mortality was identical regardless of treatment, with on average 9 worker deaths per microcolony throughout the course of the 8 week experiment (average of 1.1 per week).
 
-The efficiency of conversion from food to drone was roughly similar across treatments: to produce 1 drone required on average 0.70 +/- 0.08 grams of pollen and 10 +/- 2.54 grams of nectar.  While there were no clear statistical differences (treatment ration size effect: F~1,24~ = 0.192, _P_ = 0.664; treatment pulse effect: F~1,24~ = 0.03, _P_ = 0.853), zones 2 and 4 microcolonies were numerically more efficient in producing drones, requiring on average 18% less pollen to produce a single drone.  Zones 1 and 3 were the least efficient, especially with nectar, requiring 56% more to produce a single male relative to zones 2 and 4. However, the differences were not statistically clear.
+The efficiency of conversion from food to drone was roughly similar across treatments: to produce 1 drone required on average 0.70 +/- 0.08 grams of pollen and 10 +/- 2.54 grams of nectar.  While there were no clear statistical differences (treatment ration size effect: F~1,24~ = 0.192, _P_ = 0.664; treatment pulse effect: F~1,24~ = 0.03, _P_ = 0.853), full constant ration and reduced pulsed microcolonies were numerically more efficient in producing drones, requiring on average 18% less pollen to produce a single drone.  Reduced constant and full pulsed microcolonies were the least efficient, especially with nectar, requiring 56% more to produce a single male relative to full constant and reduced pulsed microcolonies. However, the differences were not statistically clear.
 
-#### Drone size
+## Drone size
 Drone size, as measured by average individual mass, was marginally greater in microcolonies provided full rations (F~1,24~ = 8.83, _P_ = 0.006).  However, post-hoc Tukey HSD tests did not show clear statistical differences among the treatment groups.  Intertegular distance did not vary across treatment groups, with drone body size being within tenths of a millimeter similar across treatments.
 
-## Discussion
-By manipulating the amount and temporal availability of pollen and nectar, we show that both temporal availability and total food amount affect microcolony growth and reproduction, respectively.  End of experiment microcolony mass was greatest when microcolonies were provided constant, full-rations.  This pattern matched our prediction that bumble bee microcolonies would grow the most when provided resources that mimic landscapes containing a high abundance of temporally consistent resources.  Indeed, microcolonies provided reduced, or temporally variable rations struggled to gain mass, with several exhibiting a net loss over the experiment.  However, drone production, arguably the most important metric of microcolony success, was only impacted by total food amount: colonies fed full rations produced more drones, regardless of temporal availability (i.e., Zone 2 vs. Zone 3).  The contrasting effects of total [e.g., @Rotheray2017] and temporal [e.g., @Schmid-Hempel1998a] food availability demonstrated in this study suggest that, while both factors are important to the overall success of _B. impatiens_ microcolonies, total food abundance is more important to reproductive output.
+# Discussion
+By manipulating the amount and temporal availability of pollen and nectar, we show that both temporal availability and total food amount affect microcolony growth and reproduction, respectively.  End of experiment microcolony mass was greatest when microcolonies were provided constant, full-rations.  This pattern matched our prediction that bumble bee microcolonies would grow the most when provided resources that mimic landscapes containing a high abundance of temporally consistent resources.  Indeed, microcolonies provided reduced, or temporally variable rations struggled to gain mass, with several exhibiting a net loss over the experiment.  However, drone production, arguably the most important metric of microcolony success, was only impacted by total food amount: colonies fed full rations produced more drones, regardless of temporal availability (i.e., full constant rations vs. full pulsed rations).  The contrasting effects of total [e.g., @Rotheray2017] and temporal [e.g., @Schmid-Hempel1998a] food availability demonstrated in this study suggest that, while both factors are important to the overall success of _B. impatiens_ microcolonies, total food abundance is more important to reproductive output.
 
-#### Microcolony mass gain
-Microcolonies provided constant, full-rations of food consistently gained mass over the course of the experiment. Regardless of their magnitude, food pulses were unable to rescue microcolony mass from dearth periods. In fact, microcolonies experiencing pulsed food availability exhibited dramatic swings in mass gain and loss coincident with pulse and dearth periods, respectively. In contrast, microcolonies experiencing constant rations were more consistent in their mass gain, with full-ration treatments on average gaining mass across all experimental periods, and reduced-ration treatments functionally remaining at zero.
+## Microcolony mass gain
+Microcolonies provided constant, full rations of food consistently gained mass over the course of the experiment. Regardless of their magnitude, food pulses were unable to rescue microcolony mass from dearth periods. In fact, microcolonies experiencing pulsed food availability exhibited dramatic swings in mass gain and loss coincident with pulse and dearth periods, respectively. In contrast, microcolonies experiencing constant rations were more consistent in their mass gain, with full ration treatments on average gaining mass across all experimental periods, and reduced ration treatments functionally neither gaining nor losing mass.
 
-Many studies examining bumble bee colony responses to environmental variables use mass as a proxy for reproductive output [@Goulson2002c; @Elliott2009; @Westphal2009a; @Williams2012b]. Indeed, mass in our experiments did tend to correlate with increased reproductive output (especially in the case of zone 2). In the absence of demographic data, the average lower final mass of zone 3 microcolonies might have suggested lower colony reproductive output. However, drone production was equivalent in pulsed, full-ration colonies - a signal that colony mass alone may not tell the complete story of bumble bee colony success. This finding corroborates other studies examining bumble bee reproductive success [@Williams2012b], and highlights the importance of additional supporting evidence to accompany trends in colony mass gain.
+Many studies examining bumble bee colony responses to environmental variables use mass as a proxy for reproductive output [@Goulson2002c; @Elliott2009; @Westphal2009a; @Hass2018a]. Indeed, mass in our experiments did tend to correlate with increased reproductive output (especially in the case of full constant ration microcolonies). In the absence of demographic data, the average lower final mass of full pulsed ration microcolonies might have suggested lower colony reproductive output. However, drone production was equivalent in pulsed, full-ration colonies - a signal that colony mass alone may not tell the complete story of bumble bee colony success. This finding corroborates other studies examining bumble bee reproductive success [@Williams2012b], and highlights the importance of additional supporting evidence to accompany trends in colony mass gain.
 
-For our experiment, microcolony mass was our best estimate of the total biomass of workers, brood, and nesting materials at any given timepoint. Because bumble bees store nectar within their brood cluster, our estimate of microcolony mass may more accurately capture nectar acquisition and depletion. If so, this metric is still important as stored nectar is critical for brood incubation and worker caloric intake [@Heinrich2004; @Goulson2008; @Rotheray2017]. Additionally, estimated average microcolony mass at the last experimental time point corresponds well to the average final brood mass measured after microcolony termination (R^2^ = 0.42), suggesting our calculation of microcolony mass is relatively accurate. Regardless of its true constituents, colony mass is best used in tandem with demographic or additional physical characteristics of the colony (e.g. estimated colony volume) in inferring colony “success”. Patterns of mass gain/loss are likely more appropriate to describe relative food intake and consumption, rather than reproductive output.  Despite this, colony mass is still an important metric given that, for many species, colony size is an important precursor to the reproductive switch point of the colony [@Goulson2008].
+For our experiment, microcolony mass was our best estimate of the total biomass of workers, brood, and nesting materials at any given timepoint. Because bumble bees store nectar within their brood cluster, our estimate of microcolony mass may more accurately capture nectar acquisition and depletion. If so, this metric is still important as stored nectar is critical for brood incubation and worker caloric intake [@Heinrich2004; @Goulson2008; @Rotheray2017].  Regardless of its true constituents, colony mass is best used in tandem with demographic or additional physical characteristics of the colony (e.g. estimated colony volume) in inferring colony “success”. Patterns of mass gain/loss are likely more appropriate to describe relative food intake and consumption, rather than reproductive output.  Despite this, colony mass is still an important metric given that, for many species, colony size is an important precursor to the reproductive switch point of the colony [@Goulson2008].
 
-#### Drone production
-A lack of an interaction between total food and temporal availability revealed a statistically clear, positive effect of increased food abundance on drone production independent of temporal availability.  This result supports our hypothesis regarding _B. impatiens_ suspected tolerance of highly variable food environments.  That is, over time for _B.impatiens_, when food is presented is less important to drone productivity than how much food is available.  In fact, populations of _B. impatiens_, among several other species, remain stable in agriculturally dominated landscapes despite dearth periods of food, while other species (namely _B. affinis_ and _B. terricola_) have declined [@Cameron2011]. Worker polymorphism within _B. impatiens_ could explain this tolerance, as smaller workers are more robust to periods of nectar starvation [@Couvillon2010]. In our study, however, worker body size was not controlled for as workers selected for a given microcolony were selected at random from natal colonies. Worker mortality was also consistent across microcolonies and treatments, suggesting we did not unintentionally select smaller, more tolerant workers for any given treatment.
+## Drone production
+A lack of an interaction between total food and temporal availability revealed a statistically clear, positive effect of increased food abundance on drone production independent of temporal availability.  This result supports our hypothesis regarding _B. impatiens_ suspected tolerance of highly variable food environments.  That is, over time for _B.impatiens_, when food is presented is less important to drone productivity than how much food is available.  In fact, populations of _B. impatiens_, among several other species, remain stable in agriculturally dominated landscapes despite dearth periods of food, while other species (namely _B. affinis_ and _B. terricola_) have declined [@Cameron2011]. Worker polymorphism within _B. impatiens_ could explain this tolerance, as smaller workers are more robust to periods of nectar starvation [@Couvillon2010]. In our study, however, worker body size was not controlled for as workers selected for a given microcolony were selected at random from natal colonies. Worker mortality was also consistent across microcolonies and treatments, suggesting we did not unintentionally select smaller, more tolerant workers for any given treatment.  Given that microcolony mass in pulsed-treatment microcolonies increased more during food pulses, it could also be that workers increased food storage in order to functionally "smooth" their resource landscape over time.  Such caching behavior, common among other insects and birds, would allow for the consistent production of drones despite dearth periods encompassing the pulses.
 
-Drone size was greatest under full-ration conditions.  This is an important difference, as drones are crucial for gene flow via dispersal.  Therefore, colonies producing relatively large-bodied drones (which correlates with flight range [@Greenleaf2007b]) may be more successful in contributing genetic information to subsequent generations.  We might also expect that the total food-driven difference in drone size that we observed in this study would translate to full-colonies producing workers rather than drones.  Larger workers are known to have colony-level benefits thanks to increased foraging range and efficiency [@Peat2005; @Rotheray2017].  Interestingly, the treatment that produced the largest drones, Zone 3, was one of the least efficient at converting pollen into drones (though the difference in pollen consumption efficiency was not statistically clear).  This suggests that, while _B. impatiens_ seems robust to temporal fluctuations in food abundance, it comes at a cost of efficiency of food use.
+Drone size was greatest under full-ration conditions.  This is an important difference, as drones are crucial for gene flow via dispersal.  Therefore, colonies producing relatively large-bodied drones [which correlates with increased flight range in worker bumble bees @Greenleaf2007b, and with increased sperm number in honey bees @Schluns2003] may be more successful in contributing genetic information to subsequent generations.  We might also expect that the total food-driven difference in drone size that we observed in this study would translate to full-colonies producing workers rather than drones.  Larger workers are known to have colony-level benefits thanks to increased foraging range and efficiency [@Peat2005; @Rotheray2017].  Interestingly, the treatment that produced the largest drones, full pulsed rations, was one of the least efficient at converting pollen into drones (though the difference in pollen consumption efficiency was not statistically clear).  This suggests that, while _B. impatiens_ seems robust to temporal fluctuations in food abundance, it comes at a cost of efficiency of food use.
 
-Environmental stressors like food abundance and temporal availability are likely to impact species differently [@Roulston2011; @Woodard2017].  While studies examining _B. impatiens_ reproductive response to variable food abundance are lacking, experiments have documented enhanced reproductive success in variable resource environments for the European ecological analog, _B. terrestris_ [@Schmid-Hempel1998a].  For example, [@Schmid-Hempel1998a] found that variable access to food led to an increased rate of food collection (mass gain) and increased production of workers.  We found similar patterns of increased food collection rate among _B. impatiens_ microcolonies fed variable rations, especially during the second pulse of our experiment. However, we did not find variable food abundance elevated drone production, suggesting that bumble bee responses to total food abundance and temporal availability are likely to be species-specific.  Given this, it is important for future studies to consider comparative, interspecies studies which could identify species most sensitive to temporal bottlenecks in food availability.  Such work would build on findings highlighting the importance of resource continuity for wild bee communities [@Martins2018], and could aid in the design of more friendly agricultural landscapes [@Landis2017].
+Environmental stressors like food abundance and temporal availability are likely to impact species differently [@Roulston2011; @Woodard2017].  While studies examining _B. impatiens_ reproductive response to variable food abundance are lacking, experiments have documented enhanced reproductive success in variable resource environments for the European ecological analog, _B. terrestris_ [@Schmid-Hempel1998a].  For example, @Schmid-Hempel1998a found that variable access to food led to an increased rate of food collection (mass gain) and increased production of workers.  We found similar patterns of increased food collection rate among _B. impatiens_ microcolonies fed variable rations, especially during the second pulse of our experiment. However, we did not find variable food abundance elevated drone production relative to constant ration microcolonies.  Despite this, the ability for the microcolonies provided pulsed-rations to consistently produce drones suggests a mechanism for dealing with dearth periods of food availability.  Increasing food collection and storage during pulses could allow _B. impatiens_ colonies to thrive in agricultural landscapes with highly variable floral resources.  This can be contrasted to other bumble bee species that may not engage in such foraging behaviors, or that have a more limited diet breadth [@Wood2019], potentially explaining the loss of these species (e.g., _B. affinis_ and _B. terricola_) from landscapes dominated by agriculture.  Given this, it is important for future studies to consider comparative, interspecies studies which could identify species most sensitive to temporal bottlenecks in food availability.  Such work would build on findings highlighting the importance of resource continuity for wild bee communities [@Martins2018], and could aid in the design of agricultural landscapes that support ecosystem service providers such as bumble bees [@Landis2017].
 
-#### Conclusions
+## Conclusions
 Disentangling the contribution of environmental stressors to bumble bee decline is imperative if we are to be successful in stemming further declines.  In this study, we showed that temporal and total pollen and nectar availability interact to impact bumble bee microcolony growth, with microcolonies provided more, temporally consistent food growing the most.  We also showed that reproductive output was driven by total, and not temporal pollen and nectar availability: microcolonies provided full rations of pollen and nectar produced the most drones.  While we examined laboratory microcolonies, the responses observed should be indicative of a standard, queen-right colony [@Tasei2008; @Dance2017].  If anything, free-foraging, queen-right colonies are likely to see exacerbated responses to similar treatments, given that foraging is the most energetically expensive and risky activity for bumble bees.  Even though temporal availability did not impact the reproductive output of _B. impatiens_ in this study, other species of bumble bee need to be examined for their ability to cope with boom-bust cycles of food availability.  The implications of this work to managing landscapes is clear: at the least, an increase in total floral abundance (i.e., pollen and nectar) would likely have benefits to bumble bee colony reproduction.  However, increasing both total floral abundance as well as temporal continuity would benefit species tolerant of dearth periods, as well as those sensitive to nutritional stress.  Such efforts are essential to limit further loss of essential ecosystem service providers like bumble bees.
 
 \newpage
-![**Figure 1:** Conceptual depiction of varation in total resource amount as well as temporal availability.  Total resource abundance increaseses along the x-axis, while temporal variance increases on the y-axis.  The intersecting regions are represented as "Zones" of varying food abundance and temporal presentation.  We designed treatments based on these intersections, with diagrams of food presentation shown in the inset graphs. The area in yellow represents the amount of food presented to bumble bee microcolonies.](./fig1_conceptual.png) 
+![**Figure 1:** Conceptual depiction of variation in total resource amount as well as temporal availability.  Total resource abundance increases along the x-axis, while temporal variance increases on the y-axis.  We designed treatments based on the intersecting regions of total food abundance and temporal availability, with diagrams of food presentation shown in the inset graphs. The area in yellow represents the amount of food presented to bumble bee microcolonies, with both pollen and nectar following the same pattern.](./fig1_conceptual.png)
 
 \clearpage
 
 \newpage
-![**Figure 2:** (a) Least square mean estimated mass throughout the experiment and (b) Least square mean terminal brood mass.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable).  Error bars represent 95% confidence intervals.  Difference of 1 interval feeding day is equal to 3 Julian days](./fig2_mc_mass.png)
+![**Figure 2:** (a) Least square mean estimated mass throughout the experiment and (b) Least square mean terminal brood mass.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable).  Error bars represent 95% confidence intervals.  Difference of 1 interval feeding day is equal to 3 Julian days.](./fig2_mc_mass.png)
 
 \clearpage
 
 \newpage
-![**Figure 3:** (a) Least square mean estimated growth rate by time periods relative to pulses and (b) Least square mean growth rates by treatment.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable) _within periods_, while asterisks represent growth estimates significantly different than 0.  Error bars represent 95% confidence intervals.  Difference of 1 interval feeding day is equal to 3 Julian days.](./fig3_mc_growth.png)
+![**Figure 3:** (a) Least square mean estimated growth rate by time periods relative to pulses and (b) Least square mean growth rates by treatment.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable) _within periods_ (x-axis), while asterisks represent growth estimates significantly different than 0.  Error bars represent 95% confidence intervals.  Difference of 1 interval feeding day is equal to 3 Julian days.](./fig3_mc_growth.png)
 
 \clearpage
 
@@ -163,436 +163,436 @@ Disentangling the contribution of environmental stressors to bumble bee decline 
 \clearpage
 
 \newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 1: Mixed model parameter estimates for model with end of experiment microcolony mass as the response variable including 95\% confidence intervals.} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Colony Mass} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & 5.94^{***}$ $(5.04$, $6.85) \\ 
-  trt\_pulse1 & 1.59^{**}$ $(0.69$, $2.49) \\ 
-  trt\_total1 & 1.21^{*}$ $(0.30$, $2.11) \\ 
-  rep & -1.26^{***}$ $(-1.67$, $-0.85) \\ 
-  trt\_pulse1:trt\_total1 & 1.18^{*}$ $(0.28$, $2.08) \\ 
-  trt\_pulse1:rep & -0.54^{*}$ $(-0.95$, $-0.13) \\ 
-  trt\_total1:rep & -0.20$ $(-0.61$, $0.21) \\ 
-  trt\_pulse1:trt\_total1:rep & -0.38$ $(-0.79$, $0.03) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{80} \\ 
-Log Likelihood & \multicolumn{1}{c}{-147.64} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{315.28} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{338.05} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
-\clearpage
-
-
-\newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 2: Mixed model parameter estimates for model with rate of mass gain as the response variable including 95\% confidence intervals.} 
-  \label{suptab2} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Rate of Mass Gain} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & 0.21^{***}$ $(0.10$, $0.32) \\ 
-  trt\_pulse1 & 0.07$ $(-0.04$, $0.18) \\ 
-  trt\_total1 & 0.13^{*}$ $(0.02$, $0.24) \\ 
-  pulse\_cat1 & -0.67^{***}$ $(-0.89$, $-0.45) \\ 
-  pulse\_cat2 & -0.40^{***}$ $(-0.62$, $-0.18) \\ 
-  pulse\_cat3 & -0.23^{*}$ $(-0.45$, $-0.01) \\ 
-  pulse\_cat4 & -0.14$ $(-0.36$, $0.08) \\ 
-  trt\_pulse1:trt\_total1 & 0.20^{**}$ $(0.09$, $0.31) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{140} \\ 
-Log Likelihood & \multicolumn{1}{c}{-150.53} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{321.06} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{349.89} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
-\clearpage
-
-
-\newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 3: Mixed model parameter estimates for repeated measures model with mass as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Mass Gain (Temporal trends)} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & -793.66^{***}$ $(-982.99$, $-604.33) \\ 
-  trt\_total1 & 1.15^{***}$ $(0.94$, $1.36) \\ 
-  trt\_pulse1 & 0.13$ $(-0.08$, $0.34) \\ 
-  rep1 & 4.88^{***}$ $(3.66$, $6.09) \\ 
-  rep2 & 0.04$ $(-0.33$, $0.41) \\ 
-  date & 0.04^{***}$ $(0.03$, $0.06) \\ 
-  trt\_total1:trt\_pulse1 & 0.19$ $(-0.02$, $0.40) \\ 
-  trt\_total1:rep1 & 0.21$ $(-0.09$, $0.51) \\ 
-  trt\_total1:rep2 & -0.07$ $(-0.37$, $0.23) \\ 
-  trt\_pulse1:rep1 & 0.44^{**}$ $(0.14$, $0.74) \\ 
-  trt\_pulse1:rep2 & -0.27$ $(-0.57$, $0.03) \\ 
-  trt\_total1:trt\_pulse1:rep1 & 0.35^{*}$ $(0.06$, $0.65) \\ 
-  trt\_total1:trt\_pulse1:rep2 & -0.25$ $(-0.55$, $0.05) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{1,315} \\ 
-Log Likelihood & \multicolumn{1}{c}{-2,589.40} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{5,228.81} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{5,358.10} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
-\clearpage
-
-
-\newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 4: Mixed model parameter estimates for model with cumulative drone production as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Drone Production} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & 29.02^{***}$ $(24.92$, $33.12) \\ 
-  trt\_pulse1 & 2.62$ $(-1.48$, $6.72) \\ 
-  trt\_total1 & 4.53^{*}$ $(0.43$, $8.63) \\ 
-  rep & -7.43^{***}$ $(-9.29$, $-5.57) \\ 
-  trt\_pulse1:trt\_total1 & 2.70$ $(-1.40$, $6.80) \\ 
-  trt\_pulse1:rep & -0.85$ $(-2.70$, $1.01) \\ 
-  trt\_total1:rep & -1.05$ $(-2.91$, $0.80) \\ 
-  trt\_pulse1:trt\_total1:rep & -0.92$ $(-2.78$, $0.94) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{77} \\ 
-Log Likelihood & \multicolumn{1}{c}{-245.15} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{510.30} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{532.64} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
+\begin{table}[] \centering
+\caption{}{Supplementary Table 1: Mixed model parameter estimates for model with end of experiment microcolony mass as the response variable including 95\% confidence intervals.}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Colony Mass} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & 5.94^{***}$ $(5.04$, $6.85) \\
+  trt\_pulse1 & 1.59^{**}$ $(0.69$, $2.49) \\
+  trt\_total1 & 1.21^{*}$ $(0.30$, $2.11) \\
+  rep & -1.26^{***}$ $(-1.67$, $-0.85) \\
+  trt\_pulse1:trt\_total1 & 1.18^{*}$ $(0.28$, $2.08) \\
+  trt\_pulse1:rep & -0.54^{*}$ $(-0.95$, $-0.13) \\
+  trt\_total1:rep & -0.20$ $(-0.61$, $0.21) \\
+  trt\_pulse1:trt\_total1:rep & -0.38$ $(-0.79$, $0.03) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{80} \\
+Log Likelihood & \multicolumn{1}{c}{-147.64} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{315.28} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{338.05} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
 \end{table}
 \clearpage
 
 
 \newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 5: Mixed model parameter estimates for model with time to first drone as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Time to First Drone} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & 17.24^{***}$ $(16.12$, $18.35) \\ 
-  trt\_total1 & -0.50$ $(-1.62$, $0.61) \\ 
-  trt\_pulse1 & 0.82$ $(-0.29$, $1.94) \\ 
-  rep1 & -4.18^{***}$ $(-5.47$, $-2.88) \\ 
-  rep2 & -2.23^{**}$ $(-3.47$, $-0.98) \\ 
-  trt\_total1:trt\_pulse1 & -0.95$ $(-2.07$, $0.17) \\ 
-  trt\_total1:rep1 & -0.63$ $(-1.92$, $0.67) \\ 
-  trt\_total1:rep2 & 0.06$ $(-1.18$, $1.31) \\ 
-  trt\_pulse1:rep1 & 0.19$ $(-1.11$, $1.48) \\ 
-  trt\_pulse1:rep2 & -0.55$ $(-1.80$, $0.70) \\ 
-  trt\_total1:trt\_pulse1:rep1 & 1.15$ $(-0.15$, $2.45) \\ 
-  trt\_total1:trt\_pulse1:rep2 & 0.24$ $(-1.01$, $1.49) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{75} \\ 
-Log Likelihood & \multicolumn{1}{c}{-204.21} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{436.42} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{466.42} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
+\begin{table}[] \centering
+\caption{}{Supplementary Table 2: Mixed model parameter estimates for model with rate of mass gain as the response variable including 95\% confidence intervals.}
+  \label{suptab2}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Rate of Mass Gain} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & 0.21^{***}$ $(0.10$, $0.32) \\
+  trt\_pulse1 & 0.07$ $(-0.04$, $0.18) \\
+  trt\_total1 & 0.13^{*}$ $(0.02$, $0.24) \\
+  pulse\_cat1 & -0.67^{***}$ $(-0.89$, $-0.45) \\
+  pulse\_cat2 & -0.40^{***}$ $(-0.62$, $-0.18) \\
+  pulse\_cat3 & -0.23^{*}$ $(-0.45$, $-0.01) \\
+  pulse\_cat4 & -0.14$ $(-0.36$, $0.08) \\
+  trt\_pulse1:trt\_total1 & 0.20^{**}$ $(0.09$, $0.31) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{140} \\
+Log Likelihood & \multicolumn{1}{c}{-150.53} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{321.06} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{349.89} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
 \clearpage
 
 
 \newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 6: Linear model parameter estimates for model with drone mass as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Drone Mass} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{OLS}} \\ 
-\hline \\[-1.8ex] 
- Constant & 0.13^{***}$ $(0.12$, $0.14) \\ 
-  trt\_total1 & 0.01$ $(-0.001$, $0.02) \\ 
-  trt\_pulse1 & -0.01$ $(-0.02$, $0.003) \\ 
-  rep & -0.01^{***}$ $(-0.02$, $-0.005) \\ 
-  trt\_total1:trt\_pulse1 & 0.0003$ $(-0.01$, $0.01) \\ 
-  trt\_total1:rep & -0.001$ $(-0.01$, $0.005) \\ 
-  trt\_pulse1:rep & 0.004$ $(-0.002$, $0.01) \\ 
-  trt\_total1:trt\_pulse1:rep & -0.0001$ $(-0.01$, $0.01) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{401} \\ 
-R$^{2}$ & \multicolumn{1}{c}{0.06} \\ 
-Adjusted R$^{2}$ & \multicolumn{1}{c}{0.05} \\ 
-Residual Std. Error & \multicolumn{1}{c}{0.05 (df = 393)} \\ 
-F Statistic & \multicolumn{1}{c}{3.87$^{***}$ (df = 7; 393)} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
+\begin{table}[] \centering
+\caption{}{Supplementary Table 3: Mixed model parameter estimates for repeated measures model with mass as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Mass Gain (Temporal trends)} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & -793.66^{***}$ $(-982.99$, $-604.33) \\
+  trt\_total1 & 1.15^{***}$ $(0.94$, $1.36) \\
+  trt\_pulse1 & 0.13$ $(-0.08$, $0.34) \\
+  rep1 & 4.88^{***}$ $(3.66$, $6.09) \\
+  rep2 & 0.04$ $(-0.33$, $0.41) \\
+  date & 0.04^{***}$ $(0.03$, $0.06) \\
+  trt\_total1:trt\_pulse1 & 0.19$ $(-0.02$, $0.40) \\
+  trt\_total1:rep1 & 0.21$ $(-0.09$, $0.51) \\
+  trt\_total1:rep2 & -0.07$ $(-0.37$, $0.23) \\
+  trt\_pulse1:rep1 & 0.44^{**}$ $(0.14$, $0.74) \\
+  trt\_pulse1:rep2 & -0.27$ $(-0.57$, $0.03) \\
+  trt\_total1:trt\_pulse1:rep1 & 0.35^{*}$ $(0.06$, $0.65) \\
+  trt\_total1:trt\_pulse1:rep2 & -0.25$ $(-0.55$, $0.05) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{1,315} \\
+Log Likelihood & \multicolumn{1}{c}{-2,589.40} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{5,228.81} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{5,358.10} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
 \clearpage
 
 
 \newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 7: Linear model parameter estimates for model with drone intertegular distance as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Drone Intertegular Distance} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{OLS}} \\ 
-\hline \\[-1.8ex] 
- Constant & 2.89^{***}$ $(2.84$, $2.94) \\ 
-  trt\_total1 & -0.01$ $(-0.06$, $0.04) \\ 
-  trt\_pulse1 & 0.001$ $(-0.05$, $0.05) \\ 
-  rep & 0.06^{***}$ $(0.03$, $0.08) \\ 
-  trt\_total1:trt\_pulse1 & -0.03$ $(-0.08$, $0.02) \\ 
-  trt\_total1:rep & 0.02$ $(-0.01$, $0.04) \\ 
-  trt\_pulse1:rep & 0.01$ $(-0.01$, $0.04) \\ 
-  trt\_total1:trt\_pulse1:rep & 0.02$ $(-0.01$, $0.04) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{1,163} \\ 
-R$^{2}$ & \multicolumn{1}{c}{0.03} \\ 
-Adjusted R$^{2}$ & \multicolumn{1}{c}{0.02} \\ 
-Residual Std. Error & \multicolumn{1}{c}{0.35 (df = 1155)} \\ 
-F Statistic & \multicolumn{1}{c}{4.85$^{***}$ (df = 7; 1155)} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
+\begin{table}[] \centering
+\caption{}{Supplementary Table 4: Mixed model parameter estimates for model with cumulative drone production as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Drone Production} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & 29.02^{***}$ $(24.92$, $33.12) \\
+  trt\_pulse1 & 2.62$ $(-1.48$, $6.72) \\
+  trt\_total1 & 4.53^{*}$ $(0.43$, $8.63) \\
+  rep & -7.43^{***}$ $(-9.29$, $-5.57) \\
+  trt\_pulse1:trt\_total1 & 2.70$ $(-1.40$, $6.80) \\
+  trt\_pulse1:rep & -0.85$ $(-2.70$, $1.01) \\
+  trt\_total1:rep & -1.05$ $(-2.91$, $0.80) \\
+  trt\_pulse1:trt\_total1:rep & -0.92$ $(-2.78$, $0.94) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{77} \\
+Log Likelihood & \multicolumn{1}{c}{-245.15} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{510.30} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{532.64} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
 \clearpage
 
 
 \newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 8: Mixed model parameter estimates for model with total pollen consumption as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Total Pollen Consumption} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & 8.92^{***}$ $(8.25$, $9.60) \\ 
-  trt\_pulse1 & 0.45$ $(-0.22$, $1.13) \\ 
-  trt\_total1 & 1.46^{***}$ $(0.78$, $2.13) \\ 
-  rep1 & 3.77^{***}$ $(2.93$, $4.62) \\ 
-  rep2 & -1.75^{***}$ $(-2.55$, $-0.95) \\ 
-  trt\_pulse1:trt\_total1 & 0.53$ $(-0.14$, $1.21) \\ 
-  trt\_pulse1:rep1 & 0.43$ $(-0.41$, $1.27) \\ 
-  trt\_pulse1:rep2 & -0.49$ $(-1.29$, $0.31) \\ 
-  trt\_total1:rep1 & 0.98^{*}$ $(0.14$, $1.82) \\ 
-  trt\_total1:rep2 & -0.83^{*}$ $(-1.63$, $-0.03) \\ 
-  trt\_pulse1:trt\_total1:rep1 & 0.86$ $(0.02$, $1.71) \\ 
-  trt\_pulse1:trt\_total1:rep2 & -0.70$ $(-1.50$, $0.10) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{79} \\ 
-Log Likelihood & \multicolumn{1}{c}{-186.53} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{401.05} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{431.92} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
+\begin{table}[] \centering
+\caption{}{Supplementary Table 5: Mixed model parameter estimates for model with time to first drone as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Time to First Drone} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & 17.24^{***}$ $(16.12$, $18.35) \\
+  trt\_total1 & -0.50$ $(-1.62$, $0.61) \\
+  trt\_pulse1 & 0.82$ $(-0.29$, $1.94) \\
+  rep1 & -4.18^{***}$ $(-5.47$, $-2.88) \\
+  rep2 & -2.23^{**}$ $(-3.47$, $-0.98) \\
+  trt\_total1:trt\_pulse1 & -0.95$ $(-2.07$, $0.17) \\
+  trt\_total1:rep1 & -0.63$ $(-1.92$, $0.67) \\
+  trt\_total1:rep2 & 0.06$ $(-1.18$, $1.31) \\
+  trt\_pulse1:rep1 & 0.19$ $(-1.11$, $1.48) \\
+  trt\_pulse1:rep2 & -0.55$ $(-1.80$, $0.70) \\
+  trt\_total1:trt\_pulse1:rep1 & 1.15$ $(-0.15$, $2.45) \\
+  trt\_total1:trt\_pulse1:rep2 & 0.24$ $(-1.01$, $1.49) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{75} \\
+Log Likelihood & \multicolumn{1}{c}{-204.21} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{436.42} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{466.42} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
 \clearpage
 
 
 \newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 9: Mixed model parameter estimates for model with total nectar consumption as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Total Nectar Consumption} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & 104.04^{***}$ $(100.47$, $107.61) \\ 
-  trt\_pulse1 & 1.79$ $(-1.78$, $5.36) \\ 
-  trt\_total1 & 11.58^{***}$ $(8.01$, $15.15) \\ 
-  rep1 & 15.96^{***}$ $(11.52$, $20.41) \\ 
-  rep2 & -6.47^{**}$ $(-10.70$, $-2.25) \\ 
-  trt\_pulse1:trt\_total1 & 1.56$ $(-2.01$, $5.13) \\ 
-  trt\_pulse1:rep1 & 2.42$ $(-2.03$, $6.86) \\ 
-  trt\_pulse1:rep2 & -1.51$ $(-5.73$, $2.72) \\ 
-  trt\_total1:rep1 & 2.60$ $(-1.85$, $7.05) \\ 
-  trt\_total1:rep2 & -4.45^{*}$ $(-8.67$, $-0.22) \\ 
-  trt\_pulse1:trt\_total1:rep1 & 2.96$ $(-1.49$, $7.40) \\ 
-  trt\_pulse1:trt\_total1:rep2 & 0.26$ $(-3.97$, $4.48) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{79} \\ 
-Log Likelihood & \multicolumn{1}{c}{-298.10} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{624.20} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{655.07} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
+\begin{table}[] \centering
+\caption{}{Supplementary Table 6: Linear model parameter estimates for model with drone mass as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Drone Mass} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{OLS}} \\
+\hline \\[-1.8ex]
+ Constant & 0.13^{***}$ $(0.12$, $0.14) \\
+  trt\_total1 & 0.01$ $(-0.001$, $0.02) \\
+  trt\_pulse1 & -0.01$ $(-0.02$, $0.003) \\
+  rep & -0.01^{***}$ $(-0.02$, $-0.005) \\
+  trt\_total1:trt\_pulse1 & 0.0003$ $(-0.01$, $0.01) \\
+  trt\_total1:rep & -0.001$ $(-0.01$, $0.005) \\
+  trt\_pulse1:rep & 0.004$ $(-0.002$, $0.01) \\
+  trt\_total1:trt\_pulse1:rep & -0.0001$ $(-0.01$, $0.01) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{401} \\
+R$^{2}$ & \multicolumn{1}{c}{0.06} \\
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.05} \\
+Residual Std. Error & \multicolumn{1}{c}{0.05 (df = 393)} \\
+F Statistic & \multicolumn{1}{c}{3.87$^{***}$ (df = 7; 393)} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
 \clearpage
 
 
 \newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 10: Mixed model parameter estimates for model with total worker mortality as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Total Worker Mortality} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & 8.94^{***}$ $(7.73$, $10.14) \\ 
-  trt\_pulse1 & -0.12$ $(-1.33$, $1.09) \\ 
-  trt\_total1 & -0.12$ $(-1.33$, $1.08) \\ 
-  rep1 & -1.17$ $(-2.92$, $0.59) \\ 
-  rep2 & -3.15^{***}$ $(-4.82$, $-1.48) \\ 
-  trt\_pulse1:trt\_total1 & 0.41$ $(-0.80$, $1.61) \\ 
-  trt\_pulse1:rep1 & -1.28$ $(-3.03$, $0.47) \\ 
-  trt\_pulse1:rep2 & 0.83$ $(-0.84$, $2.51) \\ 
-  trt\_total1:rep1 & -0.004$ $(-1.76$, $1.75) \\ 
-  trt\_total1:rep2 & 0.41$ $(-1.26$, $2.08) \\ 
-  trt\_pulse1:trt\_total1:rep1 & 1.49$ $(-0.26$, $3.24) \\ 
-  trt\_pulse1:trt\_total1:rep2 & -1.19$ $(-2.87$, $0.48) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{79} \\ 
-Log Likelihood & \multicolumn{1}{c}{-232.32} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{492.64} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{523.50} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
+\begin{table}[] \centering
+\caption{}{Supplementary Table 7: Linear model parameter estimates for model with drone intertegular distance as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Drone Intertegular Distance} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{OLS}} \\
+\hline \\[-1.8ex]
+ Constant & 2.89^{***}$ $(2.84$, $2.94) \\
+  trt\_total1 & -0.01$ $(-0.06$, $0.04) \\
+  trt\_pulse1 & 0.001$ $(-0.05$, $0.05) \\
+  rep & 0.06^{***}$ $(0.03$, $0.08) \\
+  trt\_total1:trt\_pulse1 & -0.03$ $(-0.08$, $0.02) \\
+  trt\_total1:rep & 0.02$ $(-0.01$, $0.04) \\
+  trt\_pulse1:rep & 0.01$ $(-0.01$, $0.04) \\
+  trt\_total1:trt\_pulse1:rep & 0.02$ $(-0.01$, $0.04) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{1,163} \\
+R$^{2}$ & \multicolumn{1}{c}{0.03} \\
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.02} \\
+Residual Std. Error & \multicolumn{1}{c}{0.35 (df = 1155)} \\
+F Statistic & \multicolumn{1}{c}{4.85$^{***}$ (df = 7; 1155)} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
 \clearpage
 
 
 \newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 11: Mixed model parameter estimates for model with pollen per drone produced as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Pollen per Drone} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & 0.70^{***}$ $(0.64$, $0.77) \\ 
-  trt\_pulse1 & 0.01$ $(-0.06$, $0.08) \\ 
-  trt\_total1 & -0.01$ $(-0.08$, $0.06) \\ 
-  rep1 & -0.16^{**}$ $(-0.26$, $-0.06) \\ 
-  rep2 & -0.002$ $(-0.10$, $0.09) \\ 
-  trt\_pulse1:trt\_total1 & -0.07$ $(-0.14$, $0.002) \\ 
-  trt\_pulse1:rep1 & -0.03$ $(-0.13$, $0.07) \\ 
-  trt\_pulse1:rep2 & 0.05$ $(-0.05$, $0.14) \\ 
-  trt\_total1:rep1 & 0.01$ $(-0.08$, $0.11) \\ 
-  trt\_total1:rep2 & -0.06$ $(-0.15$, $0.04) \\ 
-  trt\_pulse1:trt\_total1:rep1 & 0.09$ $(-0.004$, $0.19) \\ 
-  trt\_pulse1:trt\_total1:rep2 & -0.04$ $(-0.13$, $0.06) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{73} \\ 
-Log Likelihood & \multicolumn{1}{c}{-36.08} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{100.15} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{129.70} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
-\end{table} 
+\begin{table}[] \centering
+\caption{}{Supplementary Table 8: Mixed model parameter estimates for model with total pollen consumption as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Total Pollen Consumption} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & 8.92^{***}$ $(8.25$, $9.60) \\
+  trt\_pulse1 & 0.45$ $(-0.22$, $1.13) \\
+  trt\_total1 & 1.46^{***}$ $(0.78$, $2.13) \\
+  rep1 & 3.77^{***}$ $(2.93$, $4.62) \\
+  rep2 & -1.75^{***}$ $(-2.55$, $-0.95) \\
+  trt\_pulse1:trt\_total1 & 0.53$ $(-0.14$, $1.21) \\
+  trt\_pulse1:rep1 & 0.43$ $(-0.41$, $1.27) \\
+  trt\_pulse1:rep2 & -0.49$ $(-1.29$, $0.31) \\
+  trt\_total1:rep1 & 0.98^{*}$ $(0.14$, $1.82) \\
+  trt\_total1:rep2 & -0.83^{*}$ $(-1.63$, $-0.03) \\
+  trt\_pulse1:trt\_total1:rep1 & 0.86$ $(0.02$, $1.71) \\
+  trt\_pulse1:trt\_total1:rep2 & -0.70$ $(-1.50$, $0.10) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{79} \\
+Log Likelihood & \multicolumn{1}{c}{-186.53} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{401.05} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{431.92} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
+\clearpage
+
+
+\newpage
+\begin{table}[] \centering
+\caption{}{Supplementary Table 9: Mixed model parameter estimates for model with total nectar consumption as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Total Nectar Consumption} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & 104.04^{***}$ $(100.47$, $107.61) \\
+  trt\_pulse1 & 1.79$ $(-1.78$, $5.36) \\
+  trt\_total1 & 11.58^{***}$ $(8.01$, $15.15) \\
+  rep1 & 15.96^{***}$ $(11.52$, $20.41) \\
+  rep2 & -6.47^{**}$ $(-10.70$, $-2.25) \\
+  trt\_pulse1:trt\_total1 & 1.56$ $(-2.01$, $5.13) \\
+  trt\_pulse1:rep1 & 2.42$ $(-2.03$, $6.86) \\
+  trt\_pulse1:rep2 & -1.51$ $(-5.73$, $2.72) \\
+  trt\_total1:rep1 & 2.60$ $(-1.85$, $7.05) \\
+  trt\_total1:rep2 & -4.45^{*}$ $(-8.67$, $-0.22) \\
+  trt\_pulse1:trt\_total1:rep1 & 2.96$ $(-1.49$, $7.40) \\
+  trt\_pulse1:trt\_total1:rep2 & 0.26$ $(-3.97$, $4.48) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{79} \\
+Log Likelihood & \multicolumn{1}{c}{-298.10} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{624.20} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{655.07} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
+\clearpage
+
+
+\newpage
+\begin{table}[] \centering
+\caption{}{Supplementary Table 10: Mixed model parameter estimates for model with total worker mortality as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Total Worker Mortality} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & 8.94^{***}$ $(7.73$, $10.14) \\
+  trt\_pulse1 & -0.12$ $(-1.33$, $1.09) \\
+  trt\_total1 & -0.12$ $(-1.33$, $1.08) \\
+  rep1 & -1.17$ $(-2.92$, $0.59) \\
+  rep2 & -3.15^{***}$ $(-4.82$, $-1.48) \\
+  trt\_pulse1:trt\_total1 & 0.41$ $(-0.80$, $1.61) \\
+  trt\_pulse1:rep1 & -1.28$ $(-3.03$, $0.47) \\
+  trt\_pulse1:rep2 & 0.83$ $(-0.84$, $2.51) \\
+  trt\_total1:rep1 & -0.004$ $(-1.76$, $1.75) \\
+  trt\_total1:rep2 & 0.41$ $(-1.26$, $2.08) \\
+  trt\_pulse1:trt\_total1:rep1 & 1.49$ $(-0.26$, $3.24) \\
+  trt\_pulse1:trt\_total1:rep2 & -1.19$ $(-2.87$, $0.48) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{79} \\
+Log Likelihood & \multicolumn{1}{c}{-232.32} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{492.64} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{523.50} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
+\clearpage
+
+
+\newpage
+\begin{table}[] \centering
+\caption{}{Supplementary Table 11: Mixed model parameter estimates for model with pollen per drone produced as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Pollen per Drone} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & 0.70^{***}$ $(0.64$, $0.77) \\
+  trt\_pulse1 & 0.01$ $(-0.06$, $0.08) \\
+  trt\_total1 & -0.01$ $(-0.08$, $0.06) \\
+  rep1 & -0.16^{**}$ $(-0.26$, $-0.06) \\
+  rep2 & -0.002$ $(-0.10$, $0.09) \\
+  trt\_pulse1:trt\_total1 & -0.07$ $(-0.14$, $0.002) \\
+  trt\_pulse1:rep1 & -0.03$ $(-0.13$, $0.07) \\
+  trt\_pulse1:rep2 & 0.05$ $(-0.05$, $0.14) \\
+  trt\_total1:rep1 & 0.01$ $(-0.08$, $0.11) \\
+  trt\_total1:rep2 & -0.06$ $(-0.15$, $0.04) \\
+  trt\_pulse1:trt\_total1:rep1 & 0.09$ $(-0.004$, $0.19) \\
+  trt\_pulse1:trt\_total1:rep2 & -0.04$ $(-0.13$, $0.06) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{73} \\
+Log Likelihood & \multicolumn{1}{c}{-36.08} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{100.15} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{129.70} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
+\end{table}
 \clearpage
 
 \newpage
-\begin{table}[] \centering 
-\caption{}{Supplementary Table 12: Mixed model parameter estimates for model with nectar per drone produced as the response variable including 95\% confidence intervals.} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} } 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{1}{c}{\textit{Response Variable:}} \\ 
-\cline{2-2} 
-\\[-1.8ex] & \multicolumn{1}{c}{Nectar per Drone} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\ 
- & \multicolumn{1}{c}{\textit{mixed effects}} \\ 
-\hline \\[-1.8ex] 
- Constant & 9.89^{***}$ $(8.55$, $11.22) \\ 
-  trt\_pulse1 & -0.31$ $(-1.65$, $1.03) \\ 
-  trt\_total1 & 0.09$ $(-1.24$, $1.43) \\ 
-  rep1 & -4.20^{***}$ $(-6.12$, $-2.28) \\ 
-  rep2 & 1.52$ $(-0.33$, $3.38) \\ 
-  trt\_pulse1:trt\_total1 & -1.75^{*}$ $(-3.09$, $-0.41) \\ 
-  trt\_pulse1:rep1 & 0.06$ $(-1.86$, $1.98) \\ 
-  trt\_pulse1:rep2 & 0.63$ $(-1.23$, $2.48) \\ 
-  trt\_total1:rep1 & -0.44$ $(-2.36$, $1.47) \\ 
-  trt\_total1:rep2 & -0.32$ $(-2.17$, $1.54) \\ 
-  trt\_pulse1:trt\_total1:rep1 & 1.55$ $(-0.37$, $3.47) \\ 
-  trt\_pulse1:trt\_total1:rep2 & -0.20$ $(-2.06$, $1.65) \\ 
- \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{73} \\ 
-Log Likelihood & \multicolumn{1}{c}{-217.06} \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{462.12} \\ 
-Bayesian Inf. Crit. & \multicolumn{1}{c}{491.67} \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
-\end{tabular} 
+\begin{table}[] \centering
+\caption{}{Supplementary Table 12: Mixed model parameter estimates for model with nectar per drone produced as the response variable including 95\% confidence intervals.}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-2} }
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+ & \multicolumn{1}{c}{\textit{Response Variable:}} \\
+\cline{2-2}
+\\[-1.8ex] & \multicolumn{1}{c}{Nectar per Drone} \\
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{linear}} \\
+ & \multicolumn{1}{c}{\textit{mixed effects}} \\
+\hline \\[-1.8ex]
+ Constant & 9.89^{***}$ $(8.55$, $11.22) \\
+  trt\_pulse1 & -0.31$ $(-1.65$, $1.03) \\
+  trt\_total1 & 0.09$ $(-1.24$, $1.43) \\
+  rep1 & -4.20^{***}$ $(-6.12$, $-2.28) \\
+  rep2 & 1.52$ $(-0.33$, $3.38) \\
+  trt\_pulse1:trt\_total1 & -1.75^{*}$ $(-3.09$, $-0.41) \\
+  trt\_pulse1:rep1 & 0.06$ $(-1.86$, $1.98) \\
+  trt\_pulse1:rep2 & 0.63$ $(-1.23$, $2.48) \\
+  trt\_total1:rep1 & -0.44$ $(-2.36$, $1.47) \\
+  trt\_total1:rep2 & -0.32$ $(-2.17$, $1.54) \\
+  trt\_pulse1:trt\_total1:rep1 & 1.55$ $(-0.37$, $3.47) \\
+  trt\_pulse1:trt\_total1:rep2 & -0.20$ $(-2.06$, $1.65) \\
+ \hline \\[-1.8ex]
+Observations & \multicolumn{1}{c}{73} \\
+Log Likelihood & \multicolumn{1}{c}{-217.06} \\
+Akaike Inf. Crit. & \multicolumn{1}{c}{462.12} \\
+Bayesian Inf. Crit. & \multicolumn{1}{c}{491.67} \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\
+\end{tabular}
 \end{table}
 \clearpage
 
