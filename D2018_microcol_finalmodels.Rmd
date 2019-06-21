@@ -574,6 +574,10 @@ drones.lmm <- lme(total_drones ~ trt_pulse * trt_total * rep,
                   random = ~ 1 | id,
                   data = mc.drone.all.df,
                   na.action = na.exclude)
+drones.lmer <- lmer(total_drones ~ trt_pulse * trt_total * rep + 
+                      (1 | id),
+                    data = mc.drone.all.df,
+                    na.action = na.exclude)
 drone.marginal <- lsmeans(drones.lmm, ~ trt_pulse * trt_total)
 drone.cld <- cld(drone.marginal,
                  alpha = 0.05,
@@ -743,6 +747,10 @@ dronemass.lmm <- lme(avg.individ.mass ~ trt_total * trt_pulse * rep,
                      random = ~ 1 | id,
                      data = mc.dronemass.all.df,
                      na.action = na.exclude)
+dronemass.lmer <- lmer(avg.individ.mass ~ trt_total * trt_pulse * rep + 
+                         (1 | id),
+                       data = mc.dronemass.all.df,
+                       na.action = na.exclude)
 dronemass.marginal <- lsmeans(dronemass.lmm, ~ trt_pulse * trt_total)
 dronemass.cld <- cld(dronemass.marginal,
                      alpha = 0.05,
@@ -763,6 +771,7 @@ dronemass.pairwise <- contrast(dronemass.marginal,
 summary(dronemass.lmm)
 anova(dronemass.lmm)
 Anova(dronemass.lmm, type = 2)
+Anova(dronemass.lmer, test.statistic = "F", type = 3)
 dronemass.cld
 dronemass.eff
 dronemass.pairwise
@@ -1728,13 +1737,13 @@ apropos("*.lmm")
 ## Wald Type III Chi Squared effect tests
 ### End Mass
 ```{r}
-Anova(endmass.lmm, type = 3)
+Anova(endmass.lmm, type = 3, test.statistic = "F")
 anova(endmass.lmm)
 ```
 
 ### Rate of Mass Gain
 ```{r}
-Anova(massrate.lmm, type = 3)
+Anova(massrate.lmm, type = 3, )
 anova(massrate.lmm)
 ```
 
