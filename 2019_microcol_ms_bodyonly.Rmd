@@ -1,12 +1,4 @@
 ---
-title: Saved by the pulse?  Separating the effects of total and temporal food abundance
-  on the development and performance of bumble bee microcolonies
-author:
-- Jeremy Hemberger
-- Agathe Frappa
-- Grant Witynski
-- Claudio Gratton
-date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
   pdf_document:
     fig_caption: yes
@@ -26,26 +18,8 @@ header-includes:
 - \usepackage{float}
 - \usepackage{afterpage}
 - \usepackage{siunitx}
-keywords: _Bombus impatiens_, colony growth, floral resources, temporal variability,
-  agroecosystems
 bibliography: ./library.bib
 spacing: double
-abstract: The loss of flower-rich habitat in agricultural landscapes is a key factor contributing
-  to bumble bee declines across Europe and North America.  Yet, agricultural intensification
-  has not only altered flower abundance in the landscape, but also affected when flowers
-  are available during the season (e.g., mass-flowering crops).  While we know that
-  both total pollen and nectar as well as temporal availability can impact bumble
-  bee colony success (growth and reproductive output), we have yet to understand how
-  these two factors combined might manifest.  We designed an experiment to decouple
-  the effects of total food abundance and its temporal availability on bumble bee
-  microcolony development by exposing them to either constant or pulsed food availability
-  at two ration levels, 100% and 60% _ad-libitum_ food abundance.  Microcolonies provided
-  constant, full-rations of food grew the most, while those fed variable, but full-rations
-  gained less mass over the course of the experiment.  Regardless of the temporal presentation of food, microcolonies fed 60% _ad-libitum_ rations gained little mass over the experiment.  Reproductive output
-  was greatest in microcolonies fed full-rations, regardless of the temporal availability
-  of food, while those given 60% rations produced on average 27% fewer drones.  This
-  study highlights the importance of flower abundance for
-  both colony growth and reproduction, regardless of how food is presented (e.g., constantly or in a pulse).  Together, these results indicate that increasing total food abundance will have the greatest, positive impact on colony fitness.
 ---
 
 # Introduction
@@ -144,17 +118,17 @@ JH and CG conceived of and designed the experiment.  JH, AF, and GW conducted th
 \clearpage
 
 \newpage
-![(a) Least square mean (LSM) estimated mass throughout the experiment and (b) Least square mean terminal brood mass.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable).  Error bars are 95% confidence intervals.  Difference of 1 interval feeding day is equal to 3 Julian days.](./fig2_mc_mass.png)
+![(a,c) Least square mean (LSM) estimated mass throughout the experiment and (b,d) Least square mean terminal brood mass.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable).  Error bars are 95% confidence intervals.  Gray bands in (c) represent pulse periods, while stippling in (a) represents same period in non-pulsed treatments).  Difference of 1 interval feeding day is equal to 3 Julian days.](./fig2_mc_mass.png)
 
 \clearpage
 
 \newpage
-![(a,c) Least square mean (LSM) estimated growth rate by time periods relative to pulses.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable) _within periods_ (x-axis), and asterisks represent growth estimates significantly different than 0.  Error bars are 95% confidence intervals. (b,d) Least square mean growth rates by treatment.  Letters indicate significant differences both within and across temporal treatments.  Error bars are 95% confidence intervals Difference of 1 interval feeding day is equal to 3 Julian days.](./fig3_mc_growth.png)
+![(a,c) Least square mean (LSM) estimated growth rate by time periods relative to pulses.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable) _within periods_ (x-axis), and asterisks represent growth estimates significantly different than 0.  Error bars are 95% confidence intervals. (b,d) Least square mean growth rates by treatment.  Letters indicate significant differences both within and across temporal treatments.  Error bars are 95% confidence intervals.  Gray bands in (c) represent pulse periods, while stippling in (a) represents same period in non-pulsed treatments).  Difference of 1 interval feeding day is equal to 3 Julian days.](./fig3_mc_growth.png)
 
 \clearpage
 
 \newpage
-![(a,c) Least square mean (LSM) estimated cumulative drone production and (b,d) Least square mean total drone production.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable).  Error bars are 95% confidence intervals.  Difference of 1 interval feeding day is equal to 3 Julian days.](./fig4_drones.png)
+![(a,c) Least square mean (LSM) estimated cumulative drone production and (b,d) Least square mean total drone production.  Letters indicate significant differences both within and across temporal treatment categories (constant and variable).  Error bars are 95% confidence intervals.  Gray bands in (c) represent pulse periods, while stippling in (a) represents same period in non-pulsed treatments).  Difference of 1 interval feeding day is equal to 3 Julian days.](./fig4_drones.png)
 
 \clearpage
 

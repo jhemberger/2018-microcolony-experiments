@@ -15,6 +15,7 @@ library(psych)
 library(nlme) #lmer can't use temporal corrleation structures
 library(car)
 library(multcompView)
+library(multcomp)
 library(lsmeans)
 library(tidyverse)
 library(rcompanion)
@@ -582,7 +583,7 @@ drone.marginal <- lsmeans(drones.lmm, ~ trt_pulse * trt_total)
 drone.cld <- cld(drone.marginal,
                  alpha = 0.05,
                  Letters = letters,
-                 adjust = "tukey")
+                 adjust = "none")
 drone.cld$treatment <- c("zone.1", 
                          "zone.4", 
                          "zone.3", 
@@ -784,22 +785,31 @@ ggplot(data = dronemass.cld,
        mapping = aes(x = treatment,
                      y = lsmean,
                      label = .group)) + 
-  geom_col(mapping = aes(fill = treatment),
-           width = 0.35,
-           alpha = 1,
-           color = "gray10") + 
+  # geom_col(mapping = aes(fill = treatment),
+  #          width = 0.35,
+  #          alpha = 1,
+  #          color = "gray10") + 
+  geom_jitter(data = mc.dronemass.all.df %>%
+                filter(!is.na(treatment)),
+             mapping = aes(x = treatment,
+                           y = avg.individ.mass,
+                           color = treatment),
+             size = 1,
+             width = 0.1,
+             inherit.aes = FALSE) + 
   geom_pointrange(mapping = aes(ymin = lower.CL,
-                                ymax = upper.CL),
-                  color = "black") + 
+                                ymax = upper.CL,
+                                color = treatment),
+                  size = 1.5) + 
   theme_microcol() + 
   theme(legend.position = "right") +
   geom_text(mapping = aes(y = upper.CL + 0.01),
              color = "black") + 
   scale_y_continuous(limits = c(0, .2),
                      expand = c(0, 0)) +
-  ylab("LS mean mass per drone") + 
+  ylab("LS mean mass per drone (grams)") + 
   xlab("Treatment") + 
-  scale_fill_manual(values = c("#9FC3EA", 
+  scale_color_manual(values = c("#9FC3EA", 
                                "#172A3A", 
                                "#E6AF2E",
                                "#F3E37C"),
@@ -808,8 +818,10 @@ ggplot(data = dronemass.cld,
                                "100% - Variable",
                                "50% - Variable"),
                     name = "Treatment") + 
-  theme(legend.justification = c(1, 1), 
-        legend.position = c(1, 1))
+  theme(legend.position = "none") + 
+  ggsave("./dronemass.eps",
+         width = 5,
+         height = 3)
 ```
 
 ### 2-way ANOVA: drone IT distance
